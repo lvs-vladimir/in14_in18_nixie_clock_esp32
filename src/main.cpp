@@ -199,15 +199,6 @@ const int PWM_RESOLUTION = 8; // Мы будем использовать то �
 const int MAX_DUTY_CYCLE = (int)(pow(2, PWM_RESOLUTION) - 1);
 const int LED_OUTPUT_PIN = BL;
 
-// int dataPin  = 11;   //Пин подключен к DS входу 74HC595
-// int latchPin = 8;  //Пин подключен к ST_CP входу 74HC595
-// int clockPin = 13;  //Пин подключен к SH_CP входу 74HC595
-
-// CS - to digital pin 10  (SS pin)
-/// * SDI - to digital pin 11 (MOSI pin)
-// * CLK - to digital pin 13 (SCK pin)
-// SPIClass SPI(VSPI);
-// SPISettings tpic6c595(10000000UL, MSBFIRST, SPI_MODE0);
 void calculateTime()
 {
   second++;
@@ -311,10 +302,6 @@ void setup()
   // pinMode(clockPin, OUTPUT);
   // pinMode(dataPin, OUTPUT);
   // SPI.begin();
-  // SPI.setDataMode(SPI_MODE3);
-  // SPI.setClockDivider(SPI_CLOCK_DIV32);
-  // SPI.setFrequency(800000); //Задаем частоту SPI 8MHz
-  // SPI.beginTransaction(settings);
   hour = 23;
   minute = 22;
   second = 00;
