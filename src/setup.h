@@ -7,13 +7,7 @@ void setup()
   log_count = 0;
   log_add('I', "System boot");
 
-  if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED)) {
-    log_add('E', "LittleFS Mount Failed");
-    Serial.println("LittleFS Mount Failed");
-    return;
-  }
-
-  LittleFS.remove("/setting.dat");
+  LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED);
   FDstat_t stat = fd.read();
   if (stat != FD_READ) {
     log_add('W', "Settings read: %d, using defaults", stat);
