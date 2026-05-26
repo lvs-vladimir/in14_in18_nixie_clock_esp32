@@ -68,9 +68,11 @@ void setup()
   NtpSyncTimer.start();
 
   if (WiFi.status() == WL_CONNECTED) {
+    log_add('I', "OWM init update");
     if (strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) getTemp2(0);
   }
   OwmUpdateTimer.start();
+  log_add('I', "Init complete, HW: %d/%d, disp=%d", hour, minute, display);
 
   pricebtc = 42345;
   priceeth = 0;

@@ -1,3 +1,21 @@
+int getSlotValue(byte slotIdx)
+{
+  byte sensorIdx = mydata.autoshow_select[slotIdx];
+  switch (sensorIdx) {
+    case 0: return (int)mydata.nrd_sens[0];
+    case 1: return (int)mydata.nrd_sens[1];
+    case 2: return (int)mydata.nrd_sens[2];
+    case 3: return (int)mydata.nrd_sens[3];
+    case 4: return (int)TempValue;
+    case 5: return (int)oppressure;
+    case 6: return (int)ophumidity;
+    case 7: return (int)pricebtc;
+    case 8: return (int)priceeth;
+    case 9: return 0;
+    default: return 0;
+  }
+}
+
 void loop()
 {
   ArduinoOTA.handle();
@@ -5,27 +23,38 @@ void loop()
   fd.tick();
 
   if (display == 0 && second >= 30 && mydata.autoshow_switch && !SwitchDisplayTimer.isRunning()) {
-    SwitchDisplayTimer.setInterval(mydata.autoshow_min * 1000UL);
-    SwitchDisplayTimer.start();
+    if (mydata.autoshow_min >= 1) {
+      SwitchDisplayTimer.setInterval(mydata.autoshow_min * 1000UL);
+      SwitchDisplayTimer.start();
+      log_add('I', "AUTOSHOW start: %d sec", mydata.autoshow_min);
+    }
   }
 
   if (SwitchDisplayTimer.isReady())
   {
+    int olddisp = display;
     display++;
     if (display > 3) display = 0;
+    if (display > mydata.autoshow_slots) display = 0;
+    log_add('D', "DISP: %d->%d slots=%d", olddisp, display, mydata.autoshow_slots);
+
     if (display > 0) {
       timeon = false;
       flip = true;
       off_effects = random(1, 6);
+      log_add('D', "OFF_EFF: %d Counter:%d", off_effects, Counter);
       if (off_effects == 2) mooveNixie.setInterval(100);
       if (off_effects == 3) mooveNixie.setInterval(20);
     }
+    if (display == 0) log_add('D', "CYCLE complete, back to time");
 
-    int num = 0, num1 = 0, num2 = 0, num3 = 0, num4 = 0, num5 = 0, num6 = 0;
-    if (display == 1) num = pricebtc;
-    if (display == 2) num = priceeth;
-    if (display == 3) num = TempValue;
-    if (display >= 1 && display <= 3) {
+    int raw_val = 0;
+    if (display >= 1 && display <= mydata.autoshow_slots) {
+      raw_val = getSlotValue(display);
+    }
+
+    int num = raw_val, num1 = 0, num2 = 0, num3 = 0, num4 = 0, num5 = 0, num6 = 0;
+    if (display >= 1 && display <= mydata.autoshow_slots) {
       num1 = num % 10; num /= 10;
       num2 = num % 10; num /= 10;
       num3 = num % 10; num /= 10;
@@ -35,6 +64,7 @@ void loop()
       newhour = (num6 * 10) + num5;
       newminute = (num2 * 10) + num1;
       newsecond = (num4 * 10) + num3;
+      log_add('D', "DATA: slot=%d sens=%d raw=%d new=%02d:%02d:%02d", display, mydata.autoshow_select[display], raw_val, newhour, newminute, newsecond);
     }
 
     switch (display) {
@@ -51,42 +81,29 @@ void loop()
           flip = false;
         }
         break;
-      case 1:
-        SwitchDisplayTimer.setInterval(mydata.autoshow_select_sec[1] * 1000UL);
-        if (pricebtc > 0) {
-          if (flip) { SetNixieBufer(); flip = false; }
-          newhour = day; newminute = month; newsecond = year;
-        } else { display++; SwitchDisplayTimer.setInterval(10); }
-        break;
-      case 2:
-        SwitchDisplayTimer.setInterval(mydata.autoshow_select_sec[2] * 1000UL);
-        if (priceeth > 0) {
+      default:
+        if (display >= 1 && display <= mydata.autoshow_slots) {
+          SwitchDisplayTimer.setInterval(mydata.autoshow_select_sec[display] * 1000UL);
           if (flip) {
-            newhour = (num6 * 10) + num5;
-            newminute = (num4 * 10) + num3;
-            newsecond = (num2 * 10) + num1;
-            SetNixieBufer(); flip = false;
+            SetNixieBufer();
+            flip = false;
           }
-        } else { display++; SwitchDisplayTimer.setInterval(10); }
-        break;
-      case 3:
-        SwitchDisplayTimer.setInterval(mydata.autoshow_select_sec[3] * 1000UL);
-        if (flip) {
-          NixieBuffer[5] = 10; NixieBuffer[4] = 10;
-          NixieBuffer[3] = newminute % 10; NixieBuffer[2] = newminute / 10;
-          NixieBuffer[1] = 10; NixieBuffer[0] = 10;
-          flip = false;
+        } else {
+          display = 0;
+          SwitchDisplayTimer.stop();
         }
         break;
     }
 
     if (oldminute != minute) {
+      int oldfx = effects;
       switch (mydata.anim_change) {
         case 0: effects++; if (effects > 2) effects = 0; break;
         case 1: effects = 0; break;
         case 2: effects = 1; break;
         case 3: effects = 2; break;
       }
+      if (effects != oldfx) log_add('D', "EFF: %d->%d (mode=%d)", oldfx, effects, mydata.anim_change);
       oldminute = minute;
     }
   }
@@ -105,13 +122,22 @@ void loop()
   UpdateDisplay();
   switch_effects();
 
-  if (timer1) { calculateTime(); timer1 = false; }
+  if (timer1) {
+    calculateTime();
+    timer1 = false;
+    if (second % 10 == 0) log_add('T', "TIM: %02d:%02d:%02d disp=%d to=%d fx=%d off=%d on=%d C=%d",
+      hour, minute, second, display, timeon, effects, off_effects, on_effects, Counter);
+  }
 
   if (SensorSelectTimer.isReady()) {
     SensorsAutoShowSelect2 = "";
     for (byte k = 0; k <= 13; k++) SensorsAutoShowSelect2 += SensorsAutoShow[k];
   }
 
-  if (NtpSyncTimer.isReady() && WiFi.status() == WL_CONNECTED) NTPClientUpdate();
-  if (OwmUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) getTemp2(0);
+  if (NtpSyncTimer.isReady() && WiFi.status() == WL_CONNECTED) {
+    log_add('I', "NTP sync"); NTPClientUpdate();
+  }
+  if (OwmUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) {
+    log_add('I', "OWM update"); getTemp2(0);
+  }
 }
