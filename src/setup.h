@@ -35,6 +35,19 @@ void setup()
     mydata.autoshow_select[3] = 7;
   }
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
+  if (!mydata.seconds_switch) mydata.seconds_switch = true;
+  if (mydata.autoshow_slots > 0 && (mydata.autoshow_select[1] < 5 || mydata.autoshow_select[1] > 13)) {
+    log_add('W', "Slot1 invalid (%d), reset to temp", mydata.autoshow_select[1]);
+    mydata.autoshow_select[1] = 5;
+  }
+  if (mydata.autoshow_slots > 1 && (mydata.autoshow_select[2] < 5 || mydata.autoshow_select[2] > 13)) {
+    log_add('W', "Slot2 invalid (%d), reset to pressure", mydata.autoshow_select[2]);
+    mydata.autoshow_select[2] = 6;
+  }
+  if (mydata.autoshow_slots > 2 && (mydata.autoshow_select[3] < 5 || mydata.autoshow_select[3] > 13)) {
+    log_add('W', "Slot3 invalid (%d), reset to humidity", mydata.autoshow_select[3]);
+    mydata.autoshow_select[3] = 7;
+  }
 
   log_add('I', "SSID: %s", mydata.ssid);
 
