@@ -37,8 +37,11 @@ void loop()
   {
     int olddisp = display;
     display++;
-    if (display > 3) display = 0;
-    if (display > mydata.autoshow_slots) display = 0;
+    int maxdisp = (mydata.autoshow_slots > 0) ? mydata.autoshow_slots : 3;
+    if (display > maxdisp) {
+      display = 0;
+      SwitchDisplayTimer.stop();
+    }
     log_add('D', "DISP: %d->%d slots=%d", olddisp, display, mydata.autoshow_slots);
 
     if (display > 0) {
@@ -74,6 +77,7 @@ void loop()
     switch (display) {
       case 0:
         SwitchDisplayTimer.setInterval(mydata.autoshow_min * 1000UL);
+        SwitchDisplayTimer.reset();
         if (timeon) {
           newhour = hour; newminute = minute; newsecond = second;
           SetNixieBufer();
