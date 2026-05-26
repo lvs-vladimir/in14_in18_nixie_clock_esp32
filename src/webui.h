@@ -59,9 +59,6 @@ void build() {
     GP.BLOCK_THIN_BEGIN();
     M_BOX(GP_LEFT, GP.LABEL(SETTING_LANGUAGE[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("lng", SETTING_LANGUAGE_ARRAY, mydata.lng, 0, 0, 1);); GP.BREAK(););
     M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("seconds_switch", mydata.seconds_switch, GP_BLUE);););
-    GP.BREAK();
-    M_BOX(GP_LEFT, GP.LABEL(DISPLAY_DOTS_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("animations_dots", DISPLAY_DOTS_ANIMATIONS[mydata.lng], mydata.animdots, 0, 0, 1);););
-    M_BOX(GP_LEFT, GP.LABEL("Случ. анимация точек:"); M_BOX(GP_RIGHT, GP.SWITCH("random_dots_switch", mydata.dots_switch, GP_BLUE);););
     GP.BLOCK_END();
 
     GP.BUTTON_MINI("rst", SETTING_RESTART_BTN[mydata.lng], "", GP_BLUE, "", 0, 1);
@@ -146,9 +143,6 @@ void build() {
     GP.BREAK();
     M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_change", SETTING_ANIM_ARRAY[mydata.lng], mydata.anim_change, 0, 0, 1);););
     GP.HR();
-    M_BOX(GP_LEFT, GP.LABEL(DISPLAY_DOTS_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("animations_dots", DISPLAY_DOTS_ANIMATIONS[mydata.lng], mydata.animdots, 0, 0, 1);););
-    M_BOX(GP_LEFT, GP.LABEL(DISPLAY_DOTS_RANDOM_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("random_dots_switch", mydata.dots_switch, GP_BLUE);););
-    GP.HR();
     M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("seconds_switch", mydata.seconds_switch, GP_BLUE);););
     GP.HR();
     GP.BLOCK_END();
@@ -210,11 +204,8 @@ void action(GyverPortal & p) {
     if (ui.click("lng")) {
       mydata.lng = ui.getInt("lng");
     }
-    if (ui.clickInt("animations_dots", mydata.animdots)) {}
-    if (ui.clickInt("random_dots_switch", mydata.dots_switch)) {}
     if (ui.clickInt("seconds_switch", mydata.seconds_switch)) {};
     if (ui.clickInt("auto_show_switch", mydata.autoshow_switch));
-    if (ui.clickInt("random_autoshow_switch", mydata.random_autoshow_switch)) {}
     if (ui.clickInt("anim_change", mydata.anim_change));
     if (ui.clickInt("autoshow_sec", mydata.autoshow_min));
     for (byte i = 0; i < mydata.autoshow_slots; i++) {
