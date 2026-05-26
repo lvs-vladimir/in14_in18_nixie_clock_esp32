@@ -1,6 +1,10 @@
 int getSlotValue(byte slotIdx)
 {
-  byte sensorIdx = mydata.autoshow_select[slotIdx];
+  byte dropdownIdx = mydata.autoshow_select[slotIdx];
+  if (dropdownIdx == 0) return 0;
+  int sensorIdx = dropdownIdx - 1;
+  if (sensorIdx > 13) return 0;
+  log_add('D', "GETVAL slot=%d dropdown=%d sensor=%d", slotIdx, dropdownIdx, sensorIdx);
   switch (sensorIdx) {
     case 0: return (int)mydata.nrd_sens[0];
     case 1: return (int)mydata.nrd_sens[1];
@@ -11,7 +15,6 @@ int getSlotValue(byte slotIdx)
     case 6: return (int)ophumidity;
     case 7: return (int)pricebtc;
     case 8: return (int)priceeth;
-    case 9: return 0;
     default: return 0;
   }
 }

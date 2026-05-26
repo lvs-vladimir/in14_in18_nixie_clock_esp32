@@ -30,9 +30,9 @@ void setup()
     for (byte i = 0; i < 7; i++) mydata.autoshow_select_sec[i] = 10;
     mydata.autoshow_select_sec[0] = 0;
     mydata.autoshow_switch = true;
-    mydata.autoshow_select[1] = 4;
-    mydata.autoshow_select[2] = 5;
-    mydata.autoshow_select[3] = 6;
+    mydata.autoshow_select[1] = 5;
+    mydata.autoshow_select[2] = 6;
+    mydata.autoshow_select[3] = 7;
   }
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
 
