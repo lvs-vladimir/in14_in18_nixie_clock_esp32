@@ -10,11 +10,61 @@
 #include <FileData.h>
 #include <GyverPortal.h>
 #include <MD5.h>
-// #include <Wire.h>
+#include <Arduino_JSON.h>
+#include <stdarg.h>
 #include "SPI.h"
 #include "timer2Minim.h"
 #include "Freenove_WS2812_Lib_for_ESP32.h"
 #include "Adafruit_VEML7700.h"
+
+#define FORMAT_LITTLEFS_IF_FAILED true
+
+struct Data {
+  char ssid[40];
+  char pass[20];
+  char owMapApiKey[60];
+  char owCity[40];
+  char NTPserver[40];
+  char NarodmoonApi[20];
+  char NarodmoonApiMD5[40];
+  char NarodmoonID[10];
+  byte lng;
+  byte animdots;
+  int GMT;
+  boolean dots_switch, seconds_switch;
+  byte nrd_sens[5];
+  byte nrd_type_sensor[6];
+};
+Data mydata;
+FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
+GyverPortal ui(&LittleFS);
+
+#define LOG_ENTRIES 64
+#define LOG_LINE_LEN 80
+struct LogEntry {
+  uint32_t time;
+  char level;
+  char msg[LOG_LINE_LEN];
+};
+LogEntry log_entries[LOG_ENTRIES];
+byte log_write_idx = 0;
+byte log_count = 0;
+
+void log_add(char level, const char* fmt, ...) {
+  char buf[LOG_LINE_LEN];
+  va_list args;
+  va_start(args, fmt);
+  vsnprintf(buf, LOG_LINE_LEN, fmt, args);
+  va_end(args);
+  uint32_t now = millis();
+  log_entries[log_write_idx].time = now;
+  log_entries[log_write_idx].level = level;
+  strncpy(log_entries[log_write_idx].msg, buf, LOG_LINE_LEN - 1);
+  log_entries[log_write_idx].msg[LOG_LINE_LEN - 1] = 0;
+  log_write_idx = (log_write_idx + 1) % LOG_ENTRIES;
+  if (log_count < LOG_ENTRIES) log_count++;
+  Serial.printf("[%lu] %c: %s\n", now, level, buf);
+}
 
 //#define IN_14
 #define IN_18
@@ -174,3 +224,16 @@ uint16_t vemllux;
 uint8_t prev_brigh_value=255;
 
 unsigned long previousMillis;
+
+String SensorsAutoShow[20];
+String SensorsDisplay[20];
+String SensorsAutoShowSelect2;
+String WiFI_List;
+char textbuffer[7] = "";
+char buffer[7] = "";
+byte scan_list_idx;
+
+int optemperature, oppressure, ophumidity;
+int narodtemperature, narodpressure, narodhumidity;
+bool ap_show_scroll = false;
+bool wifi_dc_state = false;

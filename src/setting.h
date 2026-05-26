@@ -26,23 +26,25 @@ void TimeUpdate() {
 
 //обновляем часовой пояс 
 void NTPClientUpdate() {
-  timeClient.setPoolServerName("pool.ntp.org");
-  timeClient.setTimeOffset(3600 * 7);
+  timeClient.setPoolServerName(mydata.NTPserver);
+  timeClient.setTimeOffset(3600 * mydata.GMT);
   TimeUpdate();
 }
 
-bool initWiFi() { //Функция инициализации wifi
+bool initWiFi() {
+  if (mydata.ssid[0] == '\0') {
+    Serial.println("SSID not defined");
+    return false;
+  }
   char HOSTNAME[30];
   sprintf_P(HOSTNAME, (PGM_P)F("%S-%llX"), YOUR_HOSTNAME, ESP.getEfuseMac());
-  WiFi.setHostname(HOSTNAME); // Задаем имя хоста + мак ESP
+  WiFi.setHostname(HOSTNAME);
   WiFi.mode(WIFI_STA);
-
-  WiFi.begin("WAY", "lukjanow");
-  
+  WiFi.setAutoReconnect(true);
+  WiFi.begin(mydata.ssid, mydata.pass);
   Serial.println("Подключаемся к WiFi...");
   unsigned long currentMillis = millis();
   previousMillis = currentMillis;
-  //Если в течении 10сек нет подключения к вайфай создаем точку доступа
   while (WiFi.status() != WL_CONNECTED) {
     currentMillis = millis();
     if (currentMillis - previousMillis >= 10000) {
@@ -54,36 +56,28 @@ bool initWiFi() { //Функция инициализации wifi
   return true;
 }
 
-//Инициализация WiFI
 void WiFiConnect_APcreate() {
   if (initWiFi()) {
     Serial.println("WiFi успешно подключен");
-    //подключаемся к сервисам
-    //ConnectionToServices();
+    ap_show_scroll = false;
   } else {
-    // запускаем точку доступа если нет подключения
     char HOSTNAME[30];
     sprintf_P(HOSTNAME, (PGM_P)F("%S-%llX"), "IN18-AP", ESP.getEfuseMac());
+    log_add('W', "WiFi not connected, creating AP");
     Serial.println("WiFi не подключен, создаем точку");
     WiFi.mode(WIFI_AP);
     WiFi.softAP(HOSTNAME);
     IPAddress IP = WiFi.softAPIP();
     Serial.print("AP IP address: ");
     Serial.println(IP);
-    //timerTIME.stop();
-    //mydata.display=4;
-
-    //bufferer=text2.c_str();
-    //text2.toCharArray(bufferer, sizeof(text2));
-    //sprintf_P(textbuffer, (PGM_P)F("%S"), lost.c_str());//Заносим в буфер
-
-    //Serial.println(lost.length());
   }
 }
  //Обновление по воздуху   
 void OtaUpdate() {
  
-  ArduinoOTA.setHostname("ESP32");
+  char otaHostname[30];
+  sprintf_P(otaHostname, (PGM_P)F("%S"), YOUR_HOSTNAME);
+  ArduinoOTA.setHostname(otaHostname);
   ArduinoOTA.onStart([]() {
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH)

@@ -1,6 +1,8 @@
 void loop()
 {
-  ArduinoOTA.handle(); // Обновление по воздуху
+  ArduinoOTA.handle();
+  ui.tick();
+  fd.tick();
 
   if (SwitchDisplayTimer.isReady())
   {
