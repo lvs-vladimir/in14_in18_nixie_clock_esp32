@@ -7,7 +7,7 @@ void build() {
   GP.HR();
   GP.PAGE_TITLE(PAGE_TITLE[mydata.lng]);
   GP.HR();
-  GP.UPDATE("btc,eth,lux,optemp,ophum,oppres,lg");
+  GP.UPDATE("btc,eth,usdrub,lux,optemp,ophum,oppres,sens0,sens1,sens2,sens3,lg");
   GP.NAV_TABS_LINKS("/,/setting,/info,/firmware,/log", TAB_LINKS_NAMES[mydata.lng], GP_BLUE);
 
   if (ui.uri("/setting")) {
@@ -99,6 +99,7 @@ void build() {
     GP.HR();
     M_BOX(GP_LEFT, GP.LABEL("BTC:"); GP.LABEL(" ", "btc"); GP.LABEL("$"); GP.BREAK(););
     M_BOX(GP_LEFT, GP.LABEL("ETH:"); GP.LABEL(" ", "eth"); GP.LABEL("$"); GP.BREAK(););
+    M_BOX(GP_LEFT, GP.LABEL("USD/RUB:"); GP.LABEL(" ", "usdrub"); GP.BREAK(););
     GP.BLOCK_END();
 
     GP.BLOCK_THIN_BEGIN();
@@ -116,6 +117,41 @@ void build() {
       M_BOX(GP_LEFT, GP.LABEL("Pressure:"); GP.LABEL(" ", "oppres"); GP.LABEL("hPa"); GP.BREAK(););
       GP.BLOCK_END();
     }
+
+    GP.BLOCK_THIN_BEGIN();
+    M_BOX(GP_CENTER, GP.LABEL(DISPLAY_DATA_LABEL[mydata.lng]););
+    GP.HR();
+    M_BOX(GP_LEFT, GP.LABEL(DISPLAY_DATA_SHOW_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("auto_show_switch", mydata.autoshow_switch, GP_BLUE); GP.SPINNER("autoshow_sec", mydata.autoshow_min, 5, 255, 1, 0, GP_BLUE, "50px", 0);););
+    GP.BREAK();
+    for (byte i = 0; i < mydata.autoshow_slots; i++) {
+      char buf[20];
+      snprintf(buf, sizeof(buf), "%d:", i + 1);
+      M_BOX(GP_LEFT,
+        GP.LABEL(buf);
+        snprintf(buf, sizeof(buf), "sa%d", i);
+        GP.SELECT(buf, SensorsAutoShowSelect2, mydata.autoshow_select[i], 0, 0, 1);
+        M_BOX(GP_RIGHT,
+          snprintf(buf, sizeof(buf), "se%d", i);
+          GP.SPINNER(buf, mydata.autoshow_select_sec[i + 1], 0, 30, 1, 0, GP_BLUE, "50px", 0);
+          snprintf(buf, sizeof(buf), "rm%d", i);
+          GP.BUTTON_MINI(buf, "X", "", GP_RED, "20px", 0, 1);
+        );
+      );
+      GP.BREAK();
+    }
+    if (mydata.autoshow_slots < 6) {
+      GP.BUTTON_MINI("add_slot", "+ Add", "", GP_BLUE, "80px", 0, 1);
+      GP.BREAK();
+    }
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_change", SETTING_ANIM_ARRAY[mydata.lng], mydata.anim_change, 0, 0, 1);););
+    GP.HR();
+    M_BOX(GP_LEFT, GP.LABEL(DISPLAY_DOTS_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("animations_dots", DISPLAY_DOTS_ANIMATIONS[mydata.lng], mydata.animdots, 0, 0, 1);););
+    M_BOX(GP_LEFT, GP.LABEL(DISPLAY_DOTS_RANDOM_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("random_dots_switch", mydata.dots_switch, GP_BLUE);););
+    GP.HR();
+    M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("seconds_switch", mydata.seconds_switch, GP_BLUE);););
+    GP.HR();
+    GP.BLOCK_END();
   }
   GP.BUILD_END();
 }
@@ -177,15 +213,45 @@ void action(GyverPortal & p) {
     if (ui.clickInt("animations_dots", mydata.animdots)) {}
     if (ui.clickInt("random_dots_switch", mydata.dots_switch)) {}
     if (ui.clickInt("seconds_switch", mydata.seconds_switch)) {};
+    if (ui.clickInt("auto_show_switch", mydata.autoshow_switch));
+    if (ui.clickInt("random_autoshow_switch", mydata.random_autoshow_switch)) {}
+    if (ui.clickInt("anim_change", mydata.anim_change));
+    if (ui.clickInt("autoshow_sec", mydata.autoshow_min));
+    for (byte i = 0; i < mydata.autoshow_slots; i++) {
+      char buf[16];
+      snprintf(buf, sizeof(buf), "sa%d", i);
+      if (ui.click(buf)) mydata.autoshow_select[i] = ui.getInt(buf);
+      snprintf(buf, sizeof(buf), "se%d", i);
+      if (ui.click(buf)) mydata.autoshow_select_sec[i + 1] = ui.getInt(buf);
+      snprintf(buf, sizeof(buf), "rm%d", i);
+      if (ui.click(buf)) {
+        for (byte j = i; j < mydata.autoshow_slots - 1; j++) {
+          mydata.autoshow_select[j] = mydata.autoshow_select[j + 1];
+          mydata.autoshow_select_sec[j + 1] = mydata.autoshow_select_sec[j + 2];
+        }
+        mydata.autoshow_slots--;
+      }
+    }
+    if (ui.click("add_slot") && mydata.autoshow_slots < 6) {
+      mydata.autoshow_slots++;
+      mydata.autoshow_select[mydata.autoshow_slots - 1] = 0;
+      mydata.autoshow_select_sec[mydata.autoshow_slots] = 10;
+    }
     fd.updateNow();
   }
   if (ui.update()) {
     if (ui.update("lg")) ui.answer(mydata.ssid);
+    if (ui.update("lg")) ui.answer(mydata.ssid);
     if (ui.update("btc")) ui.answer(pricebtc);
     if (ui.update("eth")) ui.answer(priceeth);
+    if (ui.update("usdrub")) ui.answer(usdRubRate);
     if (ui.update("lux")) ui.answer(vemllux);
     if (ui.update("optemp")) ui.answer(optemperature);
     if (ui.update("ophum")) ui.answer(ophumidity);
     if (ui.update("oppres")) ui.answer(oppressure);
+    if (ui.update("sens0")) ui.answer(SensorsDisplay[0]);
+    if (ui.update("sens1")) ui.answer(SensorsDisplay[1]);
+    if (ui.update("sens2")) ui.answer(SensorsDisplay[2]);
+    if (ui.update("sens3")) ui.answer(SensorsDisplay[3]);
   }
 }

@@ -31,9 +31,11 @@ struct Data {
   byte lng;
   byte animdots;
   int GMT;
-  boolean dots_switch, seconds_switch;
+  boolean dots_switch, seconds_switch, autoshow_switch, random_autoshow_switch;
   byte nrd_sens[5];
   byte nrd_type_sensor[6];
+  byte autoshow_min, autoshow_slots, autoshow_select[6], autoshow_select_sec[7];
+  byte anim_change;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
@@ -112,6 +114,7 @@ timerMinim SwitchDisplayTimer(40);
 timerMinim ChangeCathodeTimer(60);
 timerMinim ChangeCathodeTimerEffects(20);
 timerMinim WS2812(10);
+timerMinim SensorSelectTimer(3000);
 
 // Определение NTP-клиента для получения времени
 WiFiUDP ntpUDP;
@@ -234,6 +237,7 @@ char buffer[7] = "";
 byte scan_list_idx;
 
 int optemperature, oppressure, ophumidity;
+int usdRubRate;
 int narodtemperature, narodpressure, narodhumidity;
 bool ap_show_scroll = false;
 bool wifi_dc_state = false;

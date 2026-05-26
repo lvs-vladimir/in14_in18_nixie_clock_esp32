@@ -38,6 +38,11 @@ void setup()
     mydata.animdots = 0;
     mydata.dots_switch = true;
     mydata.seconds_switch = true;
+    mydata.autoshow_slots = 3;
+    mydata.autoshow_min = 10;
+    for (byte i = 0; i < 7; i++) mydata.autoshow_select_sec[i] = 10;
+    mydata.autoshow_select_sec[0] = 0;
+    mydata.autoshow_switch = true;
     fd.read();
   }
 

@@ -172,21 +172,17 @@ switch_effects();
      calculateTime();
      timer1=false;
   }
- if (SecondTimer.isReady())
+  if (SecondTimer.isReady())
   {
-   
-   // calculateTime();
     DotTimer.reset();
-    // Serial.println(second);
-    // Serial.println(old_second);
-    // vemlvalue = veml.readLux();
-    // Serial.print(" lux: "); Serial.println(vemlvalue);
-    // if (vemlvalue>1024) vemlvalue = 1024;
-    /// vemlvalue = map(vemlvalue, 0, 1024, 200, 0);
-    // bmelvalue = bme.readTemperature();
-    // Serial.print("Temp C*: "); Serial.print(bmelvalue);
-    //  Serial.print(" lux: "); Serial.println(vemlvalue);
-    // Serial.print(" vemlvalue: "); Serial.println(vemlvalue);
   }
 
+  if (SensorSelectTimer.isReady()) {
+    SensorsAutoShowSelect2 = "";
+    byte k = 0;
+    while (k <= 13) {
+      SensorsAutoShowSelect2 += SensorsAutoShow[k];
+      k++;
+    }
+  }
 }
