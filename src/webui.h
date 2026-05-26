@@ -7,7 +7,7 @@ void build() {
   GP.HR();
   GP.PAGE_TITLE(PAGE_TITLE[mydata.lng]);
   GP.HR();
-  GP.UPDATE("btc,eth,usdrub,lux,optemp,ophum,oppres,sens0,sens1,sens2,sens3,lg");
+  GP.UPDATE("btc,eth,usdrub,lux,optemp,ophum,oppres,sens0,sens1,sens2,sens3");
   GP.NAV_TABS_LINKS("/,/setting,/info,/firmware,/log", TAB_LINKS_NAMES[mydata.lng], GP_BLUE);
 
   if (ui.uri("/setting")) {
@@ -231,7 +231,6 @@ void action(GyverPortal & p) {
     fd.updateNow();
   }
   if (ui.update()) {
-    if (ui.update("lg")) ui.answer(mydata.ssid);
     if (ui.update("lg")) ui.answer(mydata.ssid);
     if (ui.update("btc")) ui.answer(pricebtc);
     if (ui.update("eth")) ui.answer(priceeth);
