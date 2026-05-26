@@ -44,6 +44,7 @@ void loop()
     if (display > 0) {
       timeon = false;
       flip = true;
+      Counter = 5;
       off_effects = random(1, 6);
       log_add('D', "OFF_EFF: %d Counter:%d", off_effects, Counter);
       if (off_effects == 2) mooveNixie.setInterval(100);
