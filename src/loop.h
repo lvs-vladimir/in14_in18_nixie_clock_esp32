@@ -4,6 +4,11 @@ void loop()
   ui.tick();
   fd.tick();
 
+  if (display == 0 && second >= 30 && mydata.autoshow_switch && !SwitchDisplayTimer.isRunning()) {
+    SwitchDisplayTimer.setInterval(mydata.autoshow_min * 1000UL);
+    SwitchDisplayTimer.start();
+  }
+
   if (SwitchDisplayTimer.isReady())
   {
     display++;
@@ -35,10 +40,6 @@ void loop()
     switch (display) {
       case 0:
         SwitchDisplayTimer.setInterval(mydata.autoshow_min * 1000UL);
-        if (second >= 30 && mydata.autoshow_switch) {
-          SwitchDisplayTimer.setInterval(mydata.autoshow_min * 1000UL);
-          SwitchDisplayTimer.start();
-        }
         if (timeon) {
           newhour = hour; newminute = minute; newsecond = second;
           SetNixieBufer();

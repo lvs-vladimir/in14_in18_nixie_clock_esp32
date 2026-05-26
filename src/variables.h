@@ -41,7 +41,7 @@ Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
 GyverPortal ui(&LittleFS);
 
-#define LOG_ENTRIES 64
+#define LOG_ENTRIES 200
 #define LOG_LINE_LEN 80
 struct LogEntry {
   uint32_t time;
