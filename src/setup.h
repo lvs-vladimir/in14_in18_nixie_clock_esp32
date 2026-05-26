@@ -13,38 +13,29 @@ void setup()
     return;
   }
 
-  bool need_defaults = false;
-  File file = LittleFS.open("/setting.dat");
-  if (!file) {
-    log_add('W', "No settings file, applying defaults");
-    Serial.println("No settings file, applying defaults");
-    need_defaults = true;
+  LittleFS.remove("/setting.dat");
+  FDstat_t stat = fd.read();
+  if (stat != FD_READ) {
+    log_add('W', "Settings read: %d, using defaults", stat);
+    Serial.println("Using default settings");
   } else {
-    file.close();
-    FDstat_t stat = fd.read();
-    if (stat == FD_READ) {
-      log_add('I', "Settings loaded OK");
-      Serial.println("Settings loaded OK");
-    } else {
-      log_add('W', "Settings read: %d, applying defaults", stat);
-      need_defaults = true;
-    }
+    log_add('I', "Settings read OK");
+    Serial.println("Settings read OK");
   }
-  if (need_defaults) {
-    memset(&mydata, 0, sizeof(mydata));
-    strcpy(mydata.NTPserver, "pool.ntp.org");
-    mydata.GMT = 7;
-    mydata.lng = 0;
-    mydata.animdots = 0;
-    mydata.dots_switch = true;
-    mydata.seconds_switch = true;
+  if (mydata.ssid[0] == '\0') {
+    strcpy(mydata.ssid, "WAY");
+    strcpy(mydata.pass, "lukjanow");
+  }
+  if (mydata.NTPserver[0] == '\0') strcpy(mydata.NTPserver, "pool.ntp.org");
+  if (mydata.GMT == 0) mydata.GMT = 7;
+  if (mydata.autoshow_slots == 0) {
     mydata.autoshow_slots = 3;
     mydata.autoshow_min = 10;
     for (byte i = 0; i < 7; i++) mydata.autoshow_select_sec[i] = 10;
     mydata.autoshow_select_sec[0] = 0;
     mydata.autoshow_switch = true;
-    fd.read();
   }
+  log_add('I', "SSID: %s", mydata.ssid);
 
   WiFiConnect_APcreate();
   OtaUpdate();
