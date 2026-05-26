@@ -14,7 +14,6 @@ void loop()
       off_effects = random(1, 6);
       if (off_effects == 2) mooveNixie.setInterval(100);
       if (off_effects == 3) mooveNixie.setInterval(20);
-      Serial.println(off_effects);
     }
     SwitchDisplayTimer.setInterval(4000);
 
@@ -63,9 +62,7 @@ void loop()
     {
       case 0:
         if (second >= 30 && mydata.autoshow_switch) SwitchDisplayTimer.start();
-
-        if (timeon)
-        {
+        if (timeon) {
           newhour = hour;
           newminute = minute;
           newsecond = second;
@@ -73,8 +70,7 @@ void loop()
           on_effects = 0;
           Counter = 6;
         }
-        if (flip)
-        {
+        if (flip) {
           newhour = hour;
           newminute = minute;
           newsecond = second;
@@ -82,42 +78,27 @@ void loop()
           flip = false;
         }
         break;
-
       case 1:
-        if (pricebtc > 0)
-        {
-          if (flip)
-          {
-            newhour = day;
-            newminute = month;
-            newsecond = year;
-            SetNixieBufer();
-            flip = false;
-          }
-        }
-        else
-          display++;
+        if (pricebtc > 0) {
+          if (flip) { SetNixieBufer(); flip = false; }
+          newhour = day;
+          newminute = month;
+          newsecond = year;
+        } else display++;
         break;
-
       case 2:
-        if (priceeth > 0)
-        {
-          if (flip)
-          {
+        if (priceeth > 0) {
+          if (flip) {
             newhour = (num6 * 10) + num5;
             newminute = (num4 * 10) + num3;
             newsecond = (num2 * 10) + num1;
             SetNixieBufer();
             flip = false;
           }
-        }
-        else
-          display++;
+        } else display++;
         break;
-
       case 3:
-        if (flip)
-        {
+        if (flip) {
           NixieBuffer[5] = 10;
           NixieBuffer[4] = 10;
           NixieBuffer[3] = newminute % 10;
@@ -128,26 +109,23 @@ void loop()
         }
         break;
     }
-
-    switch (effects)
-    {
-      case 0:
-        if (display == 0 && timeon) SetNixie();
-        else UpdateDisplay();
-        break;
-      case 1:
-        if (display == 0 && timeon) SwitchNumbers();
-        UpdateDisplay();
-        break;
-      case 2:
-        if (display == 0 && timeon) CrossFade();
-        else UpdateDisplay();
-        break;
-    }
-
-    switch_effects();
-
   }
+
+  switch (effects)
+  {
+    case 0:
+      if (display == 0 && timeon) SetNixie();
+      break;
+    case 1:
+      if (display == 0 && timeon) SwitchNumbers();
+      break;
+    case 2:
+      if (display == 0 && timeon) CrossFade();
+      break;
+  }
+  UpdateDisplay();
+
+  switch_effects();
 
   if (timer1){
     calculateTime();

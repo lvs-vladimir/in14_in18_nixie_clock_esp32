@@ -190,7 +190,7 @@ void action(GyverPortal & p) {
     if (ui.clickInt("sens2_narod", mydata.nrd_sens[2]));
     if (ui.click("WiFi_List_Select")) {
       ui.copyInt("WiFi_List_Select", scan_list_idx);
-      sprintf_P(mydata.ssid, (PGM_P)F("%S"), GPlistIdx(WiFI_List, scan_list_idx).c_str());
+      strcpy(mydata.ssid, GPlistIdx(WiFI_List, scan_list_idx).c_str());
     }
     if (ui.click("type_sensor0")) mydata.nrd_type_sensor[0] = ui.getInt("type_sensor0");
     if (ui.click("type_sensor1")) mydata.nrd_type_sensor[1] = ui.getInt("type_sensor1");
