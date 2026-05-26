@@ -2,6 +2,8 @@ void setup()
 {
   init_timers();
   Serial.begin(115200);
+  NtpSyncTimer.stop();
+  OwmUpdateTimer.stop();
   memset(log_entries, 0, sizeof(log_entries));
   log_write_idx = 0;
   log_count = 0;
@@ -63,6 +65,12 @@ void setup()
   oldminute = minute;
 
   NTPClientUpdate();
+  NtpSyncTimer.start();
+
+  if (WiFi.status() == WL_CONNECTED) {
+    if (strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) getTemp2(0);
+  }
+  OwmUpdateTimer.start();
 
   pricebtc = 42345;
   priceeth = 0;

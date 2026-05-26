@@ -140,4 +140,12 @@ void loop()
       k++;
     }
   }
+
+  if (NtpSyncTimer.isReady()) {
+    if (WiFi.status() == WL_CONNECTED) NTPClientUpdate();
+  }
+
+  if (OwmUpdateTimer.isReady()) {
+    if (WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) getTemp2(0);
+  }
 }
