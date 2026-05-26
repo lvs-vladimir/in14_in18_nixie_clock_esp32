@@ -89,8 +89,17 @@ void flip_nixiebuffer()
 {
   if (display == 0) {
     newhour = hour; newminute = minute; newsecond = second;
+    SetNixieBufer();
+    return;
   }
-  SetNixieBufer();
+  byte si = mydata.autoshow_select[display] - 1;
+  if (si == 4) {
+    NixieBuffer[5] = 10; NixieBuffer[4] = 10;
+    NixieBuffer[3] = newminute % 10; NixieBuffer[2] = newminute / 10;
+    NixieBuffer[1] = 10; NixieBuffer[0] = 10;
+  } else {
+    SetNixieBufer();
+  }
 }
 
 void switch_effects(){

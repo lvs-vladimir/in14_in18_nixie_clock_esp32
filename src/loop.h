@@ -88,7 +88,7 @@ void loop()
         if (display >= 1 && display <= mydata.autoshow_slots) {
           SwitchDisplayTimer.setInterval(mydata.autoshow_select_sec[display] * 1000UL);
           if (flip) {
-            SetNixieBufer();
+            flip_nixiebuffer();
             flip = false;
           }
         } else {
