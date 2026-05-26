@@ -228,6 +228,7 @@ void switch_effects(){
       if (off_effects > 0) log_add('A', "OFF_DONE off=%d", off_effects);
       off_effects = 0;
       flip_switch = true;
+      flip = true;
       log_add('A', "FLIPBUF call display=%d", display);
       flip_nixiebuffer();
       on_effects = random(1, 6);

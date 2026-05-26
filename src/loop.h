@@ -78,6 +78,11 @@ void loop()
           newhour = hour; newminute = minute; newsecond = second;
           SetNixieBufer();
           on_effects = 0; Counter = 6;
+        } else {
+          timeon = true; flip = true;
+          newhour = hour; newminute = minute; newsecond = second;
+          SetNixieBufer();
+          on_effects = 0; Counter = 6;
         }
         if (flip) {
           newhour = hour; newminute = minute; newsecond = second;
