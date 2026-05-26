@@ -94,6 +94,7 @@ void flip_nixiebuffer()
 }
 
 void switch_effects(){
+  static int timeon_log = 0;
   if (mooveNixie.isReady())
   {
     if (off_effects == 1) {
@@ -164,7 +165,7 @@ void switch_effects(){
       flip_switch = true;
       on_effects = 0;
       timeon = (display == 0);
-      if (display == 0) log_add('D', "TIMEON=1 display=0");
+      if (display == 0 && ++timeon_log % 100 == 0) log_add('T', "TIMEON disp=0");
     }
   }
 }
