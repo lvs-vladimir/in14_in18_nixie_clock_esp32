@@ -35,6 +35,8 @@ void setup()
     mydata.autoshow_select_sec[0] = 0;
     mydata.autoshow_switch = true;
   }
+  if (!mydata.seconds_switch) mydata.seconds_switch = true;
+
   log_add('I', "SSID: %s", mydata.ssid);
 
   WiFiConnect_APcreate();

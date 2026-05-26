@@ -166,6 +166,13 @@ void UpdateDisplay()
   bufer[1] = masshv5522[Nixie[1]];
   bufer[0] = masshv5522[Nixie[0]];
 
+  #ifdef IN_18
+  if (display == 0 && timeon && !mydata.seconds_switch) {
+    bufer[5] = 0;
+    bufer[4] = 0;
+  }
+  #endif
+
   #ifdef IN_14
   if (display == 0 && timeon) {
     if (DotTimer.isReady()) {

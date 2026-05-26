@@ -25,27 +25,29 @@ void loop()
       SwitchDisplayTimer.setInterval(40);
     }
 
-    int num, num1, num2, num3, num4, num5, num6;
+    int num=0, num1=0, num2=0, num3=0, num4=0, num5=0, num6=0;
 
     if (display == 1) num = pricebtc;
     if (display == 2) num = priceeth;
     if (display == 3) num = TempValue;
 
-    num1 = num % 10;
-    num /= 10;
-    num2 = num % 10;
-    num /= 10;
-    num3 = num % 10;
-    num /= 10;
-    num4 = num % 10;
-    num /= 10;
-    num5 = num % 10;
-    num /= 10;
-    num6 = num % 10;
+    if (display >= 1 && display <= 3) {
+      num1 = num % 10;
+      num /= 10;
+      num2 = num % 10;
+      num /= 10;
+      num3 = num % 10;
+      num /= 10;
+      num4 = num % 10;
+      num /= 10;
+      num5 = num % 10;
+      num /= 10;
+      num6 = num % 10;
 
-    newhour = (num6 * 10) + num5;
-    newminute = (num2 * 10) + num1;
-    newsecond = (num4 * 10) + num3;
+      newhour = (num6 * 10) + num5;
+      newminute = (num2 * 10) + num1;
+      newsecond = (num4 * 10) + num3;
+    }
 
     if (oldminute != minute) {
       switch (mydata.anim_change) {
@@ -145,15 +147,11 @@ void loop()
 
     switch_effects();
 
-  } // end SwitchDisplayTimer block
+  }
 
   if (timer1){
     calculateTime();
     timer1=false;
-  }
-
-  if (SecondTimer.isReady())
-  {
   }
 
   if (SensorSelectTimer.isReady()) {
