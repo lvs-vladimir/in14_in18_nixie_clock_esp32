@@ -63,15 +63,14 @@ void ws2812_effect() {
       break;
     }
 
-    case 5: // Fire
-      for (int i = 0; i < LEDS_COUNT; i++)
-        fire_heat[i] = qsub8(fire_heat[i], random8(40));
+    case 5: { // Fire
       for (int i = LEDS_COUNT - 1; i > 0; i--)
-        fire_heat[i] = (fire_heat[i - 1] + fire_heat[i] + fire_heat[i + 1]) / 3;
+        fire_heat[i] = (fire_heat[i - 1] + fire_heat[i]) / 2;
+      fire_heat[0] = random8(255);
       for (int i = 0; i < LEDS_COUNT; i++)
-        leds[i] = HeatColor(fire_heat[i] + 80);
-      if (random8() < 20) fire_heat[0] = random8(255);
+        leds[i] = HeatColor(fire_heat[i]);
       break;
+    }
 
     case 6: // Twinkle
       for (int i = 0; i < LEDS_COUNT; i++) {
