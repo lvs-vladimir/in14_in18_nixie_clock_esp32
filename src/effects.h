@@ -344,45 +344,15 @@ void switch_effects()
         }
       }
     } else {
-      // Scroll in (7-12): content slides in from the side
-      byte sub = t - 6;
-      // Find non-blank content bounds
-      int firstNB = -1, lastNB = -1;
-      for (int i = 0; i < 6; i++) {
-        if (NixieBuffer[i] != 10) {
-          if (firstNB < 0) firstNB = i;
-          lastNB = i;
+      // Scroll in (7-12): content slides in from the edge
+      byte sub = t - 6; // 1..6
+      if (off_effects == 10) {
+        for (int i = 0; i < 6; i++) {
+          Nixie[i] = (i < 6 - sub) ? 10 : NixieBuffer[i - (6 - sub)];
         }
-      }
-      if (firstNB < 0) {
-        for (int i = 0; i < 6; i++) Nixie[i] = 10;
       } else {
-        int contentLen = lastNB - firstNB + 1;
-        if (contentLen == 6) {
-          for (int i = 0; i < 6; i++) {
-            if (off_effects == 10) {
-              Nixie[i] = (i < 6 - sub) ? 10 : NixieBuffer[i];
-            } else {
-              Nixie[i] = (i < sub) ? NixieBuffer[i] : 10;
-            }
-          }
-        } else {
-          int cs;
-          if (off_effects == 10) {
-            int needSub = 7 - contentLen - firstNB;
-            if (needSub < 1) needSub = 1;
-            cs = (sub <= needSub) ? (6 - contentLen - (sub - 1)) : firstNB;
-          } else {
-            int needSub = firstNB + 1;
-            cs = (sub <= needSub) ? (sub - 1) : firstNB;
-          }
-          for (int i = 0; i < 6; i++) {
-            if (i >= cs && i < cs + contentLen) {
-              Nixie[i] = NixieBuffer[firstNB + (i - cs)];
-            } else {
-              Nixie[i] = 10;
-            }
-          }
+        for (int i = 0; i < 6; i++) {
+          Nixie[i] = (i < sub) ? NixieBuffer[i] : 10;
         }
       }
     }
