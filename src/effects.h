@@ -195,8 +195,8 @@ void logModeDigits(const char* tag)
 
 byte pickDisplayModeEffect()
 {
-  if (mydata.animdots == 0) return random(1, 12);
-  if (mydata.animdots > 11) return 1;
+  if (mydata.animdots == 0) return random(1, 13);
+  if (mydata.animdots > 12) return 1;
   return mydata.animdots;
 }
 
@@ -214,6 +214,7 @@ const char* modeAnimName(byte effect)
     case 9: return "FADE";
     case 10: return "SCROLL_LTR";
     case 11: return "SCROLL_RTL";
+    case 12: return "RND_DIGITS";
   }
   return "UNKNOWN";
 }
@@ -223,6 +224,7 @@ void setMoveIntervalForEffect(byte effect)
   mooveNixie.setInterval(120);
   if (effect == 5) mooveNixie.setInterval(90);
   if (effect == 6 || effect == 7) mooveNixie.setInterval(110);
+  if (effect == 12) mooveNixie.setInterval(90);
 }
 
 void startHoldTimerForCurrentDisplay()
@@ -377,7 +379,7 @@ void switch_effects()
     return;
   }
 
-  if (off_effects == 8 || off_effects == 9) {
+  if (off_effects == 8 || off_effects == 9 || off_effects == 12) {
     byte doneEffect = off_effects;
     log_add('A', "OFF_SKIP st=%s off=%d/%s", modeStateName(displayState), doneEffect, modeAnimName(doneEffect));
     off_effects = 0;
@@ -390,6 +392,39 @@ void switch_effects()
     if (on_effects == 8) flipInit = true;
     log_add('S', "ON_START st=%s from=%d to=%d on=%d/%s", modeStateName(displayState), transitionFromDisplay, transitionToDisplay, on_effects, modeAnimName(on_effects));
     logModeDigits("ON_START_DIGITS");
+    return;
+  }
+
+  if (on_effects == 12) {
+    static int order[6];
+    static byte rnd[6][2];
+    if (Counter == 0) {
+      for (int i = 0; i < 6; i++) order[i] = rand_arr[i];
+      shuffle(order, 6);
+      for (int i = 0; i < 6; i++) {
+        byte tgt = NixieBuffer[i];
+        for (int j = 0; j < 2; j++) {
+          byte r;
+          do { r = random(0, 10); } while (r == tgt);
+          rnd[i][j] = r;
+        }
+      }
+      log_add('A', "RND_DIGITS init order=%d,%d,%d,%d,%d,%d", order[0], order[1], order[2], order[3], order[4], order[5]);
+    }
+
+    byte tubeIdx = order[Counter / 3];
+    byte sub = Counter % 3;
+
+    if (sub < 2) {
+      Nixie[tubeIdx] = rnd[tubeIdx][sub];
+    } else {
+      Nixie[tubeIdx] = NixieBuffer[tubeIdx];
+    }
+
+    log_add('A', "RND_DIGITS step=%d tube=%d sub=%d val=%d", Counter, tubeIdx, sub, Nixie[tubeIdx]);
+
+    Counter++;
+    if (Counter >= 18) completeOnEffect();
     return;
   }
 
