@@ -37,3 +37,6 @@ const char* SETTING_WEB_AUTH_NAME[] = {"Защита веб-интерфейса
 const char* SETTING_WEB_AUTH_PASSWORD[] = {"Новый пароль:", "New password:"};
 const char* SETTING_WEB_AUTH_OLD_PASSWORD[] = {"Старый пароль:", "Old password:"};
 const char* SETTING_WEB_AUTH_SAVE_BTN[] = {"Сменить пароль", "Change password"};
+const char* WEB_LOGIN_TITLE[] = {"Вход", "Login"};
+const char* WEB_LOGIN_PASSWORD[] = {"Пароль:", "Password:"};
+const char* WEB_LOGIN_BUTTON[] = {"Войти", "Enter"};

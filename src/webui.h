@@ -8,6 +8,22 @@ void build() {
   GP.PAGE_TITLE(PAGE_TITLE[mydata.lng]);
   GP.HR();
   GP.UPDATE("btc,eth,usdrub,lux,optemp,ophum,oppres,sens0,sens1,sens2,sens3");
+  if (ui.uri("/logout")) {
+    webAuthOk = false;
+  }
+
+  if (!webAuthOk) {
+    GP.BLOCK_THIN_BEGIN();
+    M_BOX(GP_CENTER, GP.LABEL(WEB_LOGIN_TITLE[mydata.lng]););
+    GP.HR();
+    M_BOX(GP_LEFT, GP.LABEL(WEB_LOGIN_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("login_pass", "Password", "", "100%", 31, "", false, true);););
+    GP.BREAK();
+    M_BOX(GP_CENTER, GP.BUTTON_MINI("login_btn", WEB_LOGIN_BUTTON[mydata.lng], "", GP_BLUE, "", 0, 1););
+    GP.BLOCK_END();
+    GP.BUILD_END();
+    return;
+  }
+
   GP.NAV_TABS_LINKS("/,/setting,/info,/firmware,/log", TAB_LINKS_NAMES[mydata.lng], GP_BLUE);
 
   if (ui.uri("/setting")) {
@@ -163,6 +179,19 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
 
 void action(GyverPortal & p) {
   if (ui.click()) {
+    if (ui.click("login_btn")) {
+      String pass = ui.getString("login_pass");
+      pass.trim();
+      if (pass == String(webPass)) {
+        webAuthOk = true;
+        log_add('I', "Web login OK");
+      } else {
+        log_add('W', "Web login rejected");
+      }
+      return;
+    }
+
+    if (!webAuthOk) return;
     if (ui.click("rst")) ESP.restart();
     if (ui.click("sntp_btn")) {
       timeClient.setPoolServerName(mydata.NTPserver);
@@ -202,7 +231,7 @@ void action(GyverPortal & p) {
         File f = LittleFS.open("/webpass.txt", "w");
         f.print(webPass);
         f.close();
-        ui.enableAuth(webLogin, webPass);
+        webAuthOk = true;
         log_add('I', "Web password changed");
       } else {
         log_add('W', "Web password change rejected");

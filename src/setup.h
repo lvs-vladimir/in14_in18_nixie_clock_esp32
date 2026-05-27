@@ -22,8 +22,8 @@ void setup()
     f.print(webPass);
     f.close();
   }
-  ui.enableAuth(webLogin, webPass);
-  log_add('I', "Web auth enabled login=%s", webLogin);
+  ui.disableAuth();
+  log_add('I', "Web password auth enabled");
 
   FDstat_t stat = fd.read();
   if (stat != FD_READ) {

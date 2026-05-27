@@ -42,6 +42,7 @@ FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
 GyverPortal ui(&LittleFS);
 char webLogin[16] = "";
 char webPass[32] = "admin";
+bool webAuthOk = false;
 
 #define LOG_ENTRIES 200
 #define LOG_LINE_LEN 160
