@@ -122,29 +122,31 @@ void loop()
   }
 
   static int lastCrossFadeSecond = -1;
-  switch (effects) {
-    case 0:
-      if (displayState == MODE_TIME && display == 0 && timeon) SetNixie();
-      break;
-    case 1:
-      if (displayState == MODE_TIME && display == 0 && timeon) {
-        newhour = hour;
-        newminute = minute;
-        newsecond = second;
-        SetNixieBufer();
-        SwitchNumbers();
-      }
-      break;
-    case 2:
-      if (displayState == MODE_TIME && display == 0 && timeon) {
-        if (lastCrossFadeSecond != second) {
-          lastCrossFadeSecond = second;
-          CrossFade();
-        } else {
+  if (displayState == MODE_TIME && display == 0 && timeon) {
+    if (mydata.seconds_switch) {
+      switch (effects) {
+        case 1:
+          newhour = hour;
+          newminute = minute;
+          newsecond = second;
+          SetNixieBufer();
+          SwitchNumbers();
+          break;
+        case 2:
+          if (lastCrossFadeSecond != second) {
+            lastCrossFadeSecond = second;
+            CrossFade();
+          } else {
+            SetNixie();
+          }
+          break;
+        default:
           SetNixie();
-        }
+          break;
       }
-      break;
+    } else {
+      SetNixie();
+    }
   }
 
   UpdateDisplay();
