@@ -195,8 +195,8 @@ void logModeDigits(const char* tag)
 
 byte pickDisplayModeEffect()
 {
-  if (mydata.animdots == 0) return random(1, 10);
-  if (mydata.animdots > 9) return 1;
+  if (mydata.animdots == 0) return random(1, 12);
+  if (mydata.animdots > 11) return 1;
   return mydata.animdots;
 }
 
@@ -212,6 +212,8 @@ const char* modeAnimName(byte effect)
     case 7: return "ODD_EVEN";
     case 8: return "SWITCH";
     case 9: return "FADE";
+    case 10: return "SCROLL_LTR";
+    case 11: return "SCROLL_RTL";
   }
   return "UNKNOWN";
 }
@@ -318,6 +320,47 @@ void switch_effects()
   }
 
   if (!mooveNixie.isReady()) return;
+
+  if (off_effects == 10 || off_effects == 11) {
+    static byte saved[6];
+    if (Counter == 0) {
+      for (int i = 0; i < 6; i++) saved[i] = Nixie[i];
+      flip_nixiebuffer();
+      log_add('A', "SCROLL init eff=%d/%s old=%d%d:%d%d:%d%d new=%d%d:%d%d:%d%d",
+              off_effects, modeAnimName(off_effects),
+              saved[0], saved[1], saved[2], saved[3], saved[4], saved[5],
+              NixieBuffer[0], NixieBuffer[1], NixieBuffer[2],
+              NixieBuffer[3], NixieBuffer[4], NixieBuffer[5]);
+    }
+
+    byte step = Counter;
+    for (int i = 0; i < 6; i++) {
+      if (off_effects == 10) {
+        Nixie[i] = (i < 6 - step) ? saved[i + step] : NixieBuffer[i];
+      } else {
+        Nixie[i] = (i < step) ? NixieBuffer[i] : saved[i - step];
+      }
+    }
+
+    log_add('A', "SCROLL step=%d N=%d%d:%d%d:%d%d", step,
+            Nixie[0], Nixie[1], Nixie[2], Nixie[3], Nixie[4], Nixie[5]);
+
+    Counter++;
+    if (Counter >= 7) {
+      byte doneEffect = off_effects;
+      off_effects = 0;
+      on_effects = 0;
+      Counter = 0;
+      activeTransitionEffect = doneEffect;
+      timeon = (display == 0);
+      displayState = (display == 0) ? MODE_TIME : MODE_SENSOR_HOLD;
+      log_add('S', "SCROLL_DONE st=%s disp=%d eff=%d/%s",
+              modeStateName(displayState), display, doneEffect, modeAnimName(doneEffect));
+      logModeDigits("SCROLL_DONE_DIGITS");
+      startHoldTimerForCurrentDisplay();
+    }
+    return;
+  }
 
   if (off_effects == 8 || off_effects == 9) {
     byte doneEffect = off_effects;
