@@ -51,6 +51,7 @@ const char* WS2812_RANDOM_SEC[] = {"Интервал (сек):", "Interval (sec)
 const char* VEML_LABEL[] = {"VEML7700 яркость подсветки", "VEML7700 backlight"};
 const char* VEML_ENABLE[] = {"Вкл/выкл", "On/Off"};
 const char* VEML_INTERVAL[] = {"Диапазон:", "Range:"};
+const char* VEML_DESC[] = {"люкс от-до | ярк.", "lux min-max | bright"};
 const char* VEML_LUX_FROM[] = {"люкс от", "lux from"};
 const char* VEML_LUX_TO[] = {"до", "to"};
 const char* VEML_BRIGHT[] = {"ярк.", "bright"};
