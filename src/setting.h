@@ -1,10 +1,19 @@
 void TimeUpdate()
 {
   timeClient.update();
-  if (timeClient.getHours() >= 0 && timeClient.getMinutes() >= 0 && timeClient.getSeconds() >= 0) {
+  if (timeClient.getHours() != 0 || timeClient.getMinutes() != 0 || timeClient.getSeconds() != 0) {
     hour = timeClient.getHours();
     minute = timeClient.getMinutes();
     second = timeClient.getSeconds();
+  }
+
+  time_t epochTime = timeClient.getEpochTime();
+  struct tm* ntpTime = gmtime(&epochTime);
+  if (ntpTime) {
+    day = ntpTime->tm_mday;
+    dayOfMonth = ntpTime->tm_mday;
+    month = ntpTime->tm_mon;
+    year = ntpTime->tm_year - 100;
   }
 
   struct tm timeinfo;

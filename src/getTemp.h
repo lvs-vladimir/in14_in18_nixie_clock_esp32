@@ -157,12 +157,23 @@ void rebuildSensorsAutoShowSelect()
 {
   SensorsAutoShowSelect2 = ",";
   bool hasItem = false;
-  for (byte k = 0; k < 13; k++) {
+  for (byte k = 4; k <= 6; k++) {
     String item = SensorsAutoShow[k];
     while (item.startsWith(",")) item.remove(0, 1);
     if (item.length() == 0) continue;
     if (hasItem) SensorsAutoShowSelect2 += ",";
     SensorsAutoShowSelect2 += item;
+    hasItem = true;
+  }
+
+  String extra[4];
+  extra[0] = String(pricebtc) + "$ BTC";
+  extra[1] = String(priceeth) + "$ ETH";
+  extra[2] = String(usdRubRate) + " RUB/USD";
+  extra[3] = String(dayOfMonth) + "." + String(month + 1) + "." + String(year);
+  for (byte k = 0; k < 4; k++) {
+    if (hasItem) SensorsAutoShowSelect2 += ",";
+    SensorsAutoShowSelect2 += extra[k];
     hasItem = true;
   }
   log_add('D', "SELECTLIST len=%d sel1=%d sel2=%d list=%s",

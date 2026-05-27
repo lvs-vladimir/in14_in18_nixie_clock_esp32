@@ -7,6 +7,7 @@ int getSlotValue(byte slotIdx)
   }
 
   int sensorIdx = dropdownIdx + 3;
+  if (dropdownIdx >= 4) sensorIdx = dropdownIdx + 3;
   if (sensorIdx > 13) {
     log_add('W', "GETVAL slot=%d dropdown=%d invalid sensor=%d", slotIdx, dropdownIdx, sensorIdx);
     return 0;
@@ -23,6 +24,8 @@ int getSlotValue(byte slotIdx)
     case 6: value = (int)ophumidity; break;
     case 7: value = (int)pricebtc; break;
     case 8: value = (int)priceeth; break;
+    case 9: value = (int)usdRubRate; break;
+    case 10: value = dayOfMonth * 10000 + (month + 1) * 100 + year; break;
     default: value = 0; break;
   }
 
