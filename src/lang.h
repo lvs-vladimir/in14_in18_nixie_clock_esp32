@@ -32,7 +32,7 @@ const char* SETTING_ANIM_NAME[] = {"Эффект смены цифр:", "Digit e
 const char* SETTING_ANIM_SEC_NAME[] = {"Смена через (сек):", "Change every (sec):"};
 const char* SETTING_ANIM_ARRAY[] = {"Автоцикл,Без,Последовательно,Плавно", "Auto cycle,None,Sequential,Smooth"};
 const char* DISPLAY_MODE_ANIM_NAME[] = {"Анимация смены режимов:", "Mode change animation:"};
-const char* DISPLAY_MODE_ANIM_ARRAY[] = {"Случайная,Слева направо,Справа налево,К центру,От центра,Случайные лампы,Чётные потом нечётные,Нечётные потом чётные", "Random,Left to right,Right to left,To center,From center,Random tubes,Even then odd,Odd then even"};
+const char* DISPLAY_MODE_ANIM_ARRAY[] = {"Случайная,Слева направо,Справа налево,К центру,От центра,Случайные лампы,Чётные потом нечётные,Нечётные потом чётные,Перебор цифр,Кроссфейд", "Random,Left to right,Right to left,To center,From center,Random tubes,Even then odd,Odd then even,Digit switch,Crossfade"};
 
 const char* SETTING_WEB_AUTH_NAME[] = {"Защита веб-интерфейса", "Web interface security"};
 const char* SETTING_WEB_AUTH_PASSWORD[] = {"Новый пароль:", "New password:"};

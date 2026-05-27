@@ -157,8 +157,8 @@ void logModeDigits(const char* tag)
 
 byte pickDisplayModeEffect()
 {
-  if (mydata.animdots == 0) return random(1, 8);
-  if (mydata.animdots > 7) return 1;
+  if (mydata.animdots == 0) return random(1, 10);
+  if (mydata.animdots > 9) return 1;
   return mydata.animdots;
 }
 
@@ -172,6 +172,8 @@ const char* modeAnimName(byte effect)
     case 5: return "RANDOM";
     case 6: return "EVEN_ODD";
     case 7: return "ODD_EVEN";
+    case 8: return "SWITCH";
+    case 9: return "FADE";
   }
   return "UNKNOWN";
 }
@@ -259,7 +261,41 @@ void completeOnEffect()
 
 void switch_effects()
 {
+  if (on_effects == 8) {
+    SwitchNumbers();
+    bool done = true;
+    for (int i = 0; i < 6; i++) if (Nixie[i] != NixieBuffer[i]) { done = false; break; }
+    if (done) {
+      on_effects = 0;
+      completeOnEffect();
+    }
+    return;
+  }
+
+  if (on_effects == 9) {
+    CrossFade();
+    on_effects = 0;
+    completeOnEffect();
+    return;
+  }
+
   if (!mooveNixie.isReady()) return;
+
+  if (off_effects == 8 || off_effects == 9) {
+    byte doneEffect = off_effects;
+    log_add('A', "OFF_SKIP st=%s off=%d/%s", modeStateName(displayState), doneEffect, modeAnimName(doneEffect));
+    off_effects = 0;
+    activeTransitionEffect = doneEffect;
+    Counter = 0;
+    flip_switch = true;
+    flip_nixiebuffer();
+    on_effects = doneEffect;
+    displayState = (display == 0) ? MODE_TIME_ON : MODE_SENSOR_ON;
+    if (on_effects == 8) flipInit = true;
+    log_add('S', "ON_START st=%s from=%d to=%d on=%d/%s", modeStateName(displayState), transitionFromDisplay, transitionToDisplay, on_effects, modeAnimName(on_effects));
+    logModeDigits("ON_START_DIGITS");
+    return;
+  }
 
   if (off_effects > 0) {
     if (Counter == 0 && off_effects == 5 && flip_switch) {
