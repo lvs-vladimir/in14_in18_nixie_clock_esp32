@@ -114,6 +114,11 @@ void log_add(char level, const char* fmt, ...) {
 #define HSPI_SCLK 14
 #define HSPI_SS 15
 
+
+#define LAMP_DOT_BIT 30
+#define LAMP_PLUS_BIT 31
+#define LAMP_CELSIUS_BIT 30
+#define LAMP_PERCENT_BIT 31
 #define num_ranges 6
 
 CRGB leds[LEDS_COUNT];
@@ -225,6 +230,10 @@ boolean dmooveleft = false;
 boolean flip;
 boolean flipInit = true;
 boolean flip_switch, flip_switch2 = true;
+boolean lamp_dot_hv31 = false;
+boolean lamp_plus_hv32 = false;
+boolean lamp_celsius_hv31 = false;
+boolean lamp_percent_hv32 = false;
 boolean timeon = true;
 boolean timer0 = false;
 boolean timer1 = false;

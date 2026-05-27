@@ -149,7 +149,17 @@ void loop()
     }
   }
 
-  UpdateDisplay();
+  
+  lamp_celsius_hv31 = false;
+  lamp_percent_hv32 = false;
+  lamp_dot_hv31 = false;
+  lamp_plus_hv32 = false;
+  if (display > 0) {
+    byte type = mydata.nrd_type_sensor[display - 1];
+    if (type >= 1 && type <= 4) lamp_celsius_hv31 = true;
+    else if (type == 5) lamp_percent_hv32 = true;
+  }
+UpdateDisplay();
   switch_effects();
 
   if (timer1) {

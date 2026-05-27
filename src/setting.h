@@ -223,6 +223,10 @@ void UpdateDisplay()
   #ifdef IN_18
   hv5222_2 = (bufer[3] << 20) | (bufer[4] << 10) | bufer[5];
   hv5222_1 = (bufer[0] << 20) | (bufer[1] << 10) | bufer[2];
+  if (lamp_celsius_hv31) hv5222_2 |= (1UL << 30);
+  if (lamp_percent_hv32) hv5222_2 |= (1UL << 31);
+  if (lamp_dot_hv31) hv5222_1 |= (1UL << 30);
+  if (lamp_plus_hv32) hv5222_1 |= (1UL << 31);
   hspi->transfer32(hv5222_2);
   hspi->transfer32(hv5222_1);
   #endif
