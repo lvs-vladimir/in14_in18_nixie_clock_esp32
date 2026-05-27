@@ -177,8 +177,8 @@ void UpdateDisplay()
 
   #ifdef IN_18
   if (display == 0 && timeon && !mydata.seconds_switch) {
+    bufer[0] = 0;
     bufer[5] = 0;
-    bufer[4] = 0;
   }
   #endif
 
@@ -229,30 +229,38 @@ void UpdateDisplay()
 
 void SetNixieBufer()
 {
-  NixieBuffer[0] = newhour / 10;
-  NixieBuffer[1] = newhour % 10;
-  NixieBuffer[2] = newminute / 10;
-  NixieBuffer[3] = newminute % 10;
   if (mydata.seconds_switch) {
+    NixieBuffer[0] = newhour / 10;
+    NixieBuffer[1] = newhour % 10;
+    NixieBuffer[2] = newminute / 10;
+    NixieBuffer[3] = newminute % 10;
     NixieBuffer[4] = newsecond / 10;
     NixieBuffer[5] = newsecond % 10;
   } else {
-    NixieBuffer[4] = 10;
+    NixieBuffer[0] = 10;
+    NixieBuffer[1] = newhour / 10;
+    NixieBuffer[2] = newhour % 10;
+    NixieBuffer[3] = newminute / 10;
+    NixieBuffer[4] = newminute % 10;
     NixieBuffer[5] = 10;
   }
 }
 
 void SetNixie()
 {
-  Nixie[0] = hour / 10;
-  Nixie[1] = hour % 10;
-  Nixie[2] = minute / 10;
-  Nixie[3] = minute % 10;
   if (mydata.seconds_switch) {
+    Nixie[0] = hour / 10;
+    Nixie[1] = hour % 10;
+    Nixie[2] = minute / 10;
+    Nixie[3] = minute % 10;
     Nixie[4] = second / 10;
     Nixie[5] = second % 10;
   } else {
-    Nixie[4] = 10;
+    Nixie[0] = 10;
+    Nixie[1] = hour / 10;
+    Nixie[2] = hour % 10;
+    Nixie[3] = minute / 10;
+    Nixie[4] = minute % 10;
     Nixie[5] = 10;
   }
 }
