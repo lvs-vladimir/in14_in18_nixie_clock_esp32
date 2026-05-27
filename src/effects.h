@@ -156,10 +156,32 @@ void logModeDigits(const char* tag)
           NixieBuffer[0], NixieBuffer[1], NixieBuffer[2], NixieBuffer[3], NixieBuffer[4], NixieBuffer[5]);
 }
 
+byte pickDisplayModeEffect()
+{
+  if (mydata.animdots == 0) return random(1, 8);
+  if (mydata.animdots > 7) return 1;
+  return mydata.animdots;
+}
+
+const char* modeAnimName(byte effect)
+{
+  switch (effect) {
+    case 1: return "LTR";
+    case 2: return "RTL";
+    case 3: return "CENTER";
+    case 4: return "OUTWARD";
+    case 5: return "RANDOM";
+    case 6: return "EVEN_ODD";
+    case 7: return "ODD_EVEN";
+  }
+  return "UNKNOWN";
+}
+
 void setMoveIntervalForEffect(byte effect)
 {
   mooveNixie.setInterval(120);
   if (effect == 5) mooveNixie.setInterval(90);
+  if (effect == 6 || effect == 7) mooveNixie.setInterval(110);
 }
 
 void startHoldTimerForCurrentDisplay()
@@ -184,32 +206,42 @@ void beginModeOffTransition(byte fromDisplay, byte toDisplay, DisplayModeState o
   flip = true;
   flip_switch = true;
   on_effects = 0;
-  off_effects = random(1, 6);
+  off_effects = pickDisplayModeEffect();
   activeTransitionEffect = off_effects;
   Counter = 0;
   SwitchDisplayTimer.stop();
   setMoveIntervalForEffect(off_effects);
-  log_add('S', "OFF_START st=%s from=%d to=%d off=%d", modeStateName(displayState), fromDisplay, toDisplay, off_effects);
+  log_add('S', "OFF_START st=%s from=%d to=%d off=%d/%s menu=%d", modeStateName(displayState), fromDisplay, toDisplay, off_effects, modeAnimName(off_effects), mydata.animdots);
   logModeDigits("OFF_START_DIGITS");
 }
 
 int transitionIndexForEffect(byte effect, int step)
 {
-  if (effect == 2 || effect == 4) return 5 - step;
+  static const byte centerOrder[6] = {0, 5, 1, 4, 2, 3};
+  static const byte outwardOrder[6] = {2, 3, 1, 4, 0, 5};
+  static const byte evenOddOrder[6] = {0, 2, 4, 1, 3, 5};
+  static const byte oddEvenOrder[6] = {1, 3, 5, 0, 2, 4};
+
+  if (effect == 2) return 5 - step;
+  if (effect == 3) return centerOrder[step];
+  if (effect == 4) return outwardOrder[step];
   if (effect == 5) return rand_arr[step];
+  if (effect == 6) return evenOddOrder[step];
+  if (effect == 7) return oddEvenOrder[step];
   return step;
 }
 
 void prepareNextOnEffect()
 {
   flip_nixiebuffer();
-  on_effects = random(1, 6);
+  on_effects = off_effects ? off_effects : activeTransitionEffect;
+  if (on_effects == 0) on_effects = pickDisplayModeEffect();
   activeTransitionEffect = on_effects;
   Counter = 0;
   flip_switch = true;
   setMoveIntervalForEffect(on_effects);
   displayState = (display == 0) ? MODE_TIME_ON : MODE_SENSOR_ON;
-  log_add('S', "ON_START st=%s from=%d to=%d on=%d", modeStateName(displayState), transitionFromDisplay, transitionToDisplay, on_effects);
+  log_add('S', "ON_START st=%s from=%d to=%d on=%d/%s menu=%d", modeStateName(displayState), transitionFromDisplay, transitionToDisplay, on_effects, modeAnimName(on_effects), mydata.animdots);
   logModeDigits("ON_START_DIGITS");
 }
 
@@ -235,6 +267,9 @@ void switch_effects()
       flip_switch = false;
       shuffle(rand_arr, 6);
       log_add('A', "OFF_ORDER random=%d,%d,%d,%d,%d,%d", rand_arr[0], rand_arr[1], rand_arr[2], rand_arr[3], rand_arr[4], rand_arr[5]);
+    } else if (Counter == 0 && flip_switch) {
+      flip_switch = false;
+      log_add('A', "OFF_ORDER effect=%d/%s", off_effects, modeAnimName(off_effects));
     }
 
     int idx = transitionIndexForEffect(off_effects, Counter);
@@ -247,8 +282,10 @@ void switch_effects()
 
     Counter++;
     if (Counter >= 6) {
-      log_add('A', "OFF_DONE st=%s off=%d from=%d to=%d", modeStateName(displayState), off_effects, transitionFromDisplay, transitionToDisplay);
+      byte doneEffect = off_effects;
+      log_add('A', "OFF_DONE st=%s off=%d/%s from=%d to=%d", modeStateName(displayState), doneEffect, modeAnimName(doneEffect), transitionFromDisplay, transitionToDisplay);
       off_effects = 0;
+      activeTransitionEffect = doneEffect;
       Counter = 0;
       flip_switch = true;
       prepareNextOnEffect();
@@ -261,6 +298,9 @@ void switch_effects()
       flip_switch = false;
       shuffle(rand_arr, 6);
       log_add('A', "ON_ORDER random=%d,%d,%d,%d,%d,%d", rand_arr[0], rand_arr[1], rand_arr[2], rand_arr[3], rand_arr[4], rand_arr[5]);
+    } else if (Counter == 0 && flip_switch) {
+      flip_switch = false;
+      log_add('A', "ON_ORDER effect=%d/%s", on_effects, modeAnimName(on_effects));
     }
 
     int idx = transitionIndexForEffect(on_effects, Counter);

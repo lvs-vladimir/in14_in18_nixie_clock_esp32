@@ -141,9 +141,11 @@ void build() {
       GP.BREAK();
     }
     GP.BREAK();
-    M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_change", SETTING_ANIM_ARRAY[mydata.lng], mydata.anim_change, 0, 0, 1);););
-    GP.HR();
-    M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("seconds_switch", mydata.seconds_switch, GP_BLUE);););
+M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_change", SETTING_ANIM_ARRAY[mydata.lng], mydata.anim_change, 0, 0, 1);););
+GP.BREAK();
+M_BOX(GP_LEFT, GP.LABEL(DISPLAY_MODE_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("animdots", DISPLAY_MODE_ANIM_ARRAY[mydata.lng], mydata.animdots, 0, 0, 1);););
+GP.HR();
+M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("seconds_switch", mydata.seconds_switch, GP_BLUE);););
     GP.HR();
     GP.BLOCK_END();
   }
@@ -207,6 +209,7 @@ void action(GyverPortal & p) {
     if (ui.clickInt("seconds_switch", mydata.seconds_switch)) {};
     if (ui.clickInt("auto_show_switch", mydata.autoshow_switch));
     if (ui.clickInt("anim_change", mydata.anim_change));
+  if (ui.clickInt("animdots", mydata.animdots));
     if (ui.clickInt("autoshow_sec", mydata.autoshow_min));
     for (byte i = 0; i < mydata.autoshow_slots; i++) {
       char buf[16];

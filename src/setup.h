@@ -36,6 +36,7 @@ void setup()
   }
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
   if (!mydata.seconds_switch) mydata.seconds_switch = true;
+  if (mydata.animdots > 7) mydata.animdots = 0;
   if (mydata.autoshow_slots > 0 && (mydata.autoshow_select[1] < 5 || mydata.autoshow_select[1] > 13)) {
     log_add('W', "Slot1 invalid (%d), reset to temp", mydata.autoshow_select[1]);
     mydata.autoshow_select[1] = 5;
