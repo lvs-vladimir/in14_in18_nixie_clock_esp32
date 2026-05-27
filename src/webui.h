@@ -96,7 +96,11 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     GP.FORM_END();
 
   } else if (ui.uri("/info")) {
+    GP.BLOCK_THIN_BEGIN();
+    M_BOX(GP_CENTER, GP.LABEL(PAGE_TITLE[mydata.lng]););
+    GP.HR();
     GP.SYSTEM_INFO("1.0");
+    GP.BLOCK_END();
 
   } else if (ui.uri("/firmware")) {
     GP.BLOCK_THIN_BEGIN();
