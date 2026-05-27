@@ -6,8 +6,13 @@ void CrossFade()
   int ct_sum = 60;
   int delta = 67;
 
-  log_add('A', "XFADE start old=%02d:%02d:%02d new=%02d:%02d:%02d",
-          old_hour, old_minute, old_second, hour, minute, second);
+  log_add('A', "XFADE start disp=%d timeon=%d old=%02d:%02d:%02d cur=%02d:%02d:%02d new=%02d:%02d:%02d",
+          display, timeon,
+          old_hour, old_minute, old_second, hour, minute, second,
+          newhour, newminute, newsecond);
+  log_add('A', "XFADE Nixie=%d%d:%d%d:%d%d Buf=%d%d:%d%d:%d%d",
+          Nixie[0], Nixie[1], Nixie[2], Nixie[3], Nixie[4], Nixie[5],
+          NixieBuffer[0], NixieBuffer[1], NixieBuffer[2], NixieBuffer[3], NixieBuffer[4], NixieBuffer[5]);
 
   for (int ct = 0; ct < ct_sum; ct++) {
     Nixie[0] = old_hour / 10;
@@ -52,6 +57,39 @@ void CrossFade()
   }
 
   log_add('A', "XFADE done Nixie=%d%d:%d%d:%d%d",
+          Nixie[0], Nixie[1], Nixie[2], Nixie[3], Nixie[4], Nixie[5]);
+}
+
+void CrossFadeNixie()
+{
+  int old_nixie[6];
+  for (int i = 0; i < 6; i++) old_nixie[i] = Nixie[i];
+
+  int t1 = 4020;
+  int t2 = 0;
+  int steps = 40;
+  int delta = 100;
+
+  log_add('A', "XFADE_NIXIE start disp=%d old_N=%d%d:%d%d:%d%d Buf=%d%d:%d%d:%d%d",
+          display,
+          old_nixie[0], old_nixie[1], old_nixie[2], old_nixie[3], old_nixie[4], old_nixie[5],
+          NixieBuffer[0], NixieBuffer[1], NixieBuffer[2], NixieBuffer[3], NixieBuffer[4], NixieBuffer[5]);
+
+  for (int ct = 0; ct < steps; ct++) {
+    for (int i = 0; i < 6; i++) Nixie[i] = old_nixie[i];
+    UpdateDisplay();
+    delayMicroseconds(t1);
+    t1 -= delta;
+
+    for (int i = 0; i < 6; i++) Nixie[i] = NixieBuffer[i];
+    UpdateDisplay();
+    delayMicroseconds(t2);
+    t2 += delta;
+  }
+
+  for (int i = 0; i < 6; i++) Nixie[i] = NixieBuffer[i];
+
+  log_add('A', "XFADE_NIXIE done N=%d%d:%d%d:%d%d",
           Nixie[0], Nixie[1], Nixie[2], Nixie[3], Nixie[4], Nixie[5]);
 }
 
@@ -273,7 +311,7 @@ void switch_effects()
   }
 
   if (on_effects == 9) {
-    CrossFade();
+    CrossFadeNixie();
     on_effects = 0;
     completeOnEffect();
     return;
