@@ -60,21 +60,21 @@ void prepareDisplayTarget(byte targetDisplay)
   }
 
   int raw_val = getSlotValue(targetDisplay);
-  int num = raw_val;
-  int num1 = 0, num2 = 0, num3 = 0, num4 = 0, num5 = 0, num6 = 0;
-  num1 = num % 10; num /= 10;
-  num2 = num % 10; num /= 10;
-  num3 = num % 10; num /= 10;
-  num4 = num % 10; num /= 10;
-  num5 = num % 10; num /= 10;
-  num6 = num % 10;
-  newhour = (num6 * 10) + num5;
-  newminute = (num2 * 10) + num1;
-  newsecond = (num4 * 10) + num3;
+  sensorDisplayValue = raw_val;
+  int abs_val = abs(raw_val);
+  sensorDisplayDigits = 1;
+  int tmp_val = abs_val;
+  while (tmp_val >= 10 && sensorDisplayDigits < 6) {
+    tmp_val /= 10;
+    sensorDisplayDigits++;
+  }
+  newhour = 0;
+  newminute = 0;
+  newsecond = 0;
 
-  log_add('S', "TARGET sensor slot=%d dropdown=%d raw=%d new=%02d:%02d:%02d hold=%d",
+  log_add('S', "TARGET sensor slot=%d dropdown=%d raw=%d digits=%d hold=%d",
           targetDisplay, mydata.autoshow_select[targetDisplay], raw_val,
-          newhour, newminute, newsecond, mydata.autoshow_select_sec[targetDisplay]);
+          sensorDisplayDigits, mydata.autoshow_select_sec[targetDisplay]);
 }
 
 void loop()

@@ -115,23 +115,22 @@ void flip_nixiebuffer()
 
   byte dropdownIdx = mydata.autoshow_select[display];
   byte si = dropdownIdx > 0 ? dropdownIdx + 3 : 0;
-  if (si == 4) {
-    NixieBuffer[0] = 10;
-    NixieBuffer[1] = 10;
-    NixieBuffer[2] = newminute / 10;
-    NixieBuffer[3] = newminute % 10;
-    NixieBuffer[4] = 10;
-    NixieBuffer[5] = 10;
-    log_add('A', "FLIPBUF temp slot=%d raw=%02d B=%d%d:%d%d:%d%d",
-            display, newminute,
-            NixieBuffer[0], NixieBuffer[1], NixieBuffer[2], NixieBuffer[3], NixieBuffer[4], NixieBuffer[5]);
-  } else {
-    SetNixieBufer();
-    log_add('A', "FLIPBUF sensor slot=%d sensor=%d B=%d%d:%d%d:%d%d new=%02d:%02d:%02d",
-            display, si,
-            NixieBuffer[0], NixieBuffer[1], NixieBuffer[2], NixieBuffer[3], NixieBuffer[4], NixieBuffer[5],
-            newhour, newminute, newsecond);
+  for (byte i = 0; i < 6; i++) NixieBuffer[i] = 10;
+
+  long value = sensorDisplayValue;
+  if (value < 0) value = -value;
+  byte digits = sensorDisplayDigits;
+  if (digits == 0) digits = 1;
+  if (digits > 6) digits = 6;
+  byte start = (6 - digits) / 2;
+  for (int pos = start + digits - 1; pos >= start; pos--) {
+    NixieBuffer[pos] = value % 10;
+    value /= 10;
   }
+
+  log_add('A', "FLIPBUF sensor slot=%d sensor=%d raw=%d digits=%d B=%d%d:%d%d:%d%d",
+          display, si, sensorDisplayValue, digits,
+          NixieBuffer[0], NixieBuffer[1], NixieBuffer[2], NixieBuffer[3], NixieBuffer[4], NixieBuffer[5]);
 }
 
 const char* modeStateName(DisplayModeState state)

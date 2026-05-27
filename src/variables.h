@@ -210,6 +210,8 @@ boolean timer0 = false;
 boolean timer1 = false;
 
 int pricebtc, priceeth, TempValue;
+int sensorDisplayValue = 0;
+byte sensorDisplayDigits = 0;
 
 enum DisplayModeState : byte {
   MODE_TIME = 0,
