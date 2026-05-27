@@ -1,4 +1,4 @@
-const char* DEVICE_NAME[] = {"Часы на IN-14/IN-18", "IN-14/IN-18 Nixie clock"};
+const char* DEVICE_NAME[] = {"<a href='https://github.com/lvs-vladimir/in14_in18_nixie_clock_esp32' style='text-decoration:none;color:inherit'>Часы на IN-14/IN-18</a>", "<a href='https://github.com/lvs-vladimir/in14_in18_nixie_clock_esp32' style='text-decoration:none;color:inherit'>IN-14/IN-18 Nixie clock</a>"};
 const char* TAB_LINKS_NAMES[] = {"Главная,Настройки,Инфо,Прошивка,Логи", "Home,Setting,Info,Firmware,Logs"};
 const char* PAGE_TITLE[] = {"Газоразрядные часы", "Nixie tube clock"};
 const char* SETTING_LANGUAGE[] = {"Язык", "Language"};
