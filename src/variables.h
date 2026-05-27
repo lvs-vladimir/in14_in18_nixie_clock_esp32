@@ -117,6 +117,7 @@ timerMinim WS2812(10);
 timerMinim SensorSelectTimer(3000);
 timerMinim NtpSyncTimer(3600000);
 timerMinim OwmUpdateTimer(300000);
+timerMinim CoinUpdateTimer(600000);
 
 // Определение NTP-клиента для получения времени
 WiFiUDP ntpUDP;

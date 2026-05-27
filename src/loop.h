@@ -183,4 +183,8 @@ void loop()
     log_add('I', "OWM update");
     getTemp2(0);
   }
+
+  if (CoinUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED) {
+    updateCryptoRates();
+  }
 }

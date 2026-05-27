@@ -4,6 +4,7 @@ void setup()
   Serial.begin(115200);
   NtpSyncTimer.stop();
   OwmUpdateTimer.stop();
+  CoinUpdateTimer.stop();
   memset(log_entries, 0, sizeof(log_entries));
   log_write_idx = 0;
   log_count = 0;
@@ -113,9 +114,9 @@ void setup()
   OwmUpdateTimer.start();
   log_add('I', "Init complete, HW: %d/%d, disp=%d", hour, minute, display);
 
-  pricebtc = 42345;
-  priceeth = 0;
   if (TempValue == 0 && optemperature != 0) TempValue = optemperature;
+  if (WiFi.status() == WL_CONNECTED) updateCryptoRates();
+  CoinUpdateTimer.start();
 
   SwitchDisplayTimer.stop();
   veml.begin();

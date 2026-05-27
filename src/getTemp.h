@@ -15,6 +15,27 @@ int temperature = myObject["main"]["feels_like"];
 
 }
  */
+
+void updateCryptoRates()
+{
+  if (WiFi.status() != WL_CONNECTED) return;
+
+  String payload = httpGETRequest("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd");
+  JSONVar json = JSON.parse(payload);
+  if (JSON.typeof(json) != "undefined") {
+    if (JSON.typeof(json["bitcoin"]["usd"]) != "undefined") pricebtc = (int)json["bitcoin"]["usd"];
+    if (JSON.typeof(json["ethereum"]["usd"]) != "undefined") priceeth = (int)json["ethereum"]["usd"];
+  }
+
+  payload = httpGETRequest("https://www.cbr-xml-daily.ru/daily_json.js");
+  json = JSON.parse(payload);
+  if (JSON.typeof(json) != "undefined" && JSON.typeof(json["Valute"]["USD"]["Value"]) != "undefined") {
+    usdRubRate = (int)((double)json["Valute"]["USD"]["Value"] + 0.5);
+  }
+
+  log_add('I', "Rates update BTC=%d ETH=%d USD/RUB=%d", pricebtc, priceeth, usdRubRate);
+}
+
 //***************Получаем темперутуру с openweathermap.org и narodmon.ru**********************************
 void getTemp2(byte i){
 
