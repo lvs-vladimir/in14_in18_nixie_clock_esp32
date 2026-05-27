@@ -4,7 +4,6 @@ void build() {
   GP.BUILD_BEGIN(500);
   GP.THEME(GP_DARK);
   GP.TITLE(DEVICE_NAME[mydata.lng]);
-  GP.HR();
   GP.PAGE_TITLE(PAGE_TITLE[mydata.lng]);
   GP.HR();
   GP.UPDATE("btc,eth,usdrub,lux,optemp,ophum,oppres,sens0,sens1,sens2,sens3");
@@ -195,7 +194,6 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
     GP.HR();
     GP.BLOCK_END();
   }
-  GP.HR();
   M_BOX(GP_CENTER, GP.BUTTON_MINI_LINK("/logout", WEB_LOGOUT_BUTTON[mydata.lng], GP_RED, "100px"););
   GP.BUILD_END();
 }
