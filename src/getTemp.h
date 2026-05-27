@@ -32,6 +32,8 @@ void getTemp2(byte i){
       j++;
     }
         optemperature = myObject["main"]["temp"];
+        TempValue = optemperature;
+        log_add('I', "OWM temp update opt=%d TempValue=%d", optemperature, TempValue);
         oppressure = myObject["main"]["pressure"];
         ophumidity = myObject["main"]["humidity"];
 

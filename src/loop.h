@@ -18,7 +18,7 @@ int getSlotValue(byte slotIdx)
     case 1: value = (int)mydata.nrd_sens[1]; break;
     case 2: value = (int)mydata.nrd_sens[2]; break;
     case 3: value = (int)mydata.nrd_sens[3]; break;
-    case 4: value = (int)TempValue; break;
+    case 4: value = (int)optemperature; break;
     case 5: value = (int)oppressure; break;
     case 6: value = (int)ophumidity; break;
     case 7: value = (int)pricebtc; break;

@@ -94,7 +94,7 @@ void setup()
 
   pricebtc = 42345;
   priceeth = 0;
-  TempValue = 18;
+  if (TempValue == 0 && optemperature != 0) TempValue = optemperature;
 
   SwitchDisplayTimer.stop();
   veml.begin();
