@@ -351,8 +351,32 @@ void switch_effects()
           Nixie[i] = (i < 6 - sub) ? 10 : NixieBuffer[i - (6 - sub)];
         }
       } else {
+        int firstNB = -1, lastNB = -1;
         for (int i = 0; i < 6; i++) {
-          Nixie[i] = (i < sub) ? NixieBuffer[i] : 10;
+          if (NixieBuffer[i] != 10) {
+            if (firstNB < 0) firstNB = i;
+            lastNB = i;
+          }
+        }
+        if (firstNB < 0) {
+          for (int i = 0; i < 6; i++) Nixie[i] = 10;
+        } else if (lastNB - firstNB + 1 == 6) {
+          for (int i = 0; i < 6; i++) {
+            Nixie[i] = (i < sub) ? NixieBuffer[i] : 10;
+          }
+        } else {
+          int cLen = lastNB - firstNB + 1;
+          int needSub = firstNB + 1;
+          int cs = (sub <= needSub) ? (sub - 1) : firstNB;
+          int ce = cs + cLen;
+          if (ce > 6) ce = 6;
+          for (int i = 0; i < 6; i++) {
+            if (i >= cs && i < ce) {
+              Nixie[i] = NixieBuffer[firstNB + (i - cs)];
+            } else {
+              Nixie[i] = 10;
+            }
+          }
         }
       }
     }
