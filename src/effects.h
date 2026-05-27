@@ -224,7 +224,7 @@ void setMoveIntervalForEffect(byte effect)
   mooveNixie.setInterval(120);
   if (effect == 5) mooveNixie.setInterval(90);
   if (effect == 6 || effect == 7) mooveNixie.setInterval(110);
-  if (effect == 12) mooveNixie.setInterval(90);
+  if (effect == 12) mooveNixie.setInterval(60);
 }
 
 void startHoldTimerForCurrentDisplay()
@@ -269,6 +269,7 @@ int transitionIndexForEffect(byte effect, int step)
   if (effect == 3) return centerOrder[step];
   if (effect == 4) return outwardOrder[step];
   if (effect == 5) return rand_arr[step];
+  if (effect == 12) return rand_arr[step];
   if (effect == 6) return evenOddOrder[step];
   if (effect == 7) return oddEvenOrder[step];
   return step;
@@ -379,7 +380,7 @@ void switch_effects()
     return;
   }
 
-  if (off_effects == 8 || off_effects == 9 || off_effects == 12) {
+  if (off_effects == 8 || off_effects == 9) {
     byte doneEffect = off_effects;
     log_add('A', "OFF_SKIP st=%s off=%d/%s", modeStateName(displayState), doneEffect, modeAnimName(doneEffect));
     off_effects = 0;
@@ -397,39 +398,36 @@ void switch_effects()
 
   if (on_effects == 12) {
     static int order[6];
-    static byte rnd[6][2];
+    static int curIdx;
+    int t = -1;
     if (Counter == 0) {
       for (int i = 0; i < 6; i++) order[i] = rand_arr[i];
       shuffle(order, 6);
-      for (int i = 0; i < 6; i++) {
-        byte tgt = NixieBuffer[i];
-        for (int j = 0; j < 2; j++) {
-          byte r;
-          do { r = random(0, 10); } while (r == tgt);
-          rnd[i][j] = r;
-        }
+      curIdx = 0;
+      log_add('A', "RND_SWITCH init order=%d,%d,%d,%d,%d,%d", order[0], order[1], order[2], order[3], order[4], order[5]);
+    }
+
+    if (curIdx < 6) {
+      t = order[curIdx];
+      if (NixieBuffer[t] >= 10) {
+        Nixie[t] = 10;
+        curIdx++;
+      } else {
+        if (Nixie[t] >= 10) Nixie[t] = 9;
+        else if (Nixie[t] > 0) Nixie[t]--;
+        else Nixie[t] = 9;
+        if (Nixie[t] == NixieBuffer[t]) curIdx++;
       }
-      log_add('A', "RND_DIGITS init order=%d,%d,%d,%d,%d,%d", order[0], order[1], order[2], order[3], order[4], order[5]);
     }
-
-    byte tubeIdx = order[Counter / 3];
-    byte sub = Counter % 3;
-
-    if (sub < 2) {
-      Nixie[tubeIdx] = rnd[tubeIdx][sub];
-    } else {
-      Nixie[tubeIdx] = NixieBuffer[tubeIdx];
-    }
-
-    log_add('A', "RND_DIGITS step=%d tube=%d sub=%d val=%d", Counter, tubeIdx, sub, Nixie[tubeIdx]);
+    log_add('A', "RND_SWITCH step=%d idx=%d/6 t=%d val=%d tgt=%d", Counter, curIdx, t, (t >=0)?Nixie[t]:-1, (t >=0)?NixieBuffer[t]:-1);
 
     Counter++;
-    if (Counter >= 18) completeOnEffect();
+    if (curIdx >= 6) completeOnEffect();
     return;
   }
 
   if (off_effects > 0) {
-    if (Counter == 0 && off_effects == 5 && flip_switch) {
+    if (Counter == 0 && (off_effects == 5 || off_effects == 12) && flip_switch) {
       flip_switch = false;
       shuffle(rand_arr, 6);
       log_add('A', "OFF_ORDER random=%d,%d,%d,%d,%d,%d", rand_arr[0], rand_arr[1], rand_arr[2], rand_arr[3], rand_arr[4], rand_arr[5]);
