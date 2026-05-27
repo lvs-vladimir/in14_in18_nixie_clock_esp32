@@ -47,8 +47,10 @@ struct Data {
   byte ws2812_brightness;
   byte ws2812_random_sec;
   boolean veml_enable;
-  byte veml_bright_min;
-  byte veml_bright_max;
+  byte ws2812_br_ranges;
+  int ws2812_lux_min[4];
+  int ws2812_lux_max[4];
+  byte ws2812_bright_val[4];
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));

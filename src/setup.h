@@ -107,8 +107,13 @@ void setup()
 
   if (mydata.ws2812_brightness == 0) mydata.ws2812_brightness = 100;
   if (mydata.ws2812_random_sec == 0) mydata.ws2812_random_sec = 10;
-  if (mydata.veml_bright_min == 0) mydata.veml_bright_min = 10;
-  if (mydata.veml_bright_max == 0) mydata.veml_bright_max = 200;
+  if (mydata.ws2812_br_ranges == 0) {
+    mydata.ws2812_br_ranges = 4;
+    mydata.ws2812_lux_min[0] = 0; mydata.ws2812_lux_max[0] = 15; mydata.ws2812_bright_val[0] = 10;
+    mydata.ws2812_lux_min[1] = 20; mydata.ws2812_lux_max[1] = 200; mydata.ws2812_bright_val[1] = 60;
+    mydata.ws2812_lux_min[2] = 300; mydata.ws2812_lux_max[2] = 700; mydata.ws2812_bright_val[2] = 130;
+    mydata.ws2812_lux_min[3] = 1000; mydata.ws2812_lux_max[3] = 15000; mydata.ws2812_bright_val[3] = 200;
+  }
   FastLED.addLeds<WS2812B, LEDS_PIN, GRB>(leds, LEDS_COUNT);
   FastLED.setBrightness(mydata.ws2812_enable ? mydata.ws2812_brightness : 0);
 

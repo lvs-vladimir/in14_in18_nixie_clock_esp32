@@ -207,12 +207,16 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
   GP.HR();
   GP.BLOCK_END();
 
-  GP.BLOCK_THIN_BEGIN();
+    GP.BLOCK_THIN_BEGIN();
   M_BOX(GP_CENTER, GP.LABEL(VEML_LABEL[mydata.lng]););
   GP.HR();
   M_BOX(GP_LEFT, GP.LABEL(VEML_ENABLE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("veml_enable", mydata.veml_enable, GP_BLUE);););
-  M_BOX(GP_LEFT, GP.LABEL(VEML_MIN[mydata.lng]); M_BOX(GP_RIGHT, GP.SLIDER("veml_bright_min", mydata.veml_bright_min, 0, 255, 1, 0, GP_BLUE);););
-  M_BOX(GP_LEFT, GP.LABEL(VEML_MAX[mydata.lng]); M_BOX(GP_RIGHT, GP.SLIDER("veml_bright_max", mydata.veml_bright_max, 0, 255, 1, 0, GP_BLUE);););
+  GP.HR();
+  M_BOX(GP_CENTER, GP.LABEL(VEML_INTERVAL[mydata.lng]););
+  M_BOX(GP_LEFT, GP.LABEL("1:"); M_BOX(GP_RIGHT, GP.LABEL(VEML_LUX_FROM[mydata.lng]); GP.SPINNER("veml_lm0", mydata.ws2812_lux_min[0], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(VEML_LUX_TO[mydata.lng]); GP.SPINNER("veml_lx0", mydata.ws2812_lux_max[0], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(VEML_BRIGHT[mydata.lng]); GP.SPINNER("veml_bv0", mydata.ws2812_bright_val[0], 0, 255, 1, 0, GP_BLUE, "50px", 0);););
+  M_BOX(GP_LEFT, GP.LABEL("2:"); M_BOX(GP_RIGHT, GP.LABEL(VEML_LUX_FROM[mydata.lng]); GP.SPINNER("veml_lm1", mydata.ws2812_lux_min[1], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(VEML_LUX_TO[mydata.lng]); GP.SPINNER("veml_lx1", mydata.ws2812_lux_max[1], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(VEML_BRIGHT[mydata.lng]); GP.SPINNER("veml_bv1", mydata.ws2812_bright_val[1], 0, 255, 1, 0, GP_BLUE, "50px", 0);););
+  M_BOX(GP_LEFT, GP.LABEL("3:"); M_BOX(GP_RIGHT, GP.LABEL(VEML_LUX_FROM[mydata.lng]); GP.SPINNER("veml_lm2", mydata.ws2812_lux_min[2], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(VEML_LUX_TO[mydata.lng]); GP.SPINNER("veml_lx2", mydata.ws2812_lux_max[2], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(VEML_BRIGHT[mydata.lng]); GP.SPINNER("veml_bv2", mydata.ws2812_bright_val[2], 0, 255, 1, 0, GP_BLUE, "50px", 0);););
+  M_BOX(GP_LEFT, GP.LABEL("4:"); M_BOX(GP_RIGHT, GP.LABEL(VEML_LUX_FROM[mydata.lng]); GP.SPINNER("veml_lm3", mydata.ws2812_lux_min[3], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(VEML_LUX_TO[mydata.lng]); GP.SPINNER("veml_lx3", mydata.ws2812_lux_max[3], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(VEML_BRIGHT[mydata.lng]); GP.SPINNER("veml_bv3", mydata.ws2812_bright_val[3], 0, 255, 1, 0, GP_BLUE, "50px", 0);););
   GP.BLOCK_END();
 
   }
@@ -312,8 +316,18 @@ void action(GyverPortal& ui) {
     if (ui.clickInt("ws2812_bright", mydata.ws2812_brightness));
     if (ui.clickInt("ws2812_random_sec", mydata.ws2812_random_sec));
     if (ui.clickInt("veml_enable", mydata.veml_enable));
-    if (ui.clickInt("veml_bright_min", mydata.veml_bright_min));
-    if (ui.clickInt("veml_bright_max", mydata.veml_bright_max));
+    if (ui.clickInt("veml_lm0", mydata.ws2812_lux_min[0]));
+    if (ui.clickInt("veml_lx0", mydata.ws2812_lux_max[0]));
+    if (ui.clickInt("veml_bv0", mydata.ws2812_bright_val[0]));
+    if (ui.clickInt("veml_lm1", mydata.ws2812_lux_min[1]));
+    if (ui.clickInt("veml_lx1", mydata.ws2812_lux_max[1]));
+    if (ui.clickInt("veml_bv1", mydata.ws2812_bright_val[1]));
+    if (ui.clickInt("veml_lm2", mydata.ws2812_lux_min[2]));
+    if (ui.clickInt("veml_lx2", mydata.ws2812_lux_max[2]));
+    if (ui.clickInt("veml_bv2", mydata.ws2812_bright_val[2]));
+    if (ui.clickInt("veml_lm3", mydata.ws2812_lux_min[3]));
+    if (ui.clickInt("veml_lx3", mydata.ws2812_lux_max[3]));
+    if (ui.clickInt("veml_bv3", mydata.ws2812_bright_val[3]));
     if (ui.clickInt("anim_change", mydata.anim_change));
   if (ui.clickInt("anim_change_sec", mydata.anim_change_sec));
   if (ui.clickInt("animdots", mydata.animdots));
