@@ -11,6 +11,20 @@ void setup()
   log_add('I', "System boot");
 
   LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED);
+  if (LittleFS.exists("/webpass.txt")) {
+    File f = LittleFS.open("/webpass.txt", "r");
+    String pass = f.readStringUntil('\n');
+    f.close();
+    pass.trim();
+    if (pass.length() > 0) pass.toCharArray(webPass, sizeof(webPass));
+  } else {
+    File f = LittleFS.open("/webpass.txt", "w");
+    f.print(webPass);
+    f.close();
+  }
+  ui.enableAuth(webLogin, webPass);
+  log_add('I', "Web auth enabled login=%s", webLogin);
+
   FDstat_t stat = fd.read();
   if (stat != FD_READ) {
     log_add('W', "Settings read: %d, using defaults", stat);

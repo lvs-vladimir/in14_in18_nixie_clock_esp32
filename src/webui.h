@@ -30,10 +30,16 @@ void build() {
     M_BOX(GP_LEFT, GP.LABEL(SETTING_NETWORK_WIFI_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.TEXT("ps", "Password", mydata.pass, "100%");));
     GP.BREAK();
     M_BOX(GP_CENTER, GP.BUTTON_MINI("wifi_btn", SETTING_WIFI_CONNECT_BTN[mydata.lng], "", GP_BLUE, "", 0, 1););
-    GP.BLOCK_END();
+GP.BLOCK_END();
 
-    GP.BLOCK_THIN_BEGIN();
-    M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_blank\">OpenWeatherMap.org</a>"), "", GP_DEFAULT, 0, 1););
+GP.BLOCK_THIN_BEGIN();
+M_BOX(GP_CENTER, GP.LABEL(SETTING_WEB_AUTH_NAME[mydata.lng]););
+GP.HR();
+M_BOX(GP_LEFT, GP.LABEL(SETTING_WEB_AUTH_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("web_pass", "Password", webPass, "100%", 31, "", false, true);););
+GP.BLOCK_END();
+
+GP.BLOCK_THIN_BEGIN();
+M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_blank\">OpenWeatherMap.org</a>"), "", GP_DEFAULT, 0, 1););
     GP.HR();
     M_BOX(GP_LEFT, GP.LABEL(SETTING_OP_APIKEY[mydata.lng]); M_BOX(GP_RIGHT, GP.TEXT("ap", "ApiKey", mydata.owMapApiKey, "100%");););
     M_BOX(GP_LEFT, GP.LABEL(SETTING_OP_CITY[mydata.lng]); M_BOX(GP_RIGHT, GP.TEXT("ct", "City", mydata.owCity, "100%");););
@@ -183,6 +189,18 @@ void action(GyverPortal & p) {
     if (ui.clickStr("ntp", mydata.NTPserver));
     if (ui.clickStr("lg", mydata.ssid));
     if (ui.clickStr("ps", mydata.pass));
+    if (ui.click("web_pass")) {
+      String pass = ui.getString("web_pass");
+      pass.trim();
+      if (pass.length() > 0 && pass.length() < sizeof(webPass)) {
+        pass.toCharArray(webPass, sizeof(webPass));
+        File f = LittleFS.open("/webpass.txt", "w");
+        f.print(webPass);
+        f.close();
+        ui.enableAuth(webLogin, webPass);
+        log_add('I', "Web password changed");
+      }
+    }
     if (ui.clickStr("ap", mydata.owMapApiKey));
     if (ui.clickStr("ct", mydata.owCity));
     if (ui.clickStr("api_narod", mydata.NarodmoonApi));
