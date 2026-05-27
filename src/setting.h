@@ -139,7 +139,7 @@ void calculateTime()
 uint8_t brigh_value_indi(uint16_t veml_value, int lux_min[], int lux_max[], uint8_t brigh_values[], uint8_t prev_brigh_value) {
   for (byte i = 0; i < num_ranges; i++) {
     if (veml_value >= lux_min[i] && veml_value <= lux_max[i]) {
-      return prev_brigh_value = (brigh_values[i] > prev_brigh_value) ? brigh_values[i] : prev_brigh_value;
+      return prev_brigh_value = brigh_values[i];
     }
   }
   return prev_brigh_value;
