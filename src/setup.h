@@ -133,6 +133,7 @@ void setup()
   minute = 22;
   second = 00;
   oldminute = minute;
+  if (mydata.anim_change_sec == 0) mydata.anim_change_sec = 30;
 
   NTPClientUpdate();
   NtpSyncTimer.start();

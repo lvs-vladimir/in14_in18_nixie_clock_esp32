@@ -36,6 +36,7 @@ struct Data {
   byte nrd_type_sensor[6];
   byte autoshow_min, autoshow_slots, autoshow_select[6], autoshow_select_sec[7];
   byte anim_change;
+  byte anim_change_sec;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));

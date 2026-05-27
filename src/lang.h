@@ -29,6 +29,7 @@ const char* DISPLAY_SECONDS_SWITCH[] = {"Вкл/выкл секунды", "On/of
 const char* DISPLAY_DATA_LABEL[] = {"Данные дисплея", "Display data"};
 const char* DISPLAY_DATA_SHOW_SWITCH[] = {"Автопоказ", "Auto show"};
 const char* SETTING_ANIM_NAME[] = {"Эффект смены цифр:", "Digit effect:"};
+const char* SETTING_ANIM_SEC_NAME[] = {"Смена через (сек):", "Change every (sec):"};
 const char* SETTING_ANIM_ARRAY[] = {"Автоцикл,Без,Последовательно,Плавно", "Auto cycle,None,Sequential,Smooth"};
 const char* DISPLAY_MODE_ANIM_NAME[] = {"Анимация смены режимов:", "Mode change animation:"};
 const char* DISPLAY_MODE_ANIM_ARRAY[] = {"Случайная,Слева направо,Справа налево,К центру,От центра,Случайные лампы,Чётные потом нечётные,Нечётные потом чётные", "Random,Left to right,Right to left,To center,From center,Random tubes,Even then odd,Odd then even"};

@@ -175,6 +175,8 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     GP.BREAK();
 M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_change", SETTING_ANIM_ARRAY[mydata.lng], mydata.anim_change, 0, 0, 1);););
 GP.BREAK();
+M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_SEC_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("anim_change_sec", mydata.anim_change_sec, 3, 300, 1, 0, GP_BLUE, "60px", 0);););
+GP.BREAK();
 M_BOX(GP_LEFT, GP.LABEL(DISPLAY_MODE_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("animdots", DISPLAY_MODE_ANIM_ARRAY[mydata.lng], mydata.animdots, 0, 0, 1);););
 GP.HR();
 M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("seconds_switch", mydata.seconds_switch, GP_BLUE);););
@@ -280,6 +282,7 @@ void action(GyverPortal& ui) {
     if (ui.clickInt("seconds_switch", mydata.seconds_switch)) {};
     if (ui.clickInt("auto_show_switch", mydata.autoshow_switch));
     if (ui.clickInt("anim_change", mydata.anim_change));
+  if (ui.clickInt("anim_change_sec", mydata.anim_change_sec));
   if (ui.clickInt("animdots", mydata.animdots));
     if (ui.clickInt("autoshow_sec", mydata.autoshow_min));
     for (byte i = 0; i < mydata.autoshow_slots; i++) {
