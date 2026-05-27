@@ -27,6 +27,8 @@ void build() {
   }
 
   GP.NAV_TABS_LINKS("/,/setting,/info,/firmware,/log", TAB_LINKS_NAMES[mydata.lng], GP_BLUE);
+  M_BOX(GP_RIGHT, GP.BUTTON_MINI_LINK("/logout", WEB_LOGOUT_BUTTON[mydata.lng], GP_RED, "80px"););
+  GP.HR();
 
   if (ui.uri("/setting")) {
     GP.FORM_BEGIN("/setting");

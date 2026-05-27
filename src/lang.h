@@ -40,3 +40,4 @@ const char* SETTING_WEB_AUTH_SAVE_BTN[] = {"Сменить пароль", "Chang
 const char* WEB_LOGIN_TITLE[] = {"Вход", "Login"};
 const char* WEB_LOGIN_PASSWORD[] = {"Пароль:", "Password:"};
 const char* WEB_LOGIN_BUTTON[] = {"Войти", "Enter"};
+const char* WEB_LOGOUT_BUTTON[] = {"Выход", "Logout"};
