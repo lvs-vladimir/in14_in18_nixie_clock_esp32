@@ -19,8 +19,12 @@ void ws2812_effect() {
 
   byte target_bright = mydata.ws2812_brightness;
   if (mydata.veml_enable) {
+    byte min_b = mydata.veml_bright_min;
+    byte max_b = mydata.veml_bright_max;
+    if (max_b < min_b) { byte t = min_b; min_b = max_b; max_b = t; }
     int raw = min((int)vemllux, 1000);
-    target_bright = map(raw, 0, 1000, 0, target_bright);
+    target_bright = map(raw, 0, 1000, min_b, max_b);
+    target_bright = min((int)target_bright, (int)mydata.ws2812_brightness);
   }
   FastLED.setBrightness(target_bright);
 

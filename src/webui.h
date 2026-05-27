@@ -211,6 +211,8 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
   M_BOX(GP_CENTER, GP.LABEL(VEML_LABEL[mydata.lng]););
   GP.HR();
   M_BOX(GP_LEFT, GP.LABEL(VEML_ENABLE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("veml_enable", mydata.veml_enable, GP_BLUE);););
+  M_BOX(GP_LEFT, GP.LABEL(VEML_MIN[mydata.lng]); M_BOX(GP_RIGHT, GP.SLIDER("veml_bright_min", mydata.veml_bright_min, 0, 255, 1, 0, GP_BLUE);););
+  M_BOX(GP_LEFT, GP.LABEL(VEML_MAX[mydata.lng]); M_BOX(GP_RIGHT, GP.SLIDER("veml_bright_max", mydata.veml_bright_max, 0, 255, 1, 0, GP_BLUE);););
   GP.BLOCK_END();
 
   }
@@ -310,6 +312,8 @@ void action(GyverPortal& ui) {
     if (ui.clickInt("ws2812_bright", mydata.ws2812_brightness));
     if (ui.clickInt("ws2812_random_sec", mydata.ws2812_random_sec));
     if (ui.clickInt("veml_enable", mydata.veml_enable));
+    if (ui.clickInt("veml_bright_min", mydata.veml_bright_min));
+    if (ui.clickInt("veml_bright_max", mydata.veml_bright_max));
     if (ui.clickInt("anim_change", mydata.anim_change));
   if (ui.clickInt("anim_change_sec", mydata.anim_change_sec));
   if (ui.clickInt("animdots", mydata.animdots));
