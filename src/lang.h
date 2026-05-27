@@ -46,4 +46,4 @@ const char* WS2812_LABEL[] = {"Подсветка WS2812", "WS2812 Backlight"};
 const char* WS2812_ENABLE[] = {"Вкл/выкл", "On/Off"};
 const char* WS2812_ANIM[] = {"Анимация:", "Animation:"};
 const char* WS2812_BRIGHT[] = {"Яркость:", "Brightness:"};
-const char* WS2812_ANIM_ARRAY[] = {"Радуга,Тёплый белый,Дыхание,Волна,Театр", "Rainbow,Warm white,Breathing,Wipe,Theater"};
+const char* WS2812_ANIM_ARRAY[] = {"Радуга,Бегущая радуга,Случайные цвета,Мячик,Мячик со шлейфом,Огонь,Мерцание,Стробоскоп,Сканер,Искры,Тёплый белый", "Rainbow,Running rainbow,Random colors,Bounce,Bounce trail,Fire,Twinkle,Strobe,Scanner,Sparkle,Warm white"};

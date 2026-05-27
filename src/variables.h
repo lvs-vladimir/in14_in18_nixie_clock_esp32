@@ -14,7 +14,7 @@
 #include <stdarg.h>
 #include "SPI.h"
 #include "timer2Minim.h"
-#include "Freenove_WS2812_Lib_for_ESP32.h"
+#include "FastLED.h"
 #include "Adafruit_VEML7700.h"
 #include "lwip/raw.h"
 #include "lwip/ip4.h"
@@ -110,7 +110,7 @@ void log_add(char level, const char* fmt, ...) {
 
 #define num_ranges 6
 
-Freenove_ESP32_WS2812 strip = Freenove_ESP32_WS2812(LEDS_COUNT, LEDS_PIN, CHANNEL, TYPE_GRB);
+CRGB leds[LEDS_COUNT];
 Adafruit_VEML7700 veml = Adafruit_VEML7700();
 
 SPIClass *vspi = NULL;
@@ -125,7 +125,7 @@ timerMinim mooveNixie(100);
 timerMinim SwitchDisplayTimer(40);
 timerMinim ChangeCathodeTimer(60);
 timerMinim ChangeCathodeTimerEffects(20);
-timerMinim WS2812(10);
+timerMinim WS2812_timer(10);
 timerMinim SensorSelectTimer(3000);
 timerMinim NtpSyncTimer(3600000);
 timerMinim OwmUpdateTimer(300000);

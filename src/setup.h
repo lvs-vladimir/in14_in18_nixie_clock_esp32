@@ -105,9 +105,9 @@ void setup()
   hspi = new SPIClass(HSPI);
   hspi->begin(HSPI_SCLK, HSPI_MISO, HSPI_MOSI, HSPI_SS);
 
-  strip.begin();
   if (mydata.ws2812_brightness == 0) mydata.ws2812_brightness = 100;
-  if (mydata.ws2812_enable) strip.setBrightness(mydata.ws2812_brightness); else strip.setBrightness(0);
+  FastLED.addLeds<WS2812B, LEDS_PIN, GRB>(leds, LEDS_COUNT);
+  FastLED.setBrightness(mydata.ws2812_enable ? mydata.ws2812_brightness : 0);
 
   ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
   ledcAttachPin(LED_OUTPUT_PIN, PWM_CHANNEL);
