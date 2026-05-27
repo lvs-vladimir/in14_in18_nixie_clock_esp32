@@ -6,7 +6,7 @@ int getSlotValue(byte slotIdx)
     return 0;
   }
 
-  int sensorIdx = dropdownIdx - 1;
+  int sensorIdx = dropdownIdx + 3;
   if (sensorIdx > 13) {
     log_add('W', "GETVAL slot=%d dropdown=%d invalid sensor=%d", slotIdx, dropdownIdx, sensorIdx);
     return 0;

@@ -30,9 +30,9 @@ void setup()
     for (byte i = 0; i < 7; i++) mydata.autoshow_select_sec[i] = 10;
     mydata.autoshow_select_sec[0] = 0;
     mydata.autoshow_switch = true;
-    mydata.autoshow_select[1] = 5;
-    mydata.autoshow_select[2] = 6;
-    mydata.autoshow_select[3] = 7;
+    mydata.autoshow_select[1] = 1;
+    mydata.autoshow_select[2] = 2;
+    mydata.autoshow_select[3] = 3;
   }
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
   if (!mydata.seconds_switch) mydata.seconds_switch = true;
@@ -47,17 +47,26 @@ void setup()
     mydata.autoshow_select[0] = 0;
     fd.updateNow();
   }
-  if (mydata.autoshow_slots > 0 && (mydata.autoshow_select[1] < 5 || mydata.autoshow_select[1] > 13)) {
+  bool autoshowMigratedCompact = false;
+  for (byte idx = 1; idx <= mydata.autoshow_slots; idx++) {
+    if (mydata.autoshow_select[idx] >= 5) {
+      log_add('W', "Compact autoshow slot %d old=%d new=%d", idx, mydata.autoshow_select[idx], mydata.autoshow_select[idx] - 4);
+      mydata.autoshow_select[idx] -= 4;
+      autoshowMigratedCompact = true;
+    }
+  }
+  if (autoshowMigratedCompact) fd.updateNow();
+  if (mydata.autoshow_slots > 0 && mydata.autoshow_select[1] > 5) {
     log_add('W', "Slot1 invalid (%d), reset to temp", mydata.autoshow_select[1]);
-    mydata.autoshow_select[1] = 5;
+    mydata.autoshow_select[1] = 1;
   }
-  if (mydata.autoshow_slots > 1 && (mydata.autoshow_select[2] < 5 || mydata.autoshow_select[2] > 13)) {
+  if (mydata.autoshow_slots > 1 && mydata.autoshow_select[2] > 5) {
     log_add('W', "Slot2 invalid (%d), reset to pressure", mydata.autoshow_select[2]);
-    mydata.autoshow_select[2] = 6;
+    mydata.autoshow_select[2] = 2;
   }
-  if (mydata.autoshow_slots > 2 && (mydata.autoshow_select[3] < 5 || mydata.autoshow_select[3] > 13)) {
+  if (mydata.autoshow_slots > 2 && mydata.autoshow_select[3] > 5) {
     log_add('W', "Slot3 invalid (%d), reset to humidity", mydata.autoshow_select[3]);
-    mydata.autoshow_select[3] = 7;
+    mydata.autoshow_select[3] = 3;
   }
 
   log_add('I', "SSID: %s", mydata.ssid);

@@ -114,7 +114,7 @@ void flip_nixiebuffer()
   }
 
   byte dropdownIdx = mydata.autoshow_select[display];
-  byte si = dropdownIdx > 0 ? dropdownIdx - 1 : 0;
+  byte si = dropdownIdx > 0 ? dropdownIdx + 3 : 0;
   if (si == 4) {
     NixieBuffer[0] = 10;
     NixieBuffer[1] = 10;
