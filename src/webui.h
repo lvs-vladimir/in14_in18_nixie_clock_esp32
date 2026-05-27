@@ -14,11 +14,13 @@ void build() {
 
   if (!webAuthOk) {
     GP.BLOCK_THIN_BEGIN();
+    GP.FORM_BEGIN("/login");
     M_BOX(GP_CENTER, GP.LABEL(WEB_LOGIN_TITLE[mydata.lng]););
     GP.HR();
     M_BOX(GP_LEFT, GP.LABEL(WEB_LOGIN_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("login_pass", "Password", "", "100%", 31, "", false, true);););
     GP.BREAK();
-    M_BOX(GP_CENTER, GP.BUTTON_MINI("login_btn", WEB_LOGIN_BUTTON[mydata.lng], "", GP_BLUE, "", 0, 1););
+    M_BOX(GP_CENTER, GP.SUBMIT_MINI(WEB_LOGIN_BUTTON[mydata.lng], GP_BLUE););
+    GP.FORM_END();
     GP.BLOCK_END();
     GP.BUILD_END();
     return;
@@ -178,9 +180,8 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
 }
 
 void action(GyverPortal & p) {
-  if (ui.click()) {
-    if (ui.click("login_btn")) {
-      String pass = ui.getString("login_pass");
+    if (ui.form("/login")) {
+      String pass = ui.arg("login_pass");
       pass.trim();
       if (pass == String(webPass)) {
         webAuthOk = true;
@@ -191,7 +192,9 @@ void action(GyverPortal & p) {
       return;
     }
 
+
     if (!webAuthOk) return;
+  if (ui.click()) {
     if (ui.click("rst")) ESP.restart();
     if (ui.click("sntp_btn")) {
       timeClient.setPoolServerName(mydata.NTPserver);
