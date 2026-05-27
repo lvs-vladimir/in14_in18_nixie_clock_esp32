@@ -42,7 +42,7 @@ FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
 GyverPortal ui(&LittleFS);
 
 #define LOG_ENTRIES 200
-#define LOG_LINE_LEN 80
+#define LOG_LINE_LEN 160
 struct LogEntry {
   uint32_t time;
   char level;
@@ -210,6 +210,24 @@ boolean timer0 = false;
 boolean timer1 = false;
 
 int pricebtc, priceeth, TempValue;
+
+enum DisplayModeState : byte {
+  MODE_TIME = 0,
+  MODE_TIME_OFF,
+  MODE_SENSOR_ON,
+  MODE_SENSOR_HOLD,
+  MODE_SENSOR_OFF,
+  MODE_TIME_ON
+};
+
+DisplayModeState displayState = MODE_TIME;
+byte nextDisplay = 0;
+byte transitionFromDisplay = 0;
+byte transitionToDisplay = 0;
+uint32_t modeStateStarted = 0;
+uint32_t modeHoldStarted = 0;
+byte activeTransitionEffect = 0;
+
 //        LD               RD
 // 0b000000100000, 0b000100000000,
 
