@@ -333,20 +333,33 @@ void switch_effects()
               NixieBuffer[3], NixieBuffer[4], NixieBuffer[5]);
     }
 
-    byte step = Counter;
-    for (int i = 0; i < 6; i++) {
-      if (off_effects == 10) {
-        Nixie[i] = (i < 6 - step) ? saved[i + step] : NixieBuffer[i];
-      } else {
-        Nixie[i] = (i < step) ? NixieBuffer[i] : saved[i - step];
+    byte t = Counter;
+    if (t < 7) {
+      // Scroll out (0-6): old → blank
+      for (int i = 0; i < 6; i++) {
+        if (off_effects == 10) {
+          Nixie[i] = (i < 6 - t) ? saved[i + t] : 10;
+        } else {
+          Nixie[i] = (i < t) ? 10 : saved[i - t];
+        }
+      }
+    } else {
+      // Scroll in (7-12): blank → new
+      byte sub = t - 6;
+      for (int i = 0; i < 6; i++) {
+        if (off_effects == 10) {
+          Nixie[i] = (i < 6 - sub) ? 10 : NixieBuffer[i];
+        } else {
+          Nixie[i] = (i < sub) ? NixieBuffer[i] : 10;
+        }
       }
     }
 
-    log_add('A', "SCROLL step=%d N=%d%d:%d%d:%d%d", step,
+    log_add('A', "SCROLL t=%d N=%d%d:%d%d:%d%d", t,
             Nixie[0], Nixie[1], Nixie[2], Nixie[3], Nixie[4], Nixie[5]);
 
     Counter++;
-    if (Counter >= 7) {
+    if (Counter > 12) {
       byte doneEffect = off_effects;
       off_effects = 0;
       on_effects = 0;
