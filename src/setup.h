@@ -80,24 +80,15 @@ void setup()
     mydata.autoshow_select[0] = 0;
     fd.updateNow();
   }
-  bool autoshowMigratedCompact = false;
-  for (byte idx = 1; idx <= mydata.autoshow_slots; idx++) {
-    if (mydata.autoshow_select[idx] >= 5) {
-      log_add('W', "Compact autoshow slot %d old=%d new=%d", idx, mydata.autoshow_select[idx], mydata.autoshow_select[idx] - 4);
-      mydata.autoshow_select[idx] -= 4;
-      autoshowMigratedCompact = true;
-    }
-  }
-  if (autoshowMigratedCompact) fd.updateNow();
-  if (mydata.autoshow_slots > 0 && mydata.autoshow_select[1] > 5) {
+  if (mydata.autoshow_slots > 0 && mydata.autoshow_select[1] > 7) {
     log_add('W', "Slot1 invalid (%d), reset to temp", mydata.autoshow_select[1]);
     mydata.autoshow_select[1] = 1;
   }
-  if (mydata.autoshow_slots > 1 && mydata.autoshow_select[2] > 5) {
+  if (mydata.autoshow_slots > 1 && mydata.autoshow_select[2] > 7) {
     log_add('W', "Slot2 invalid (%d), reset to pressure", mydata.autoshow_select[2]);
     mydata.autoshow_select[2] = 2;
   }
-  if (mydata.autoshow_slots > 2 && mydata.autoshow_select[3] > 5) {
+  if (mydata.autoshow_slots > 2 && mydata.autoshow_select[3] > 7) {
     log_add('W', "Slot3 invalid (%d), reset to humidity", mydata.autoshow_select[3]);
     mydata.autoshow_select[3] = 3;
   }
