@@ -107,7 +107,9 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     GP.BLOCK_END();
 
   } else if (ui.uri("/log")) {
-    GP.LABEL(F("<script>setInterval(function(){location.reload()},3000)</script>"), "");
+    GP.JS_BEGIN();
+    *_GPP += F("setInterval(function(){location.reload()},3000)");
+    GP.JS_END();
     GP.BLOCK_THIN_BEGIN();
     M_BOX(GP_CENTER, GP.LABEL("System Log"););
     GP.HR();
