@@ -19,15 +19,14 @@ void ws2812_effect() {
 
   byte target_bright = mydata.ws2812_brightness;
   if (mydata.veml_enable) {
-    byte found = 255;
+    byte found = mydata.ws2812_bright_val[0];
     byte num = mydata.ws2812_br_ranges;
-    for (int i = 0; i < 4; i++) {
-      if (i < num && vemllux >= mydata.ws2812_lux_min[i] && vemllux <= mydata.ws2812_lux_max[i]) {
+    for (int i = 0; i < 4 && i < num; i++) {
+      if ((int)vemllux >= mydata.ws2812_lux_min[i]) {
         found = mydata.ws2812_bright_val[i];
-        break;
       }
     }
-    if (found != 255) target_bright = found;
+    target_bright = found;
   }
   FastLED.setBrightness(target_bright);
 
@@ -209,7 +208,6 @@ void ws2812_effect() {
   }
   FastLED.show();
 }
-
 void loop2 (void* pvParameters) {
   while (1) {
     ws2812_effect();
