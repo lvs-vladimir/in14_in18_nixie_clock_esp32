@@ -26,7 +26,7 @@ void build() {
     return;
   }
 
-  GP.NAV_TABS_LINKS("/,/setting,/info,/firmware,/log", TAB_LINKS_NAMES[mydata.lng], GP_BLUE);
+  GP.NAV_TABS_LINKS("/,/setting,/info,/firmware,/log,/readme", TAB_LINKS_NAMES[mydata.lng], GP_BLUE);
   GP.HR();
 
   if (ui.uri("/setting")) {
@@ -117,9 +117,21 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
       byte n = (idx + i) % LOG_ENTRIES;
       char line[LOG_LINE_LEN + 16];
       snprintf(line, sizeof(line), "[%5lu] %c: %s", log_entries[n].time, log_entries[n].level, log_entries[n].msg);
-      GP.LABEL(line, "", GP_DEFAULT, 10);
+      GP.LABEL(line, "", GP_DEFAULT, 10, false, true);
       GP.BREAK();
     }
+    GP.BLOCK_END();
+
+  } else if (ui.uri("/readme")) {
+    GP.BLOCK_THIN_BEGIN();
+    M_BOX(GP_CENTER, GP.LABEL("README.md"););
+    GP.HR();
+    if (WiFi.status() == WL_CONNECTED && (readmeCache.length() == 0 || millis() - readmeFetchTime > 300000)) {
+      readmeCache = httpGETRequest("https://raw.githubusercontent.com/lvs-vladimir/in14_in18_nixie_clock_esp32/main/README.md");
+      if (readmeCache.length() == 0) readmeCache = "Failed to fetch README from GitHub";
+      else readmeFetchTime = millis();
+    }
+    GP.LABEL(readmeCache, "", GP_DEFAULT, 12, false, true);
     GP.BLOCK_END();
 
   } else {

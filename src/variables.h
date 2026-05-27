@@ -268,3 +268,5 @@ int usdRubRate;
 int narodtemperature, narodpressure, narodhumidity;
 bool ap_show_scroll = false;
 bool wifi_dc_state = false;
+String readmeCache;
+unsigned long readmeFetchTime = 0;
