@@ -171,8 +171,7 @@ void loop()
   }
 
   if (SensorSelectTimer.isReady()) {
-    SensorsAutoShowSelect2 = "";
-    for (byte k = 0; k < 13; k++) SensorsAutoShowSelect2 += SensorsAutoShow[k];
+    rebuildSensorsAutoShowSelect();
   }
 
   if (NtpSyncTimer.isReady() && WiFi.status() == WL_CONNECTED) {

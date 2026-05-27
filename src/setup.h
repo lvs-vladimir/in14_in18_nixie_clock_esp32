@@ -99,6 +99,8 @@ void setup()
     log_add('I', "OWM init update");
     if (strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) getTemp2(0);
   }
+  rebuildSensorsAutoShowSelect();
+  log_add('I', "Sensor select list initialized: len=%d", SensorsAutoShowSelect2.length());
   OwmUpdateTimer.start();
   log_add('I', "Init complete, HW: %d/%d, disp=%d", hour, minute, display);
 

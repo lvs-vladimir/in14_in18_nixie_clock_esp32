@@ -130,3 +130,10 @@ void getTemp2(byte i){
 
 
 
+
+
+void rebuildSensorsAutoShowSelect()
+{
+  SensorsAutoShowSelect2 = ",";
+  for (byte k = 0; k < 13; k++) SensorsAutoShowSelect2 += SensorsAutoShow[k];
+}
