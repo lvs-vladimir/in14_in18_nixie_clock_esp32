@@ -16,6 +16,10 @@
 #include "timer2Minim.h"
 #include "Freenove_WS2812_Lib_for_ESP32.h"
 #include "Adafruit_VEML7700.h"
+#include "lwip/raw.h"
+#include "lwip/ip4.h"
+#include "lwip/icmp.h"
+#include "lwip/pbuf.h"
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 

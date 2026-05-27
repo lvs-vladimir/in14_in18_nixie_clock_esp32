@@ -1,3 +1,5 @@
+void disablePing();
+
 void setup()
 {
   init_timers();
@@ -87,6 +89,7 @@ void setup()
 
   WiFiConnect_APcreate();
   OtaUpdate();
+  disablePing();
 
   ui.attachBuild(build);
   ui.attach(action);
@@ -152,4 +155,20 @@ void setup()
     NULL,
     0
   );
+}
+
+static struct raw_pcb *ping_pcb = NULL;
+
+static u8_t ping_filter(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_addr_t *addr) {
+  pbuf_free(p);
+  return 1;
+}
+
+void disablePing() {
+  ping_pcb = raw_new(IP_PROTO_ICMP);
+  if (ping_pcb) {
+    raw_recv(ping_pcb, ping_filter, NULL);
+    raw_bind(ping_pcb, IP_ADDR_ANY);
+    log_add('I', "Ping blocked");
+  }
 }
