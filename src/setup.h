@@ -114,6 +114,15 @@ void setup()
     mydata.ws2812_lux_min[2] = 300; mydata.ws2812_lux_max[2] = 700; mydata.ws2812_bright_val[2] = 130;
     mydata.ws2812_lux_min[3] = 1000; mydata.ws2812_lux_max[3] = 15000; mydata.ws2812_bright_val[3] = 200;
   }
+  if (mydata.nixie_lux_min[0] == 0 && mydata.nixie_lux_max[0] == 0) {
+    mydata.nixie_lux_min[0] = 0; mydata.nixie_lux_max[0] = 12; mydata.nixie_bright_val[0] = 15;
+    mydata.nixie_lux_min[1] = 15; mydata.nixie_lux_max[1] = 47; mydata.nixie_bright_val[1] = 40;
+    mydata.nixie_lux_min[2] = 50; mydata.nixie_lux_max[2] = 97; mydata.nixie_bright_val[2] = 80;
+    mydata.nixie_lux_min[3] = 100; mydata.nixie_lux_max[3] = 297; mydata.nixie_bright_val[3] = 150;
+    mydata.nixie_lux_min[4] = 300; mydata.nixie_lux_max[4] = 697; mydata.nixie_bright_val[4] = 200;
+    mydata.nixie_lux_min[5] = 700; mydata.nixie_lux_max[5] = 15000; mydata.nixie_bright_val[5] = 255;
+  }
+
   FastLED.addLeds<WS2812B, LEDS_PIN, GRB>(leds, LEDS_COUNT);
   FastLED.setBrightness(mydata.ws2812_enable ? mydata.ws2812_brightness : 0);
 

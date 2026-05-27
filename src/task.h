@@ -215,7 +215,7 @@ void loop2 (void* pvParameters) {
 
     if (timer0) {
       vemllux = veml.readLux();
-      uint8_t bright_value = brigh_value_indi(vemllux, lux_ranges, brigh_values, prev_brigh_value);
+      uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
       prev_brigh_value = bright_value;
       ledcWrite(PWM_CHANNEL, bright_value);
       Serial.print("LUX: ");

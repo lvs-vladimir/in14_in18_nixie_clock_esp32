@@ -51,6 +51,9 @@ struct Data {
   int ws2812_lux_min[4];
   int ws2812_lux_max[4];
   byte ws2812_bright_val[4];
+  int nixie_lux_min[6];
+  int nixie_lux_max[6];
+  byte nixie_bright_val[6];
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
