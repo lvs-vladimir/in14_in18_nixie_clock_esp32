@@ -34,4 +34,6 @@ const char* DISPLAY_MODE_ANIM_NAME[] = {"Анимация смены режим�
 const char* DISPLAY_MODE_ANIM_ARRAY[] = {"Случайная,Слева направо,Справа налево,К центру,От центра,Случайные лампы,Чётные потом нечётные,Нечётные потом чётные", "Random,Left to right,Right to left,To center,From center,Random tubes,Even then odd,Odd then even"};
 
 const char* SETTING_WEB_AUTH_NAME[] = {"Защита веб-интерфейса", "Web interface security"};
-const char* SETTING_WEB_AUTH_PASSWORD[] = {"Пароль веб-интерфейса:", "Web password:"};
+const char* SETTING_WEB_AUTH_PASSWORD[] = {"Новый пароль:", "New password:"};
+const char* SETTING_WEB_AUTH_OLD_PASSWORD[] = {"Старый пароль:", "Old password:"};
+const char* SETTING_WEB_AUTH_SAVE_BTN[] = {"Сменить пароль", "Change password"};

@@ -40,7 +40,7 @@ struct Data {
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
 GyverPortal ui(&LittleFS);
-char webLogin[16] = "admin";
+char webLogin[16] = "";
 char webPass[32] = "admin";
 
 #define LOG_ENTRIES 200

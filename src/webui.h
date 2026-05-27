@@ -35,7 +35,10 @@ GP.BLOCK_END();
 GP.BLOCK_THIN_BEGIN();
 M_BOX(GP_CENTER, GP.LABEL(SETTING_WEB_AUTH_NAME[mydata.lng]););
 GP.HR();
-M_BOX(GP_LEFT, GP.LABEL(SETTING_WEB_AUTH_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("web_pass", "Password", webPass, "100%", 31, "", false, true);););
+M_BOX(GP_LEFT, GP.LABEL(SETTING_WEB_AUTH_OLD_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("web_old_pass", "Old password", "", "100%", 31, "", false, true);););
+M_BOX(GP_LEFT, GP.LABEL(SETTING_WEB_AUTH_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("web_new_pass", "New password", "", "100%", 31, "", false, true);););
+GP.BREAK();
+M_BOX(GP_CENTER, GP.BUTTON_MINI("web_pass_btn", SETTING_WEB_AUTH_SAVE_BTN[mydata.lng], "", GP_BLUE, "", 0, 1););
 GP.BLOCK_END();
 
 GP.BLOCK_THIN_BEGIN();
@@ -189,16 +192,20 @@ void action(GyverPortal & p) {
     if (ui.clickStr("ntp", mydata.NTPserver));
     if (ui.clickStr("lg", mydata.ssid));
     if (ui.clickStr("ps", mydata.pass));
-    if (ui.click("web_pass")) {
-      String pass = ui.getString("web_pass");
-      pass.trim();
-      if (pass.length() > 0 && pass.length() < sizeof(webPass)) {
-        pass.toCharArray(webPass, sizeof(webPass));
+    if (ui.click("web_pass_btn")) {
+      String oldPass = ui.getString("web_old_pass");
+      String newPass = ui.getString("web_new_pass");
+      oldPass.trim();
+      newPass.trim();
+      if (oldPass == String(webPass) && newPass.length() > 0 && newPass.length() < sizeof(webPass)) {
+        newPass.toCharArray(webPass, sizeof(webPass));
         File f = LittleFS.open("/webpass.txt", "w");
         f.print(webPass);
         f.close();
         ui.enableAuth(webLogin, webPass);
         log_add('I', "Web password changed");
+      } else {
+        log_add('W', "Web password change rejected");
       }
     }
     if (ui.clickStr("ap", mydata.owMapApiKey));
