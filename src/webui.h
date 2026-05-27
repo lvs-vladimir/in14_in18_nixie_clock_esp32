@@ -26,7 +26,6 @@ void build() {
   }
 
   GP.NAV_TABS_LINKS("/,/setting,/info,/firmware,/log,/readme", TAB_LINKS_NAMES[mydata.lng], GP_BLUE);
-  GP.HR();
 
   if (ui.uri("/setting")) {
     GP.FORM_BEGIN("/setting");
@@ -97,8 +96,6 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
 
   } else if (ui.uri("/info")) {
     GP.BLOCK_THIN_BEGIN();
-    M_BOX(GP_CENTER, GP.LABEL(PAGE_TITLE[mydata.lng]););
-    GP.HR();
     GP.SYSTEM_INFO("1.0");
     GP.BLOCK_END();
 
