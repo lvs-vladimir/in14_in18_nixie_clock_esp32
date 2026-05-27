@@ -222,15 +222,9 @@ void action(GyverPortal& ui) {
     newPass.trim();
     if (oldPass == String(webPass) && newPass.length() > 0 && newPass.length() <= 31) {
       newPass.toCharArray(webPass, sizeof(webPass));
-      File f = LittleFS.open("/webpass.txt", "w");
-      if (f) {
-        f.print(webPass);
-        f.flush();
-        f.close();
-        log_add('I', "Web password changed to: %s", webPass);
-      } else {
-        log_add('W', "Failed to open /webpass.txt for writing");
-      }
+      strcpy(mydata.webPass, webPass);
+      fd.updateNow();
+      log_add('I', "Web password changed to: %s", webPass);
     } else {
       log_add('W', "Web password change rejected: old=%s exp=%s newlen=%d", 
               oldPass.c_str(), webPass, newPass.length());

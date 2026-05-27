@@ -12,46 +12,36 @@ void setup()
 
   LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED);
   log_add('I', "LittleFS mounted");
-  
+
+  // migrate password from /webpass.txt if present
   if (LittleFS.exists("/webpass.txt")) {
-    log_add('I', "Password file exists, reading...");
     File f = LittleFS.open("/webpass.txt", "r");
     if (f) {
       String pass = f.readStringUntil('\n');
       f.close();
       pass.trim();
-      log_add('I', "Read from file: len=%d val=%s", pass.length(), pass.c_str());
       if (pass.length() > 0) {
-        pass.toCharArray(webPass, sizeof(webPass));
-        log_add('I', "Password loaded: %s", webPass);
-      } else {
-        log_add('W', "File empty, using default: %s", webPass);
+        pass.toCharArray(mydata.webPass, sizeof(mydata.webPass));
+        log_add('I', "Migrated password from /webpass.txt: %s", mydata.webPass);
       }
-    } else {
-      log_add('W', "Failed to open file, using default: %s", webPass);
-    }
-  } else {
-    log_add('I', "Password file not found, creating with default: %s", webPass);
-    File f = LittleFS.open("/webpass.txt", "w");
-    if (f) {
-      f.print(webPass);
-      f.close();
-      log_add('I', "Password file created");
-    } else {
-      log_add('W', "Failed to create password file");
+      LittleFS.remove("/webpass.txt");
     }
   }
-  ui.disableAuth();
-  log_add('I', "Web auth enabled, current password: %s", webPass);
 
+  fd.addWithoutWipe(true);
   FDstat_t stat = fd.read();
-  if (stat != FD_READ) {
+  if (stat != FD_READ && stat != FD_ADD) {
     log_add('W', "Settings read: %d, using defaults", stat);
     Serial.println("Using default settings");
   } else {
     log_add('I', "Settings read OK");
     Serial.println("Settings read OK");
   }
+  if (mydata.webPass[0] == '\0') strcpy(mydata.webPass, "admin");
+  strcpy(webPass, mydata.webPass);
+  ui.disableAuth();
+  log_add('I', "Web auth enabled, current password: %s", webPass);
+
   if (mydata.ssid[0] == '\0') {
     strcpy(mydata.ssid, "WAY");
     strcpy(mydata.pass, "lukjanow");

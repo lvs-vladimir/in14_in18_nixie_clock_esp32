@@ -37,6 +37,7 @@ struct Data {
   byte autoshow_min, autoshow_slots, autoshow_select[6], autoshow_select_sec[7];
   byte anim_change;
   byte anim_change_sec;
+  char webPass[32];
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
