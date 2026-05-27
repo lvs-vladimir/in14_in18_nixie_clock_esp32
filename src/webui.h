@@ -3,6 +3,8 @@
 void build() {
   GP.BUILD_BEGIN(500);
   GP.THEME(GP_DARK);
+GP.TAG_RAW(F("style"), F("label,input,select,button{font-size:16px!important;}.thinText{font-size:16px!important;}"));
+GP.THEME(GP_DARK);
   GP.TITLE(DEVICE_NAME[mydata.lng]);
   GP.PAGE_TITLE(PAGE_TITLE[mydata.lng]);
   GP.HR();
