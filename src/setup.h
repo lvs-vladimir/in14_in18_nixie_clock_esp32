@@ -37,6 +37,16 @@ void setup()
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
   if (!mydata.seconds_switch) mydata.seconds_switch = true;
   if (mydata.animdots > 7) mydata.animdots = 0;
+  if (mydata.autoshow_slots > 5) mydata.autoshow_slots = 5;
+  if (mydata.autoshow_select[0] != 0) {
+    byte slots = mydata.autoshow_slots;
+    if (slots > 5) slots = 5;
+    log_add('W', "Migrate autoshow select 0-based slots=%d s0=%d s1=%d s2=%d", slots,
+            mydata.autoshow_select[0], mydata.autoshow_select[1], mydata.autoshow_select[2]);
+    for (int idx = slots; idx >= 1; idx--) mydata.autoshow_select[idx] = mydata.autoshow_select[idx - 1];
+    mydata.autoshow_select[0] = 0;
+    fd.updateNow();
+  }
   if (mydata.autoshow_slots > 0 && (mydata.autoshow_select[1] < 5 || mydata.autoshow_select[1] > 13)) {
     log_add('W', "Slot1 invalid (%d), reset to temp", mydata.autoshow_select[1]);
     mydata.autoshow_select[1] = 5;

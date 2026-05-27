@@ -126,7 +126,7 @@ void build() {
       M_BOX(GP_LEFT,
         GP.LABEL(buf);
         snprintf(buf, sizeof(buf), "sa%d", i);
-        GP.SELECT(buf, SensorsAutoShowSelect2, mydata.autoshow_select[i], 0, 0, 1);
+        GP.SELECT(buf, SensorsAutoShowSelect2, mydata.autoshow_select[i + 1], 0, 0, 1);
         M_BOX(GP_RIGHT,
           snprintf(buf, sizeof(buf), "se%d", i);
           GP.SPINNER(buf, mydata.autoshow_select_sec[i + 1], 0, 30, 1, 0, GP_BLUE, "50px", 0);
@@ -136,7 +136,7 @@ void build() {
       );
       GP.BREAK();
     }
-    if (mydata.autoshow_slots < 6) {
+    if (mydata.autoshow_slots < 5) {
       GP.BUTTON_MINI("add_slot", "+ Add", "", GP_BLUE, "80px", 0, 1);
       GP.BREAK();
     }
@@ -214,23 +214,26 @@ void action(GyverPortal & p) {
     for (byte i = 0; i < mydata.autoshow_slots; i++) {
       char buf[16];
       snprintf(buf, sizeof(buf), "sa%d", i);
-      if (ui.click(buf)) mydata.autoshow_select[i] = ui.getInt(buf);
+      if (ui.click(buf)) mydata.autoshow_select[i + 1] = ui.getInt(buf);
       snprintf(buf, sizeof(buf), "se%d", i);
       if (ui.click(buf)) mydata.autoshow_select_sec[i + 1] = ui.getInt(buf);
       snprintf(buf, sizeof(buf), "rm%d", i);
       if (ui.click(buf)) {
-        for (byte j = i; j < mydata.autoshow_slots - 1; j++) {
+        byte slot = i + 1;
+        for (byte j = slot; j < mydata.autoshow_slots; j++) {
           mydata.autoshow_select[j] = mydata.autoshow_select[j + 1];
-          mydata.autoshow_select_sec[j + 1] = mydata.autoshow_select_sec[j + 2];
+          mydata.autoshow_select_sec[j] = mydata.autoshow_select_sec[j + 1];
         }
+        mydata.autoshow_select[mydata.autoshow_slots] = 0;
+        mydata.autoshow_select_sec[mydata.autoshow_slots] = 10;
         mydata.autoshow_slots--;
       }
     }
-    if (ui.click("add_slot") && mydata.autoshow_slots < 6) {
-      mydata.autoshow_slots++;
-      mydata.autoshow_select[mydata.autoshow_slots - 1] = 0;
-      mydata.autoshow_select_sec[mydata.autoshow_slots] = 10;
-    }
+  if (ui.click("add_slot") && mydata.autoshow_slots < 5) {
+    mydata.autoshow_slots++;
+    mydata.autoshow_select[mydata.autoshow_slots] = 0;
+    mydata.autoshow_select_sec[mydata.autoshow_slots] = 10;
+  }
     fd.updateNow();
   }
   if (ui.update()) {
