@@ -50,17 +50,21 @@ void build() {
     GP.BREAK();
     M_BOX(GP_CENTER, GP.BUTTON_MINI("wifi_btn", SETTING_WIFI_CONNECT_BTN[mydata.lng], "", GP_BLUE, "", 0, 1););
 GP.BLOCK_END();
+  GP.FORM_END();
 
-GP.BLOCK_THIN_BEGIN();
-M_BOX(GP_CENTER, GP.LABEL(SETTING_WEB_AUTH_NAME[mydata.lng]););
-GP.HR();
-M_BOX(GP_LEFT, GP.LABEL(SETTING_WEB_AUTH_OLD_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("web_old_pass", "Old password", "", "100%", 31, "", false, true);););
-M_BOX(GP_LEFT, GP.LABEL(SETTING_WEB_AUTH_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("web_new_pass", "New password", "", "100%", 31, "", false, true);););
-GP.BREAK();
-M_BOX(GP_CENTER, GP.BUTTON_MINI("web_pass_btn", SETTING_WEB_AUTH_SAVE_BTN[mydata.lng], "", GP_BLUE, "", 0, 1););
-GP.BLOCK_END();
+  GP.FORM_BEGIN("/change_pass");
+  GP.BLOCK_THIN_BEGIN();
+  M_BOX(GP_CENTER, GP.LABEL(SETTING_WEB_AUTH_NAME[mydata.lng]););
+  GP.HR();
+  M_BOX(GP_LEFT, GP.LABEL(SETTING_WEB_AUTH_OLD_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("web_old_pass", "Old password", "", "100%", 31, "", false, false);););
+  M_BOX(GP_LEFT, GP.LABEL(SETTING_WEB_AUTH_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.PASS("web_new_pass", "New password", "", "100%", 31, "", false, false);););
+  GP.BREAK();
+  M_BOX(GP_CENTER, GP.SUBMIT(SETTING_WEB_AUTH_SAVE_BTN[mydata.lng], GP_BLUE););
+  GP.BLOCK_END();
+  GP.FORM_END();
 
-GP.BLOCK_THIN_BEGIN();
+  GP.FORM_BEGIN("/setting");
+  GP.BLOCK_THIN_BEGIN();
 M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_blank\">OpenWeatherMap.org</a>"), "", GP_DEFAULT, 0, 1););
     GP.HR();
     M_BOX(GP_LEFT, GP.LABEL(SETTING_OP_APIKEY[mydata.lng]); M_BOX(GP_RIGHT, GP.TEXT("ap", "ApiKey", mydata.owMapApiKey, "100%");););
@@ -182,21 +186,44 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
   GP.BUILD_END();
 }
 
-void action(GyverPortal & p) {
-    if (ui.form("/login")) {
-      String pass = ui.arg("login_pass");
-      pass.trim();
-      if (pass == String(webPass)) {
-        webAuthOk = true;
-        log_add('I', "Web login OK");
-      } else {
-        log_add('W', "Web login rejected");
-      }
-      return;
+void action(GyverPortal& ui) {
+  if (ui.form("/login")) {
+    String pass = ui.arg("login_pass");
+    pass.trim();
+    if (pass == String(webPass)) {
+      webAuthOk = true;
+      log_add('I', "Web login OK with pass: %s (expected: %s)", pass.c_str(), webPass);
+    } else {
+      log_add('W', "Web login rejected: got=%s exp=%s", pass.c_str(), webPass);
     }
+    return;
+  }
 
-
-    if (!webAuthOk) return;
+  if (!webAuthOk) return;
+  
+  if (ui.form("/change_pass")) {
+    String oldPass = ui.getString("web_old_pass");
+    String newPass = ui.getString("web_new_pass");
+    oldPass.trim();
+    newPass.trim();
+    if (oldPass == String(webPass) && newPass.length() > 0 && newPass.length() <= 31) {
+      newPass.toCharArray(webPass, sizeof(webPass));
+      File f = LittleFS.open("/webpass.txt", "w");
+      if (f) {
+        f.print(webPass);
+        f.flush();
+        f.close();
+        log_add('I', "Web password changed to: %s", webPass);
+      } else {
+        log_add('W', "Failed to open /webpass.txt for writing");
+      }
+    } else {
+      log_add('W', "Web password change rejected: old=%s exp=%s newlen=%d", 
+              oldPass.c_str(), webPass, newPass.length());
+    }
+    return;
+  }
+  
   if (ui.click()) {
     if (ui.click("rst")) ESP.restart();
     if (ui.click("sntp_btn")) {
@@ -227,22 +254,6 @@ void action(GyverPortal & p) {
     if (ui.clickStr("ntp", mydata.NTPserver));
     if (ui.clickStr("lg", mydata.ssid));
     if (ui.clickStr("ps", mydata.pass));
-    if (ui.click("web_pass_btn")) {
-      String oldPass = ui.getString("web_old_pass");
-      String newPass = ui.getString("web_new_pass");
-      oldPass.trim();
-      newPass.trim();
-      if (oldPass == String(webPass) && newPass.length() > 0 && newPass.length() < sizeof(webPass)) {
-        newPass.toCharArray(webPass, sizeof(webPass));
-        File f = LittleFS.open("/webpass.txt", "w");
-        f.print(webPass);
-        f.close();
-        webAuthOk = true;
-        log_add('I', "Web password changed");
-      } else {
-        log_add('W', "Web password change rejected");
-      }
-    }
     if (ui.clickStr("ap", mydata.owMapApiKey));
     if (ui.clickStr("ct", mydata.owCity));
     if (ui.clickStr("api_narod", mydata.NarodmoonApi));

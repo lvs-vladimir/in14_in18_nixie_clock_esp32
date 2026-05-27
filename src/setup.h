@@ -11,19 +11,38 @@ void setup()
   log_add('I', "System boot");
 
   LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED);
+  log_add('I', "LittleFS mounted");
+  
   if (LittleFS.exists("/webpass.txt")) {
+    log_add('I', "Password file exists, reading...");
     File f = LittleFS.open("/webpass.txt", "r");
-    String pass = f.readStringUntil('\n');
-    f.close();
-    pass.trim();
-    if (pass.length() > 0) pass.toCharArray(webPass, sizeof(webPass));
+    if (f) {
+      String pass = f.readStringUntil('\n');
+      f.close();
+      pass.trim();
+      log_add('I', "Read from file: len=%d val=%s", pass.length(), pass.c_str());
+      if (pass.length() > 0) {
+        pass.toCharArray(webPass, sizeof(webPass));
+        log_add('I', "Password loaded: %s", webPass);
+      } else {
+        log_add('W', "File empty, using default: %s", webPass);
+      }
+    } else {
+      log_add('W', "Failed to open file, using default: %s", webPass);
+    }
   } else {
+    log_add('I', "Password file not found, creating with default: %s", webPass);
     File f = LittleFS.open("/webpass.txt", "w");
-    f.print(webPass);
-    f.close();
+    if (f) {
+      f.print(webPass);
+      f.close();
+      log_add('I', "Password file created");
+    } else {
+      log_add('W', "Failed to create password file");
+    }
   }
   ui.disableAuth();
-  log_add('I', "Web password auth enabled");
+  log_add('I', "Web auth enabled, current password: %s", webPass);
 
   FDstat_t stat = fd.read();
   if (stat != FD_READ) {
