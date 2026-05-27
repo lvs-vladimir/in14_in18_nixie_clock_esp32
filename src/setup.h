@@ -69,8 +69,7 @@ void setup()
     mydata.autoshow_select[3] = 3;
   }
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
-  if (!mydata.seconds_switch) mydata.seconds_switch = true;
-  if (mydata.animdots > 7) mydata.animdots = 0;
+  if (mydata.animdots > 12) mydata.animdots = 0;
   if (mydata.autoshow_slots > 5) mydata.autoshow_slots = 5;
   if (mydata.autoshow_select[0] != 0) {
     byte slots = mydata.autoshow_slots;
