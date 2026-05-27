@@ -1,6 +1,10 @@
 void TimeUpdate()
 {
-  timeClient.update();
+  bool ok = timeClient.update();
+  log_add('I', "NTP update: %s h=%d m=%d s=%d GMT=%d server=%s",
+          ok ? "OK" : "FAIL",
+          timeClient.getHours(), timeClient.getMinutes(), timeClient.getSeconds(),
+          mydata.GMT, mydata.NTPserver);
   if (timeClient.getHours() != 0 || timeClient.getMinutes() != 0 || timeClient.getSeconds() != 0) {
     hour = timeClient.getHours();
     minute = timeClient.getMinutes();

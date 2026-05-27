@@ -125,7 +125,12 @@ void setup()
   oldminute = minute;
   if (mydata.anim_change_sec == 0) mydata.anim_change_sec = 30;
 
-  NTPClientUpdate();
+  if (WiFi.status() == WL_CONNECTED) {
+    log_add('I', "NTP init update");
+    NTPClientUpdate();
+  } else {
+    log_add('W', "WiFi not connected, skipping NTP init");
+  }
   NtpSyncTimer.start();
   SwitchDisplayTimer.stop();
 
