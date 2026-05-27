@@ -42,6 +42,9 @@ struct Data {
   byte anim_change;
   byte anim_change_sec;
   char webPass[32];
+  boolean ws2812_enable;
+  byte ws2812_anim;
+  byte ws2812_brightness;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
@@ -192,6 +195,7 @@ int32_t dmoove = 0;
 int32_t MN = 6;
 int32_t Counter = 6;
 int WS2812_j = 0;
+int ws2812_phase = 0;
 int rand_arr[] = {0,1,2,3,4,5};
 int time1 = 4020; // 4020// Длительность одного такта в микросекундах. За это время выводится старая цифра и новая, время делится между ними
 int time2 = 0;    // длительность такта, умноженная на число шагов дает общее время смены информации на дисплее

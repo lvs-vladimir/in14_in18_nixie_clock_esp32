@@ -106,7 +106,8 @@ void setup()
   hspi->begin(HSPI_SCLK, HSPI_MISO, HSPI_MOSI, HSPI_SS);
 
   strip.begin();
-  strip.setBrightness(0);
+  if (mydata.ws2812_brightness == 0) mydata.ws2812_brightness = 100;
+  if (mydata.ws2812_enable) strip.setBrightness(mydata.ws2812_brightness); else strip.setBrightness(0);
 
   ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
   ledcAttachPin(LED_OUTPUT_PIN, PWM_CHANNEL);
