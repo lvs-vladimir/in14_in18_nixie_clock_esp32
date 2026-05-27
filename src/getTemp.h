@@ -135,5 +135,13 @@ void getTemp2(byte i){
 void rebuildSensorsAutoShowSelect()
 {
   SensorsAutoShowSelect2 = ",";
-  for (byte k = 0; k < 13; k++) SensorsAutoShowSelect2 += SensorsAutoShow[k];
+  for (byte k = 0; k < 13; k++) {
+    String item = SensorsAutoShow[k];
+    while (item.startsWith(",")) item.remove(0, 1);
+    SensorsAutoShowSelect2 += item;
+    if (k < 12) SensorsAutoShowSelect2 += ",";
+  }
+  log_add('D', "SELECTLIST len=%d sel1=%d sel2=%d list=%s",
+          SensorsAutoShowSelect2.length(), mydata.autoshow_select[1], mydata.autoshow_select[2],
+          SensorsAutoShowSelect2.c_str());
 }
