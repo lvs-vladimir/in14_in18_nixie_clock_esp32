@@ -106,6 +106,9 @@ void setup()
   hspi->begin(HSPI_SCLK, HSPI_MISO, HSPI_MOSI, HSPI_SS);
 
   if (mydata.ws2812_brightness == 0) mydata.ws2812_brightness = 100;
+  if (mydata.ws2812_random_sec == 0) mydata.ws2812_random_sec = 10;
+  if (mydata.veml_bright_min == 0) mydata.veml_bright_min = 10;
+  if (mydata.veml_bright_max == 0) mydata.veml_bright_max = 255;
   FastLED.addLeds<WS2812B, LEDS_PIN, GRB>(leds, LEDS_COUNT);
   FastLED.setBrightness(mydata.ws2812_enable ? mydata.ws2812_brightness : 0);
 

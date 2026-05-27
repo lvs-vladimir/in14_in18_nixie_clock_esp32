@@ -1,13 +1,13 @@
 static byte hue = 0;
 static byte idex = 0;
-static byte idex2 = 0;
 static int bouncedirection = 0;
-static int bouncedirection2 = 0;
 static int phase = 0;
 static byte fire_heat[LEDS_COUNT];
 static int ball_pos[3];
 static int ball_speed[3];
 static byte ball_init = 0;
+static int ws2812_random_counter = 0;
+static byte ws2812_current_anim = 0;
 
 void ws2812_effect() {
   if (!mydata.ws2812_enable) {
@@ -17,8 +17,22 @@ void ws2812_effect() {
     return;
   }
   FastLED.setBrightness(mydata.ws2812_brightness);
-  
-  switch (mydata.ws2812_anim) {
+
+  byte anim = mydata.ws2812_anim;
+  if (mydata.ws2812_random) {
+    ws2812_random_counter++;
+    if (ws2812_random_counter >= (int)mydata.ws2812_random_sec * 33) {
+      ws2812_random_counter = 0;
+      byte next;
+      do { next = random(20); } while (next == ws2812_current_anim || next == 0);
+      ws2812_current_anim = next;
+    }
+    anim = ws2812_current_anim;
+  } else {
+    ws2812_current_anim = mydata.ws2812_anim;
+  }
+
+  switch (anim) {
     case 0: // Rainbow fade
       fill_rainbow(leds, LEDS_COUNT, hue, 7);
       hue++;
@@ -191,13 +205,26 @@ void loop2 (void* pvParameters) {
 
     if (timer0) {
       vemllux = veml.readLux();
-      byte bright_value = brigh_value_indi(vemllux, lux_ranges, brigh_values, prev_brigh_value);
-      prev_brigh_value = bright_value;
-      ledcWrite(PWM_CHANNEL, bright_value);
-      Serial.print("LUX: ");
-      Serial.print(vemllux);
-      Serial.print(" BR: ");
-      Serial.println(bright_value);
+      if (mydata.veml_enable) {
+        byte min_b = mydata.veml_bright_min;
+        byte max_b = mydata.veml_bright_max;
+        if (max_b < min_b) { byte t = min_b; min_b = max_b; max_b = t; }
+        int raw = min((int)vemllux, 1000);
+        byte v = map(raw, 0, 1000, min_b, max_b);
+        ledcWrite(PWM_CHANNEL, v);
+        Serial.print("LUX: ");
+        Serial.print(vemllux);
+        Serial.print(" VEML BR: ");
+        Serial.println(v);
+      } else {
+        uint8_t bright_value = brigh_value_indi(vemllux, lux_ranges, brigh_values, prev_brigh_value);
+        prev_brigh_value = bright_value;
+        ledcWrite(PWM_CHANNEL, bright_value);
+        Serial.print("LUX: ");
+        Serial.print(vemllux);
+        Serial.print(" BR: ");
+        Serial.println(bright_value);
+      }
       timer0 = false;
     }
   }

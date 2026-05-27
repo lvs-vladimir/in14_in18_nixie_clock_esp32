@@ -205,6 +205,22 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
   M_BOX(GP_LEFT, GP.LABEL(WS2812_BRIGHT[mydata.lng]); M_BOX(GP_RIGHT, GP.SLIDER("ws2812_bright", mydata.ws2812_brightness, 0, 255, 1, 0, GP_BLUE);););
   GP.HR();
   GP.BLOCK_END();
+
+  GP.BLOCK_THIN_BEGIN();
+  M_BOX(GP_CENTER, GP.LABEL(WS2812_RANDOM[mydata.lng]););
+  GP.HR();
+  M_BOX(GP_LEFT, GP.LABEL(WS2812_ENABLE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("ws2812_random", mydata.ws2812_random, GP_BLUE);););
+  M_BOX(GP_LEFT, GP.LABEL(WS2812_RANDOM_SEC[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("ws2812_random_sec", mydata.ws2812_random_sec, 1, 255, 1, 0, GP_BLUE, "60px", 0);););
+  GP.BLOCK_END();
+
+  GP.BLOCK_THIN_BEGIN();
+  M_BOX(GP_CENTER, GP.LABEL(VEML_LABEL[mydata.lng]););
+  GP.HR();
+  M_BOX(GP_LEFT, GP.LABEL(VEML_ENABLE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("veml_enable", mydata.veml_enable, GP_BLUE);););
+  M_BOX(GP_LEFT, GP.LABEL(VEML_MIN[mydata.lng]); M_BOX(GP_RIGHT, GP.SLIDER("veml_bright_min", mydata.veml_bright_min, 0, 255, 1, 0, GP_BLUE);););
+  M_BOX(GP_LEFT, GP.LABEL(VEML_MAX[mydata.lng]); M_BOX(GP_RIGHT, GP.SLIDER("veml_bright_max", mydata.veml_bright_max, 0, 255, 1, 0, GP_BLUE);););
+  GP.BLOCK_END();
+
   }
   M_BOX(GP_CENTER, GP.BUTTON_MINI_LINK("/logout", WEB_LOGOUT_BUTTON[mydata.lng], GP_RED, "100px"););
   GP.BUILD_END();
@@ -300,6 +316,11 @@ void action(GyverPortal& ui) {
     if (ui.clickInt("ws2812_enable", mydata.ws2812_enable));
     if (ui.clickInt("ws2812_anim", mydata.ws2812_anim));
     if (ui.clickInt("ws2812_bright", mydata.ws2812_brightness));
+    if (ui.clickInt("ws2812_random", mydata.ws2812_random));
+    if (ui.clickInt("ws2812_random_sec", mydata.ws2812_random_sec));
+    if (ui.clickInt("veml_enable", mydata.veml_enable));
+    if (ui.clickInt("veml_bright_min", mydata.veml_bright_min));
+    if (ui.clickInt("veml_bright_max", mydata.veml_bright_max));
     if (ui.clickInt("anim_change", mydata.anim_change));
   if (ui.clickInt("anim_change_sec", mydata.anim_change_sec));
   if (ui.clickInt("animdots", mydata.animdots));
