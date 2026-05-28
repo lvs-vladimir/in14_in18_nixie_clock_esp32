@@ -214,9 +214,12 @@ void loop()
     rebuildSensorsAutoShowSelect();
   }
 
-  if (NtpSyncTimer.isReady() && WiFi.status() == WL_CONNECTED) {
+  if (mydata.ntp_sync_enable && NtpSyncTimer.isReady() && WiFi.status() == WL_CONNECTED) {
     log_add('I', "NTP sync");
     NTPClientUpdate();
+    NtpSyncTimer.setInterval(mydata.ntp_sync_interval * 60000UL);
+    NtpSyncTimer.start();
+
   }
 
   if (OwmUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) {

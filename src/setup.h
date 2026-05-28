@@ -7,7 +7,16 @@ void setup()
   NtpSyncTimer.stop();
   OwmUpdateTimer.stop();
   CoinUpdateTimer.stop();
-  memset(log_entries, 0, sizeof(log_entries));
+  
+  if (mydata.ntp_sync_enable == true && mydata.ntp_sync_interval == 0) {
+    mydata.ntp_sync_enable = true;
+    mydata.ntp_sync_interval = 60;
+  }
+  if (mydata.ntp_sync_enable) {
+    NtpSyncTimer.setInterval(mydata.ntp_sync_interval * 60000UL);
+    NtpSyncTimer.start();
+  }
+memset(log_entries, 0, sizeof(log_entries));
   log_write_idx = 0;
   log_count = 0;
   log_add('I', "System boot");

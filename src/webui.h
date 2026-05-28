@@ -38,7 +38,10 @@ GP.THEME(GP_DARK);
     M_BOX(GP_LEFT, GP.LABEL(SETTING_NTP_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.TEXT("ntp", "Ntp", mydata.NTPserver, "100%");););
     M_BOX(GP_LEFT, GP.LABEL(SETTING_TIMEZONE_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("timeZone", SETTING_TIMEZONE_GMT, mydata.GMT + 12, 0);););
     M_BOX(GP_CENTER, GP.BUTTON_MINI("sntp_btn", SETTING_NTP_SYNC_BTN[mydata.lng], "", GP_BLUE, "", 0, 1););
-    GP.BLOCK_END();
+    
+  M_BOX(GP_LEFT, GP.LABEL(SETTING_NTP_PERIODIC[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("ntp_sync_enable", mydata.ntp_sync_enable, GP_BLUE);););
+  M_BOX(GP_LEFT, GP.LABEL(SETTING_NTP_PERIODIC_LABEL[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("ntp_sync_interval", mydata.ntp_sync_interval, 10, 1440, 10, 0, GP_BLUE, "50px", 0);););
+GP.BLOCK_END();
 
     GP.BLOCK_THIN_BEGIN();
     M_BOX(GP_CENTER, GP.LABEL(SETTING_NETWORK_CONNECTION[mydata.lng]););
@@ -343,6 +346,8 @@ void action(GyverPortal& ui) {
     if (ui.clickInt("veml_lm3", mydata.ws2812_lux_min[3]));
     if (ui.clickInt("veml_lx3", mydata.ws2812_lux_max[3]));
     if (ui.clickInt("veml_bv3", mydata.ws2812_bright_val[3]));
+  if (ui.clickInt("ntp_sync_enable", mydata.ntp_sync_enable));
+  if (ui.clickInt("ntp_sync_interval", mydata.ntp_sync_interval));
 
   if (ui.clickInt("vnlm0", mydata.nixie_lux_min[0]));
   if (ui.clickInt("vnlx0", mydata.nixie_lux_max[0]));

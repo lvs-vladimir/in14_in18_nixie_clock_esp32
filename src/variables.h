@@ -54,6 +54,8 @@ struct Data {
   int nixie_lux_min[6];
   int nixie_lux_max[6];
   byte nixie_bright_val[6];
+  boolean ntp_sync_enable;
+  int ntp_sync_interval;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
