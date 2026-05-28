@@ -200,11 +200,21 @@ void ws2812_effect() {
       }
       break;
 
-    case 20: // Snow sparkle
-      fill_solid(leds, LEDS_COUNT, CHSV(160, 50, 80));
-      for (int i = 0; i < 3; i++)
-        leds[random(LEDS_COUNT)] = CRGB::White;
-      break;
+case 20: // Snow sparkle - falling snow
+{
+  static uint8_t snow_mask = 0;
+  static uint8_t snow_step = 0;
+  snow_step++;
+  if (snow_step >= 5) {
+    snow_step = 0;
+    snow_mask = (snow_mask << 1) & 0x3F;
+    if (random(100) < 25) snow_mask |= 1;
+  }
+  fill_solid(leds, LEDS_COUNT, CHSV(160, 50, 80));
+  for (int i = 0; i < LEDS_COUNT; i++)
+    if (snow_mask & (1 << i)) leds[i] = CRGB::White;
+  break;
+}
   }
   FastLED.show();
 }
