@@ -17,6 +17,15 @@ void ws2812_effect() {
     return;
   }
 
+  if (mydata.ap_mode) {
+    static uint8_t ap_phase = 0;
+    ap_phase += 3;
+    byte b = sin8(ap_phase);
+    fill_solid(leds, LEDS_COUNT, CRGB(b, 0, 0));
+    FastLED.show();
+    return;
+  }
+
   byte target_bright = mydata.ws2812_brightness;
   if (mydata.veml_enable) {
     byte found = mydata.ws2812_bright_val[0];

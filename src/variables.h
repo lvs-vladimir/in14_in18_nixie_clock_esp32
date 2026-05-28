@@ -59,6 +59,7 @@ struct Data {
   boolean anim_by_mode;
   byte anim_time_mode;
   byte anim_data_mode;
+  boolean ap_mode;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));

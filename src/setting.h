@@ -81,6 +81,7 @@ void WiFiConnect_APcreate()
     Serial.println("WiFi не подключен, создаем точку");
     WiFi.mode(WIFI_AP);
     WiFi.softAP(HOSTNAME);
+  mydata.ap_mode = true;
     IPAddress IP = WiFi.softAPIP();
     Serial.print("AP IP address: ");
     Serial.println(IP);
@@ -177,6 +178,10 @@ void UpdateDisplay()
   bufer[2] = masshv5522[Nixie[2]];
   bufer[1] = masshv5522[Nixie[1]];
   bufer[0] = masshv5522[Nixie[0]];
+
+  if (mydata.ap_mode) {
+    bufer[0] = bufer[1] = bufer[2] = bufer[3] = bufer[4] = bufer[5] = 0;
+  }
 
   #ifdef IN_18
   if (display == 0 && timeon && !mydata.seconds_switch) {
