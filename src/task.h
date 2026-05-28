@@ -159,11 +159,22 @@ void ws2812_effect() {
       break;
 
     case 16: { // Pulse one color
-      byte b = sin8((phase * 8) % 256);
-      fill_solid(leds, LEDS_COUNT, CRGB(CHSV(hue, 255, b)));
-      if (phase % 16 == 0) hue++;
-      phase++;
-      break;
+  static uint8_t hp = 0;
+  uint8_t b;
+  if (hp < 8) b = sin8(hp * 32);
+  else if (hp < 12) b = 0;
+  else if (hp < 22) b = sin8((hp - 12) * 18);
+  else if (hp < 40) b = 0;
+  else b = 0, hp = 0;
+  hp++;
+  uint8_t cp = LEDS_COUNT / 2;
+  for (int i = 0; i < LEDS_COUNT; i++) {
+    uint8_t dist = abs(i - cp);
+    uint8_t br = (b > dist * 40) ? b - dist * 40 : 0;
+    leds[i] = CHSV(hue, 255, br);
+  }
+  if (hp % 8 == 0) hue++;
+break;
     }
 
     case 17: { // Bouncing balls
