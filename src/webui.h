@@ -226,12 +226,12 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
   M_BOX(GP_CENTER, GP.LABEL(VEML_NIXIE[mydata.lng]););
   GP.HR();
   M_BOX(GP_CENTER, GP.LABEL(VEML_NIXIE_DESC[mydata.lng]););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm0", mydata.nixie_lux_min[0], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx0", mydata.nixie_lux_max[0], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv0", mydata.nixie_bright_val[0], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm1", mydata.nixie_lux_min[1], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx1", mydata.nixie_lux_max[1], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv1", mydata.nixie_bright_val[1], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm2", mydata.nixie_lux_min[2], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx2", mydata.nixie_lux_max[2], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv2", mydata.nixie_bright_val[2], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm3", mydata.nixie_lux_min[3], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx3", mydata.nixie_lux_max[3], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv3", mydata.nixie_bright_val[3], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm4", mydata.nixie_lux_min[4], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx4", mydata.nixie_lux_max[4], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv4", mydata.nixie_bright_val[4], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm5", mydata.nixie_lux_min[5], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx5", mydata.nixie_lux_max[5], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv5", mydata.nixie_bright_val[5], 0, 255, 1, 0, GP_BLUE, "50px", 0););
+    GP.SPINNER("vnlm0", mydata.nixie_lux_min[0], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnlx0", mydata.nixie_lux_max[0], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnbv0", mydata.nixie_bright_val[0], 0, 255, 1, 0, GP_BLUE, "30px", 0);
+    GP.SPINNER("vnlm1", mydata.nixie_lux_min[1], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnlx1", mydata.nixie_lux_max[1], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnbv1", mydata.nixie_bright_val[1], 0, 255, 1, 0, GP_BLUE, "30px", 0);
+    GP.SPINNER("vnlm2", mydata.nixie_lux_min[2], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnlx2", mydata.nixie_lux_max[2], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnbv2", mydata.nixie_bright_val[2], 0, 255, 1, 0, GP_BLUE, "30px", 0);
+    GP.SPINNER("vnlm3", mydata.nixie_lux_min[3], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnlx3", mydata.nixie_lux_max[3], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnbv3", mydata.nixie_bright_val[3], 0, 255, 1, 0, GP_BLUE, "30px", 0);
+    GP.SPINNER("vnlm4", mydata.nixie_lux_min[4], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnlx4", mydata.nixie_lux_max[4], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnbv4", mydata.nixie_bright_val[4], 0, 255, 1, 0, GP_BLUE, "30px", 0);
+    GP.SPINNER("vnlm5", mydata.nixie_lux_min[5], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnlx5", mydata.nixie_lux_max[5], 0, 15000, 1, 0, GP_BLUE, "30px", 0); GP.SPINNER("vnbv5", mydata.nixie_bright_val[5], 0, 255, 1, 0, GP_BLUE, "30px", 0);
   GP.BLOCK_END();
 
 
