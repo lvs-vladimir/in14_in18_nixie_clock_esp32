@@ -154,7 +154,7 @@ void loop()
   lamp_percent_hv32 = false;
   lamp_dot_hv31 = false;
   lamp_plus_hv32 = false;
-  if (display > 0 && off_effects == 0 && on_effects == 0) {
+  if (!mydata.ap_mode && display > 0 && off_effects == 0 && on_effects == 0) {
     byte sel = mydata.autoshow_select[display];
     if (sel == 1) {
       lamp_celsius_hv31 = true;

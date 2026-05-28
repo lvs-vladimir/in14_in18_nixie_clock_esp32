@@ -54,8 +54,10 @@ memset(log_entries, 0, sizeof(log_entries));
   log_add('I', "Web auth enabled, current password: %s", webPass);
 
   if (mydata.ssid[0] == '\0') {
-    strcpy(mydata.ssid, "WAY");
-    strcpy(mydata.pass, "lukjanow");
+    if (stat != FD_READ && stat != FD_ADD) {
+      strcpy(mydata.ssid, "WAY");
+      strcpy(mydata.pass, "lukjanow");
+    }
   }
   if (mydata.NTPserver[0] == '\0') strcpy(mydata.NTPserver, "pool.ntp.org");
   if (mydata.GMT == 0) mydata.GMT = 7;

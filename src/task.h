@@ -10,19 +10,11 @@ static byte ws2812_random_counter = 0;
 static byte ws2812_rand_anim = 1;
 
 void ws2812_effect() {
-  if (!mydata.ws2812_enable) {
+  if (!mydata.ws2812_enable && !mydata.ap_mode) {
     FastLED.setBrightness(0);
     fill_solid(leds, LEDS_COUNT, CRGB::Black);
-    FastLED.show();
-    return;
-  }
-
-  if (mydata.ap_mode) {
-    static uint8_t ap_phase = 0;
-    ap_phase += 3;
-    byte b = sin8(ap_phase);
-    fill_solid(leds, LEDS_COUNT, CRGB(b, 0, 0));
-    FastLED.show();
+  FastLED.show();
+  if (mydata.ap_mode) hue = 0;
     return;
   }
 
@@ -45,7 +37,17 @@ void ws2812_effect() {
     else anim = mydata.anim_data_mode;
   }
   if (anim == 0) {
-    byte interval = max((byte)1, mydata.ws2812_random_sec);
+    byte interval;
+    if (display == 0) interval = max((byte)1, mydata.autoshow_min);
+    else interval = max((byte)1, mydata.autoshow_select_sec[display]);
+    static byte prev_display = 0;
+    if (display != prev_display) {
+      ws2812_random_counter = 0;
+      byte next;
+      do { next = random(1, 21); } while (next == ws2812_rand_anim);
+      ws2812_rand_anim = next;
+      prev_display = display;
+    }
     ws2812_random_counter++;
     if (ws2812_random_counter >= interval * 33) {
       ws2812_random_counter = 0;
@@ -54,6 +56,11 @@ void ws2812_effect() {
       ws2812_rand_anim = next;
     }
     anim = ws2812_rand_anim;
+  }
+
+  if (mydata.ap_mode) {
+    hue = 0;
+    anim = 16;
   }
 
   switch (anim) {

@@ -66,6 +66,7 @@ bool initWiFi()
     }
   }
   Serial.println(WiFi.localIP());
+  mydata.ap_mode = false;
   return true;
 }
 
@@ -82,17 +83,27 @@ void WiFiConnect_APcreate()
     WiFi.mode(WIFI_AP);
     WiFi.softAP(HOSTNAME);
   mydata.ap_mode = true;
+
+
     IPAddress IP = WiFi.softAPIP();
     Serial.print("AP IP address: ");
     Serial.println(IP);
   }
 }
 
+bool forgetWiFi() {
+  mydata.ssid[0] = '\0';
+  mydata.pass[0] = '\0';
+  fd.updateNow();
+  return true;
+}
 void OtaUpdate()
 {
   char otaHostname[30];
   sprintf_P(otaHostname, (PGM_P)F("%S"), YOUR_HOSTNAME);
-  ArduinoOTA.setHostname(otaHostname);
+  
+
+ArduinoOTA.setHostname(otaHostname);
   ArduinoOTA.onStart([]() {
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH)

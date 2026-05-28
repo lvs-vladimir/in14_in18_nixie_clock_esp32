@@ -52,6 +52,8 @@ GP.BLOCK_END();
     M_BOX(GP_LEFT, GP.LABEL(SETTING_NETWORK_WIFI_PASSWORD[mydata.lng]); M_BOX(GP_RIGHT, GP.TEXT("ps", "Password", mydata.pass, "100%");));
     GP.BREAK();
     M_BOX(GP_CENTER, GP.BUTTON_MINI("wifi_btn", SETTING_WIFI_CONNECT_BTN[mydata.lng], "", GP_BLUE, "", 0, 1););
+  GP.BREAK();
+  M_BOX(GP_CENTER, GP.BUTTON_MINI("wifi_forget", "Forget WiFi", "", GP_RED, "", 0, 1););
 GP.BLOCK_END();
   GP.FORM_END();
 
@@ -306,7 +308,16 @@ void action(GyverPortal& ui) {
       WiFi.softAPdisconnect();
       WiFi.mode(WIFI_STA);
       WiFi.begin(mydata.ssid, mydata.pass);
+      mydata.ap_mode = false;
+      unsigned long start = millis();
+      while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) delay(100);
+      if (WiFi.status() == WL_CONNECTED) ESP.restart();
     }
+    if (ui.click("wifi_forget")) {
+      forgetWiFi();
+      ESP.restart();
+    }
+
     if (ui.clickStr("ntp", mydata.NTPserver));
     if (ui.clickStr("lg", mydata.ssid));
     if (ui.clickStr("ps", mydata.pass));
