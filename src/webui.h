@@ -152,12 +152,6 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     M_BOX(GP_LEFT, GP.LABEL("USD/RUB:"); GP.LABEL(" ", "usdrub"); GP.BREAK(););
     GP.BLOCK_END();
 
-    GP.BLOCK_THIN_BEGIN();
-    M_BOX(GP_CENTER, GP.LABEL("VEML7700"););
-    GP.HR();
-    M_BOX(GP_LEFT, GP.LABEL("LUX:"); GP.LABEL(" ", "lux"); GP.BREAK(););
-    GP.BLOCK_END();
-
     if (optemperature != 0) {
       GP.BLOCK_THIN_BEGIN();
       M_BOX(GP_CENTER, GP.LABEL(String("OpenWeatherMap: ") + mydata.owCity););
@@ -219,6 +213,12 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
   M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_DATA_MODE[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_data_mode", WS2812_ANIM_ARRAY[mydata.lng], mydata.anim_data_mode, 0, 0, 1);););
   GP.HR();
   GP.BLOCK_END();
+
+    GP.BLOCK_THIN_BEGIN();
+    M_BOX(GP_CENTER, GP.LABEL("VEML7700"););
+    GP.HR();
+    M_BOX(GP_LEFT, GP.LABEL("LUX:"); GP.LABEL(" ", "lux"); GP.BREAK(););
+    GP.BLOCK_END();
 
       GP.BLOCK_THIN_BEGIN();
   M_BOX(GP_CENTER, GP.LABEL(VEML_LABEL[mydata.lng]););
