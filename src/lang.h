@@ -29,11 +29,11 @@ const char* DATA_TYPE_SENSOR = ",t воздуха,t воды,t почвы,t то
 const char* DISPLAY_SECONDS_SWITCH[] = {"Вкл/выкл секунды", "On/off seconds"};
 const char* DISPLAY_DATA_LABEL[] = {"Данные дисплея", "Display data"};
 const char* DISPLAY_DATA_SHOW_SWITCH[] = {"Автопоказ", "Auto show"};
-const char* SETTING_ANIM_NAME[] = {"Эффект смены цифр:", "Digit effect:"};
+const char* SETTING_ANIM_NAME[] = {"Эффект цифр:", "Digit effect:"};
 const char* SETTING_ANIM_SEC_NAME[] = {"Смена через (сек):", "Change every (sec):"};
-const char* SETTING_ANIM_ARRAY[] = {"Автоцикл,Без,Последовательно,Плавно", "Auto cycle,None,Sequential,Smooth"};
-const char* DISPLAY_MODE_ANIM_NAME[] = {"Анимация смены режимов:", "Mode change animation:"};
-const char* DISPLAY_MODE_ANIM_ARRAY[] = {"Случайная,Слева направо,Справа налево,К центру,От центра,Случайные лампы,Чётные потом нечётные,Нечётные потом чётные,Перебор цифр,Кроссфейд,Бегущая строка LTR,Бегущая строка RTL,Случайный перебор", "Random,Left to right,Right to left,To center,From center,Random tubes,Even then odd,Odd then even,Digit switch,Crossfade,Marquee LTR,Marquee RTL,Random digit flip"};
+const char* SETTING_ANIM_ARRAY[] = {"Автоцикл,Обычный,Перебор,Кроссфейд", "Auto cycle,None,Sequential,Crossfade"};
+const char* DISPLAY_MODE_ANIM_NAME[] = {"Анимация режимов:", "Mode change animation:"};
+const char* DISPLAY_MODE_ANIM_ARRAY[] = {"Случайная,Слева направо,Справа налево,К центру,От центра,Случ. лампы,Чётн->нечётн,Нечётн->чётн,Перебор цифр,Кроссфейд,-> LTR,<- RTL,Случ. перебор", "Random,Left to right,Right to left,To center,From center,Random tubes,Even then odd,Odd then even,Digit switch,Crossfade,Marquee LTR,Marquee RTL,Random digit flip"};
 
 const char* SETTING_WEB_AUTH_NAME[] = {"Защита веб-интерфейса", "Web interface security"};
 const char* SETTING_WEB_AUTH_PASSWORD[] = {"Новый пароль:", "New password:"};
