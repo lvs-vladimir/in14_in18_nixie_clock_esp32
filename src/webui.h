@@ -195,6 +195,10 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
 M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_change", SETTING_ANIM_ARRAY[mydata.lng], mydata.anim_change, 0, 0, 1);););
 GP.BREAK();
 M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_SEC_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("anim_change_sec", mydata.anim_change_sec, 3, 300, 1, 0, GP_BLUE, "60px", 0);););
+
+  M_BOX(GP_LEFT, GP.SWITCH("anim_by_mode", mydata.anim_by_mode, GP_BLUE); M_BOX(GP_RIGHT, GP.LABEL(SETTING_ANIM_BY_MODE[mydata.lng]);););
+  M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_TIME_MODE[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_time_mode", WS2812_ANIM_ARRAY[mydata.lng], mydata.anim_time_mode, 0, 0, 1);););
+  M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_DATA_MODE[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_data_mode", WS2812_ANIM_ARRAY[mydata.lng], mydata.anim_data_mode, 0, 0, 1);););
 GP.BREAK();
 M_BOX(GP_LEFT, GP.LABEL(DISPLAY_MODE_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("animdots", DISPLAY_MODE_ANIM_ARRAY[mydata.lng], mydata.animdots, 0, 0, 1);););
 GP.HR();
@@ -369,6 +373,9 @@ void action(GyverPortal& ui) {
   if (ui.clickInt("vnlx5", mydata.nixie_lux_max[5]));
   if (ui.clickInt("vnbv5", mydata.nixie_bright_val[5]));
     if (ui.clickInt("anim_change", mydata.anim_change));
+  if (ui.clickInt("anim_by_mode", mydata.anim_by_mode));
+  if (ui.clickInt("anim_time_mode", mydata.anim_time_mode));
+  if (ui.clickInt("anim_data_mode", mydata.anim_data_mode));
   if (ui.clickInt("anim_change_sec", mydata.anim_change_sec));
   if (ui.clickInt("animdots", mydata.animdots));
     if (ui.clickInt("autoshow_sec", mydata.autoshow_min));

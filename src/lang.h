@@ -16,6 +16,9 @@ const char* SETTING_NTP_SYNC_BTN[] = {"Синхронизовать", "Synchroni
 const char* SETTING_NTP_PERIODIC[] {"Периодическая синхронизация", "Periodic sync"};
 const char* SETTING_NTP_PERIODIC_LABEL[] {"Интервал (мин)", "Interval (min)"};const char* SETTING_OP_NAME[] = {"OpenWeatherMap.org", "OpenWeatherMap.org"};
 const char* SETTING_OP_APIKEY[] = {"Api ключ:", "Api Key:"};
+const char* SETTING_ANIM_BY_MODE[] = {"По режиму дисплея", "By display mode"};
+const char* SETTING_ANIM_TIME_MODE[] = {"Анимация время", "Time animation"};
+const char* SETTING_ANIM_DATA_MODE[] = {"Анимация датчики", "Sensor animation"};
 const char* SETTING_OP_CITY[] = {"Город (eng):", "City:"};
 const char* SETTING_OP_SYNC_BTN[] = {"Обновить", "Update"};
 const char* SETTING_NAROD_NAME[] = {"Narodmon.ru", "Narodmon.ru"};

@@ -174,33 +174,38 @@ void loop()
     timer1 = false;
 
     {
-      static byte rotateCounter = 0;
-      int oldfx = effects;
-      if (mydata.anim_change == 0) {
-        byte interval = mydata.anim_change_sec;
-        if (interval == 0) interval = 30;
-        rotateCounter++;
-        if (rotateCounter >= interval) {
-          rotateCounter = 0;
-          effects++;
-          if (effects > 2) effects = 0;
-          log_add('D', "EFF cycle: %d (int=%ds)", effects, interval);
-        }
-      } else {
-        rotateCounter = 0;
-        byte target;
-        switch (mydata.anim_change) {
-          case 1: target = 0; break;
-          case 2: target = 1; break;
-          case 3: target = 2; break;
-          default: target = effects; break;
-        }
-        if (target != effects) {
-          effects = target;
-          log_add('D', "EFF set: %d (mode=%d)", effects, mydata.anim_change);
-        }
-      }
+  if (mydata.anim_by_mode) {
+    if (displayState == MODE_TIME) effects = mydata.anim_time_mode;
+    else effects = mydata.anim_data_mode;
+  } else {
+  static byte rotateCounter = 0;
+  int oldfx = effects;
+  if (mydata.anim_change == 0) {
+    byte interval = mydata.anim_change_sec;
+    if (interval == 0) interval = 30;
+    rotateCounter++;
+    if (rotateCounter >= interval) {
+      rotateCounter = 0;
+      effects++;
+      if (effects >= 2) effects = 0;
+      log_add('D', "EFF cycle: (int=%ds)", effects, interval);
     }
+  } else {
+    rotateCounter = 0;
+    byte target;
+    switch (mydata.anim_change) {
+      case 1: target = 0; break;
+      case 2: target = 1; break;
+      case 3: target = 2; break;
+      default: target = effects; break;
+    }
+    if (target != effects) {
+      effects = target;
+      log_add('D', "EFF set: (mode=%d)", effects, mydata.anim_change);
+    }
+  }
+  }
+}
 
     uint32_t holdElapsed = SwitchDisplayTimer.isRunning() ? ((millis() - modeHoldStarted) / 1000UL) : 0;
     log_add('T', "SEC %02d:%02d:%02d st=%s disp=%d to=%d fx=%d off=%d on=%d C=%d hold=%lu/%d run=%d",
