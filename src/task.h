@@ -259,10 +259,6 @@ void loop2 (void* pvParameters) {
       uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
       prev_brigh_value = bright_value;
       ledcWrite(PWM_CHANNEL, bright_value);
-      Serial.print("LUX: ");
-      Serial.print(vemllux);
-      Serial.print(" BR: ");
-      Serial.println(bright_value);
       timer0 = false;
     }
   }

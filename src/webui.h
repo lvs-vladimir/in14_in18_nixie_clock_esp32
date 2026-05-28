@@ -213,7 +213,8 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
   M_BOX(GP_LEFT, GP.LABEL(WS2812_ANIM[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("ws2812_anim", WS2812_ANIM_ARRAY[mydata.lng], mydata.ws2812_anim, 0, 0, 1);););
   M_BOX(GP_LEFT, GP.LABEL(WS2812_RANDOM_SEC[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("ws2812_random_sec", mydata.ws2812_random_sec, 1, 255, 1, 0, GP_BLUE, "60px", 0);););
   M_BOX(GP_LEFT, GP.LABEL(WS2812_BRIGHT[mydata.lng]); M_BOX(GP_RIGHT, GP.SLIDER("ws2812_bright", mydata.ws2812_brightness, 0, 255, 1, 0, GP_BLUE);););
-  M_BOX(GP_LEFT, GP.SWITCH("anim_by_mode", mydata.anim_by_mode, GP_BLUE); M_BOX(GP_RIGHT, GP.LABEL(SETTING_ANIM_BY_MODE[mydata.lng]);););
+  GP.HR();
+  M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_BY_MODE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("anim_by_mode", mydata.anim_by_mode, GP_BLUE);););
   M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_TIME_MODE[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_time_mode", WS2812_ANIM_ARRAY[mydata.lng], mydata.anim_time_mode, 0, 0, 1);););
   M_BOX(GP_LEFT, GP.LABEL(SETTING_ANIM_DATA_MODE[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("anim_data_mode", WS2812_ANIM_ARRAY[mydata.lng], mydata.anim_data_mode, 0, 0, 1);););
   GP.HR();

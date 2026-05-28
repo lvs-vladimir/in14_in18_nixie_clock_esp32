@@ -95,7 +95,6 @@ void log_add(char level, const char* fmt, ...) {
   Serial.printf("[%lu] %c: %s\n", now, level, buf);
 }
 
-//#define IN_14
 #define IN_18
 
 #ifdef IN_14
@@ -140,12 +139,9 @@ hw_timer_t *Timer0_Cfg = NULL;
 hw_timer_t *Timer1_Cfg = NULL;
 
 timerMinim DotTimer(84);          // 11 - 84, 12 - 76 посекундный таймер для часов
-timerMinim SecondTimer(1000);     // посекундный таймер для часов
 timerMinim mooveNixie(100);
 timerMinim SwitchDisplayTimer(40);
 timerMinim ChangeCathodeTimer(60);
-timerMinim ChangeCathodeTimerEffects(20);
-timerMinim WS2812_timer(10);
 timerMinim SensorSelectTimer(3000);
 timerMinim NtpSyncTimer(3600000);
 timerMinim OwmUpdateTimer(300000);
@@ -154,7 +150,6 @@ timerMinim CoinUpdateTimer(600000);
 // Определение NTP-клиента для получения времени
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP,"pool.ntp.org", 7);//"pool.ntp.org"
-
 
 typedef struct {
    const uint16_t min;
@@ -171,16 +166,9 @@ uint8_t brigh_values[num_ranges] = {60, 80, 110, 150, 200, 255};//{15, 40, 80, 1
 uint8_t brigh_values[num_ranges] = {15, 40, 80, 150, 200, 255};
 #endif
 static const int spiClk = 500000; // 1 MHz
-int incoming;
-int var1;
-int var2;
-int var3;
 int second, minute, hour, newsecond, newminute, newhour, dayOfWeek, day, dayOfMonth, month, year, minsCount, hourCount, old_second, old_minute, old_hour, oldminute;
 int Nixie[40];       // цифры, которые должны показать индикаторы (0-10)
 int NixieBuffer[40]; // цифры, которые должны показать индикаторы (0-10)
-int vemlvalue;
-
-
 
 #ifdef IN_14
 //                           0                1                2               3               4               5               6               7               8               9
@@ -188,11 +176,7 @@ int32_t masshv5522[] = {0b000000010000, 0b000010000000, 0b000100000000, 0b001000
 #endif // 
 
 #ifdef IN_18
- //       +               -          9            0             1             2           8           3             7             6            5            4
-  //0b10000000000  0b01000000000 0b1000000000 0b0100000000 0b0010000000 0b0001000000 0b0000100000 0b0000010000 0b0000001000 0b0000000100 0b00000000010 0b00000000001
-//static const uint32_t masshv5522[] = {0b0100000000, 0b0010000000, 0b0001000000, 0b0000010000, 0b00000000001, 0b00000000010, 0b0000000100, 0b0000001000, 0b0000100000, 0b1000000000, 0b0000000000};
-
-//                                     0      1     2     3     4     5     6     7     8     9     
+ //                                     0      1     2     3     4     5     6     7     8     9     
 static const uint16_t masshv5522[] = {0x100, 0x80, 0x40, 0x10, 0x01, 0x02, 0x04, 0x08, 0x20, 0x200, 0x00};
 #endif //
 
@@ -200,45 +184,21 @@ int32_t bufer[40];
 
 int32_t buferDot[12] = {0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5};
 int32_t DotMooveBufer[12] = {6, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 5};
-int32_t MooveNixieBufer[12] = {11, 23, 35, 47, 6, 5, 6, 5, 6, 5, 6, 5};
-
-int cathodeMask[] = {1, 0, 2, 9, 3, 8, 4, 7, 5, 6}; // порядок катодов in14
 
 boolean flipIndics[6];
-int startCathode[11], endCathode[11];
 
 byte display = 0;
 byte effects = 2;
 byte off_effects = 0;
 byte on_effects = 0;
 int32_t dmoove = 0;
-int32_t MN = 6;
 int32_t Counter = 6;
-int WS2812_j = 0;
-int ws2812_phase = 0;
 int rand_arr[] = {0,1,2,3,4,5};
-int time1 = 4020; // 4020// Длительность одного такта в микросекундах. За это время выводится старая цифра и новая, время делится между ними
-int time2 = 0;    // длительность такта, умноженная на число шагов дает общее время смены информации на дисплее
-int hourchange, minutecgange, secondchange;
-  // задается число шагов алгоритма. За эти шаги старая цифра сменится на новую
-int ct_sum = 58; // 60
-int ct=0;
-  // задается приращение времени на каждом такте, микросекунд
-int delta = 67;
-
-timerMinim FadeTimer1(time1);
-timerMinim FadeTimer2(time2);
-
-boolean off_left_to_right_Nixie = false; // Очистить дисплей слево на право
-boolean off_right_to_left_Nixie = false; // Очистить диспей справо на лево
-boolean on_left_to_right_Nixie = false;  // Включить дисплей слево на право
-boolean on_right_to_left_Nixie = false;  // Включить диспей справо на лево
-boolean rightMooveNixie = false;
 boolean dmooveright = true;
 boolean dmooveleft = false;
 boolean flip;
 boolean flipInit = true;
-boolean flip_switch, flip_switch2 = true;
+boolean flip_switch = true;
 boolean lamp_dot_hv31 = false;
 boolean lamp_plus_hv32 = false;
 boolean lamp_celsius_hv31 = false;
@@ -278,10 +238,6 @@ const int PWM_RESOLUTION = 8; // Мы будем использовать то �
 // Максимальное значение рабочего цикла, основанное на разрешении ШИМ (будет 255, если разрешение составляет 8 бит)
 const int MAX_DUTY_CYCLE = (int)(pow(2, PWM_RESOLUTION) - 1);
 const int LED_OUTPUT_PIN = BL;
-
-uint16_t prev_value = 0;
-byte stable_count = 0;
-const uint16_t STABLE_LIMIT = 15;
 
 uint16_t vemllux;
 uint8_t prev_brigh_value=255;

@@ -82,8 +82,7 @@ void WiFiConnect_APcreate()
     Serial.println("WiFi не подключен, создаем точку");
     WiFi.mode(WIFI_AP);
     WiFi.softAP(HOSTNAME);
-  mydata.ap_mode = true;
-
+    mydata.ap_mode = true;
 
     IPAddress IP = WiFi.softAPIP();
     Serial.print("AP IP address: ");
@@ -101,9 +100,8 @@ void OtaUpdate()
 {
   char otaHostname[30];
   sprintf_P(otaHostname, (PGM_P)F("%S"), YOUR_HOSTNAME);
-  
 
-ArduinoOTA.setHostname(otaHostname);
+  ArduinoOTA.setHostname(otaHostname);
   ArduinoOTA.onStart([]() {
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH)

@@ -149,7 +149,6 @@ void loop()
     }
   }
 
-  
         lamp_celsius_hv31 = false;
   lamp_percent_hv32 = false;
   lamp_dot_hv31 = false;
@@ -174,12 +173,7 @@ void loop()
     timer1 = false;
 
     {
-  if (mydata.anim_by_mode) {
-    if (displayState == MODE_TIME) effects = mydata.anim_time_mode;
-    else effects = mydata.anim_data_mode;
-  } else {
   static byte rotateCounter = 0;
-  int oldfx = effects;
   if (mydata.anim_change == 0) {
     byte interval = mydata.anim_change_sec;
     if (interval == 0) interval = 30;
@@ -187,7 +181,7 @@ void loop()
     if (rotateCounter >= interval) {
       rotateCounter = 0;
       effects++;
-      if (effects >= 2) effects = 0;
+      if (effects > 2) effects = 0;
       log_add('D', "EFF cycle: (int=%ds)", effects, interval);
     }
   } else {
@@ -203,7 +197,6 @@ void loop()
       effects = target;
       log_add('D', "EFF set: (mode=%d)", effects, mydata.anim_change);
     }
-  }
   }
 }
 

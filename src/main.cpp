@@ -35,7 +35,3 @@ void ValueTempUpdate() {
 #include <setup.h>
 #include <effects.h>
 #include <loop.h>
-
-
-
-
