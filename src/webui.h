@@ -217,21 +217,21 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
   GP.HR();
   M_BOX(GP_LEFT, GP.LABEL(VEML_ENABLE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("veml_enable", mydata.veml_enable, GP_BLUE);););
   M_BOX(GP_CENTER, GP.LABEL(VEML_DESC[mydata.lng]););
-  M_BOX(GP_LEFT, GP.SPINNER("veml_lm0", mydata.ws2812_lux_min[0], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("veml_lx0", mydata.ws2812_lux_max[0], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("veml_bv0", mydata.ws2812_bright_val[0], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("veml_lm1", mydata.ws2812_lux_min[1], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("veml_lx1", mydata.ws2812_lux_max[1], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("veml_bv1", mydata.ws2812_bright_val[1], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("veml_lm2", mydata.ws2812_lux_min[2], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("veml_lx2", mydata.ws2812_lux_max[2], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("veml_bv2", mydata.ws2812_bright_val[2], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("veml_lm3", mydata.ws2812_lux_min[3], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("veml_lx3", mydata.ws2812_lux_max[3], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("veml_bv3", mydata.ws2812_bright_val[3], 0, 255, 1, 0, GP_BLUE, "50px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("veml_lm0", mydata.ws2812_lux_min[0], 0, 15000, 1, 0, GP_BLUE, "40px", 0);GP.SPINNER("veml_lx0", mydata.ws2812_lux_max[0], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("veml_bv0", mydata.ws2812_bright_val[0], 0, 255, 1, 0, GP_BLUE, "40px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("veml_lm1", mydata.ws2812_lux_min[1], 0, 15000, 1, 0, GP_BLUE, "40px", 0);GP.SPINNER("veml_lx1", mydata.ws2812_lux_max[1], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("veml_bv1", mydata.ws2812_bright_val[1], 0, 255, 1, 0, GP_BLUE, "40px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("veml_lm2", mydata.ws2812_lux_min[2], 0, 15000, 1, 0, GP_BLUE, "40px", 0);GP.SPINNER("veml_lx2", mydata.ws2812_lux_max[2], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("veml_bv2", mydata.ws2812_bright_val[2], 0, 255, 1, 0, GP_BLUE, "40px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("veml_lm3", mydata.ws2812_lux_min[3], 0, 15000, 1, 0, GP_BLUE, "40px", 0);GP.SPINNER("veml_lx3", mydata.ws2812_lux_max[3], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("veml_bv3", mydata.ws2812_bright_val[3], 0, 255, 1, 0, GP_BLUE, "40px", 0););
   GP.BLOCK_END();
   GP.BLOCK_THIN_BEGIN();
   M_BOX(GP_CENTER, GP.LABEL(VEML_NIXIE[mydata.lng]););
   GP.HR();
   M_BOX(GP_CENTER, GP.LABEL(VEML_NIXIE_DESC[mydata.lng]););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm0", mydata.nixie_lux_min[0], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("vnlx0", mydata.nixie_lux_max[0], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv0", mydata.nixie_bright_val[0], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm1", mydata.nixie_lux_min[1], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("vnlx1", mydata.nixie_lux_max[1], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv1", mydata.nixie_bright_val[1], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm2", mydata.nixie_lux_min[2], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("vnlx2", mydata.nixie_lux_max[2], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv2", mydata.nixie_bright_val[2], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm3", mydata.nixie_lux_min[3], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("vnlx3", mydata.nixie_lux_max[3], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv3", mydata.nixie_bright_val[3], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm4", mydata.nixie_lux_min[4], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("vnlx4", mydata.nixie_lux_max[4], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv4", mydata.nixie_bright_val[4], 0, 255, 1, 0, GP_BLUE, "50px", 0););
-  M_BOX(GP_LEFT, GP.SPINNER("vnlm5", mydata.nixie_lux_min[5], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(F("-")); GP.SPINNER("vnlx5", mydata.nixie_lux_max[5], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv5", mydata.nixie_bright_val[5], 0, 255, 1, 0, GP_BLUE, "50px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("vnlm0", mydata.nixie_lux_min[0], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx0", mydata.nixie_lux_max[0], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv0", mydata.nixie_bright_val[0], 0, 255, 1, 0, GP_BLUE, "50px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("vnlm1", mydata.nixie_lux_min[1], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx1", mydata.nixie_lux_max[1], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv1", mydata.nixie_bright_val[1], 0, 255, 1, 0, GP_BLUE, "50px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("vnlm2", mydata.nixie_lux_min[2], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx2", mydata.nixie_lux_max[2], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv2", mydata.nixie_bright_val[2], 0, 255, 1, 0, GP_BLUE, "50px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("vnlm3", mydata.nixie_lux_min[3], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx3", mydata.nixie_lux_max[3], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv3", mydata.nixie_bright_val[3], 0, 255, 1, 0, GP_BLUE, "50px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("vnlm4", mydata.nixie_lux_min[4], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx4", mydata.nixie_lux_max[4], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv4", mydata.nixie_bright_val[4], 0, 255, 1, 0, GP_BLUE, "50px", 0););
+  M_BOX(GP_LEFT, GP.SPINNER("vnlm5", mydata.nixie_lux_min[5], 0, 15000, 1, 0, GP_BLUE, "40px", 0); GP.SPINNER("vnlx5", mydata.nixie_lux_max[5], 0, 15000, 1, 0, GP_BLUE, "50px", 0); GP.SPINNER("vnbv5", mydata.nixie_bright_val[5], 0, 255, 1, 0, GP_BLUE, "50px", 0););
   GP.BLOCK_END();
 
 
