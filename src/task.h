@@ -31,6 +31,10 @@ void ws2812_effect() {
   FastLED.setBrightness(target_bright);
 
   byte anim = mydata.ws2812_anim;
+  if (mydata.anim_by_mode) {
+    if (displayState == MODE_TIME) anim = mydata.anim_time_mode;
+    else anim = mydata.anim_data_mode;
+  } else
   if (anim == 0) {
     byte interval = max((byte)1, mydata.ws2812_random_sec);
     ws2812_random_counter++;
