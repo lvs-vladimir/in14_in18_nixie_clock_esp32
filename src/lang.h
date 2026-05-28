@@ -8,6 +8,7 @@ const char* SETTING_NETWORK_SCAN_BTN[] = {"Скан", "Scan"};
 const char* SETTING_NETWORK_WIFI_NAME[] = {"Имя сети:", "WiFi name:"};
 const char* SETTING_NETWORK_WIFI_PASSWORD[] = {"Пароль:", "Password:"};
 const char* SETTING_WIFI_CONNECT_BTN[] = {"Подключить", "Connect"};
+const char* SETTING_WIFI_FORGET_BTN[] = {"Забыть WiFi", "Forget WiFi"};
 const char* SETTING_TIME_NAME[] = {"Настройка времени", "Time setting"};
 const char* SETTING_NTP_NAME[] = {"Сервер NTP:", "Server NTP:"};
 const char* SETTING_TIMEZONE_NAME[] = {"Часовой пояс:", "Time zone:"};

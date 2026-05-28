@@ -224,7 +224,15 @@ void loop()
     NTPClientUpdate();
     NtpSyncTimer.setInterval(mydata.ntp_sync_interval * 60000UL);
     NtpSyncTimer.start();
+  }
 
+  static unsigned long lastNtpRetry = 0;
+  if (WiFi.status() == WL_CONNECTED && (year < 20 || year > 50) && millis() - lastNtpRetry > 30000) {
+    lastNtpRetry = millis();
+    log_add('W', "Bad time year=%d, forcing NTP sync", year);
+    NTPClientUpdate();
+    NtpSyncTimer.setInterval(mydata.ntp_sync_interval * 60000UL);
+    NtpSyncTimer.start();
   }
 
   if (OwmUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) {

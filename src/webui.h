@@ -53,7 +53,7 @@ GP.BLOCK_END();
     GP.BREAK();
     M_BOX(GP_CENTER, GP.BUTTON_MINI("wifi_btn", SETTING_WIFI_CONNECT_BTN[mydata.lng], "", GP_BLUE, "", 0, 1););
   GP.BREAK();
-  M_BOX(GP_CENTER, GP.BUTTON_MINI("wifi_forget", "Forget WiFi", "", GP_RED, "", 0, 1););
+  M_BOX(GP_CENTER, GP.BUTTON_MINI("wifi_forget", SETTING_WIFI_FORGET_BTN[mydata.lng], "", GP_RED, "", 0, 1););
 GP.BLOCK_END();
   GP.FORM_END();
 
