@@ -317,13 +317,12 @@ void action(GyverPortal& ui) {
     if (ui.click("type_sensor0")) mydata.nrd_type_sensor[0] = ui.getInt("type_sensor0");
     if (ui.click("type_sensor1")) mydata.nrd_type_sensor[1] = ui.getInt("type_sensor1");
     if (ui.click("type_sensor2")) mydata.nrd_type_sensor[2] = ui.getInt("type_sensor2");
-    if (ui.click("timeZone")) {
-      mydata.GMT = ui.getInt("timeZone") - 12;
-      timeClient.setPoolServerName(mydata.NTPserver);
-      timeClient.setTimeOffset(3600 * mydata.GMT);
-      timeClient.update();
-
-    }
+  if (ui.click("timeZone")) {
+    int8_t new_gmt = ui.getInt("timeZone") - 12;
+    hour += new_gmt - mydata.GMT;
+    mydata.GMT = new_gmt;
+    timeClient.setTimeOffset(3600 * mydata.GMT);
+  }
     if (ui.click("lng")) {
       mydata.lng = ui.getInt("lng");
     }
