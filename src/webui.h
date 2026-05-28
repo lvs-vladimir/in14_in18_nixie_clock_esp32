@@ -276,11 +276,6 @@ void action(GyverPortal& ui) {
       timeClient.setTimeOffset(3600 * mydata.GMT);
       timeClient.update();
 
-    if (timeClient.update()) {
-      hour = timeClient.getHours();
-      minute = timeClient.getMinutes();
-      second = timeClient.getSeconds();
-    }
     }
     if (ui.click("op_btn")) {
       if (strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) getTemp2(0);
@@ -325,11 +320,6 @@ void action(GyverPortal& ui) {
       timeClient.setTimeOffset(3600 * mydata.GMT);
       timeClient.update();
 
-    if (timeClient.update()) {
-      hour = timeClient.getHours();
-      minute = timeClient.getMinutes();
-      second = timeClient.getSeconds();
-    }
     }
     if (ui.click("lng")) {
       mydata.lng = ui.getInt("lng");

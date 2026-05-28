@@ -1,21 +1,3 @@
-
-/*
-void getTemp(){
-
-int8_t tempGetTemp;
-
-String serverPath = "http://api.openweathermap.org/data/2.5/weather?q=" + (String)mydata.owCity + "&APPID=" + (String)mydata.owMapApiKey +"&units=metric";
-String jsonBuffer = httpGETRequest(serverPath.c_str());
-JSONVar myObject = JSON.parse(jsonBuffer);
-int temperature = myObject["main"]["feels_like"]; 
-
- if (temperature>=0) {TempValue = int(temperature); minus=false;}
- else {TempValue = int(temperature*-1); minus=true;}//Если отрицательное преобразуем в положительное значение для корректного отображения.
- //Serial.println("OP: "+ TempValue);
-
-}
- */
-
 void updateCryptoRates()
 {
   if (WiFi.status() != WL_CONNECTED) return;
