@@ -62,3 +62,4 @@ const char* VEML_NIXIE_DESC[] = {"люкс от-до | ярк.", "lux min-max | 
 const char* VEML_LUX_FROM[] = {"люкс от", "lux from"};
 const char* VEML_LUX_TO[] = {"до", "to"};
 const char* VEML_BRIGHT[] = {"ярк.", "bright"};
+const char* ADD_SLOT_BTN[] = {"+ Добавить", "+ Add"};

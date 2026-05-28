@@ -184,7 +184,7 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
       GP.BREAK();
     }
     if (mydata.autoshow_slots < 5) {
-      GP.BUTTON_MINI("add_slot", "+ Add", "", GP_BLUE, "80px", 0, 1);
+      GP.BUTTON_MINI("add_slot", ADD_SLOT_BTN[mydata.lng], "", GP_BLUE, "80px", 0, 1);
       GP.BREAK();
     }
     GP.BREAK();
