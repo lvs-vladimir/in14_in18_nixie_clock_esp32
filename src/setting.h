@@ -77,7 +77,7 @@ void WiFiConnect_APcreate()
     ap_show_scroll = false;
   } else {
     char HOSTNAME[30];
-    sprintf_P(HOSTNAME, (PGM_P)F("%S-%llX"), "IN18-AP", ESP.getEfuseMac());
+    sprintf_P(HOSTNAME, (PGM_P)F("%S-%llX"), YOUR_HOSTNAME, ESP.getEfuseMac());
     log_add('W', "WiFi not connected, creating AP");
     Serial.println("WiFi не подключен, создаем точку");
     WiFi.mode(WIFI_AP);

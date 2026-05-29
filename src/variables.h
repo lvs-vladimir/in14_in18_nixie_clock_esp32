@@ -95,7 +95,7 @@ void log_add(char level, const char* fmt, ...) {
   Serial.printf("[%lu] %c: %s\n", now, level, buf);
 }
 
-#define IN_18
+#define IN_14
 
 #ifdef IN_14
 #define YOUR_HOSTNAME "IN14-NIXIE" // Имя устройства для отображение в списке подключенных устройств роутера
