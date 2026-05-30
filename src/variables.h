@@ -114,7 +114,15 @@ void log_add(char level, const char* fmt, ...) {
 #define G 16
 #define LE 15
 #define LEDS_COUNT 6
+
+#ifdef IN_14
+#define LEDS_PIN 4
+#endif
+
+#ifdef IN_18
 #define LEDS_PIN 16
+#endif
+
 #define CHANNEL 1
 
 #define HSPI_MISO 12
@@ -160,7 +168,7 @@ typedef struct {
 Range lux_ranges[num_ranges] = {{0, 12},{15, 47},{50, 97},{100, 297},{300, 697},{700, 15000}};
 //Значения яркости газоразрядных индикаторов
 #ifdef IN_14
-uint8_t brigh_values[num_ranges] = {60, 80, 110, 150, 200, 255};//{15, 40, 80, 150, 200, 255};
+uint8_t brigh_values[num_ranges] = {60, 80, 110, 150, 200, 255};
 #endif
 #ifdef IN_18
 uint8_t brigh_values[num_ranges] = {15, 40, 80, 150, 200, 255};
@@ -173,12 +181,12 @@ int NixieBuffer[40]; // цифры, которые должны показать
 #ifdef IN_14
 //                           0                1                2               3               4               5               6               7               8               9
 int32_t masshv5522[] = {0b000000010000, 0b000010000000, 0b000100000000, 0b001000000000, 0b010000000000, 0b100000000000, 0b000000000001, 0b000000000010, 0b000000000100, 0b000000001000, 0b000000000000};
-#endif // 
+#endif
 
 #ifdef IN_18
  //                                     0      1     2     3     4     5     6     7     8     9     
 static const uint16_t masshv5522[] = {0x100, 0x80, 0x40, 0x10, 0x01, 0x02, 0x04, 0x08, 0x20, 0x200, 0x00};
-#endif //
+#endif 
 
 int32_t bufer[40];
 

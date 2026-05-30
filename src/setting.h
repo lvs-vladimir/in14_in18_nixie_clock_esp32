@@ -199,30 +199,51 @@ void UpdateDisplay()
   }
   #endif
 
-  #ifdef IN_14
-  if (display == 0 && timeon) {
-    if (DotTimer.isReady()) {
-      if (dmooveright) dmoove++;
-      if (dmooveleft) dmoove--;
-      if (dmoove > 11) {
+#ifdef IN_14
+  if ((display == 0) && timeon)
+  {
+    if (DotTimer.isReady())
+    {
+      if (dmooveright)
+      {
+        dmoove++;
+      }
+      if (dmooveleft)
+      {
+        dmoove--;
+      }
+      if (dmoove >= 11)
+      {
         dmoove = 11;
         dmooveleft = true;
         dmooveright = false;
       }
-      if (dmoove < 0) {
+      if (dmoove <= 0)
+      {
         dmoove = 0;
         dmooveleft = false;
         dmooveright = true;
       }
-      if (dmoove == 11) DotTimer.setInterval(76);
-      if (dmoove == 10) DotTimer.setInterval(84);
-      bufer[buferDot[dmoove]] |= (1 << DotMooveBufer[dmoove]);
+      if (dmoove == 11)
+      {
+        DotTimer.setInterval(76);
+      }
+      if (dmoove == 10)
+      {
+        DotTimer.setInterval(84);
+      }
+      // Serial.println(dmoove);
     }
-    hv5222_3 = (bufer[5] << 20);
-    hv5222_2 = (bufer[2] << 26) | (bufer[3] << 14) | bufer[4];
-    hv5222_1 = (bufer[0] << 20) | (bufer[1] << 8) | (bufer[2] << 6);
+    bufer[buferDot[dmoove]] |= (1 << DotMooveBufer[dmoove]);
   }
-  #endif
+  hv5222_3 |= (bufer[5] << 20);
+  hv5222_2 |= (bufer[2] << 26) | (bufer[3] << 14) | bufer[4];
+  hv5222_1 |= (bufer[0] << 20) | (bufer[1] << 8) | (bufer[2] >> 6);
+  if (lamp_celsius_hv31) hv5222_2 |= (1 << 13);//C
+  if (lamp_percent_hv32) hv5222_2 |= (1 << 12);//%
+  if (lamp_dot_hv31) hv5222_1 |= (1 << 6);//-
+  if (lamp_plus_hv32) hv5222_1 |= (1 << 7);//+
+#endif
 
   hspi->beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE2));
   CS_OFF_HSPI;

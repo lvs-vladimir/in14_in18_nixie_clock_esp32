@@ -150,9 +150,14 @@ pio run -e esp32dev --target upload
 pio device monitor --port /dev/ttyACM1
 ```
 
-OTA (по DNS-имени):
+OTA прошивка IN18(по DNS-имени):
 ```bash
-pio run -e esp32dev --target upload --upload-port IN18-NIXIE.local
+pio run -e in18-ota -t upload --upload-port IN18-NIXIE.local
+```
+
+OTA прошивка IN14(по DNS-имени):
+```bash
+pio run -e in14-ota -t upload --upload-port IN14-NIXIE.local
 ```
 
 ## Dependencies
