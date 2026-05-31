@@ -135,6 +135,7 @@ memset(log_entries, 0, sizeof(log_entries));
   }
 
   FastLED.addLeds<WS2812B, LEDS_PIN, GRB>(leds, LEDS_COUNT);
+  FastLED.setMaxRefreshRate(100);
   FastLED.setBrightness(mydata.ws2812_enable ? mydata.ws2812_brightness : 0);
 
   ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
@@ -174,6 +175,7 @@ memset(log_entries, 0, sizeof(log_entries));
   veml.setLowThreshold(10000);
   veml.setHighThreshold(20000);
   veml.interruptEnable(true);
+  Wire.setTimeOut(50);
 
   xTaskCreatePinnedToCore (
     loop2,

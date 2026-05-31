@@ -14,6 +14,7 @@
 #include <stdarg.h>
 #include "SPI.h"
 #include "timer2Minim.h"
+#define FASTLED_ESP32_I2S
 #include "FastLED.h"
 #include "Adafruit_VEML7700.h"
 #include "lwip/raw.h"

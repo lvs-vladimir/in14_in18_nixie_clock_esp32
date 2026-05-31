@@ -10,36 +10,55 @@ static byte ws2812_random_counter = 0;
 static byte ws2812_rand_anim = 1;
 
 void ws2812_effect() {
-  if (!mydata.ws2812_enable && !mydata.ap_mode) {
+  bool ws2812_enable = mydata.ws2812_enable;
+  bool ap_mode = mydata.ap_mode;
+  uint8_t ws2812_brightness = mydata.ws2812_brightness;
+  bool veml_enable = mydata.veml_enable;
+  uint8_t ws2812_bright_val[4];
+  memcpy(ws2812_bright_val, mydata.ws2812_bright_val, sizeof(ws2812_bright_val));
+  uint8_t ws2812_br_ranges = mydata.ws2812_br_ranges;
+  int ws2812_lux_min[4];
+  memcpy(ws2812_lux_min, mydata.ws2812_lux_min, sizeof(ws2812_lux_min));
+  uint8_t ws2812_anim = mydata.ws2812_anim;
+  uint8_t anim_by_mode = mydata.anim_by_mode;
+  uint8_t anim_time_mode = mydata.anim_time_mode;
+  uint8_t anim_data_mode = mydata.anim_data_mode;
+  uint8_t autoshow_min = mydata.autoshow_min;
+  uint8_t autoshow_select_sec[7];
+  memcpy(autoshow_select_sec, mydata.autoshow_select_sec, sizeof(mydata.autoshow_select_sec));
+  int display = ::display;
+  int displayState = ::displayState;
+
+  if (!ws2812_enable && !ap_mode) {
     FastLED.setBrightness(0);
     fill_solid(leds, LEDS_COUNT, CRGB::Black);
   FastLED.show();
-  if (mydata.ap_mode) hue = 0;
+  if (ap_mode) hue = 0;
     return;
   }
 
-  byte target_bright = mydata.ws2812_brightness;
-  if (mydata.veml_enable) {
-    byte found = mydata.ws2812_bright_val[0];
-    byte num = mydata.ws2812_br_ranges;
+  byte target_bright = ws2812_brightness;
+  if (veml_enable) {
+    byte found = ws2812_bright_val[0];
+    byte num = ws2812_br_ranges;
     for (int i = 0; i < 4 && i < num; i++) {
-      if ((int)vemllux >= mydata.ws2812_lux_min[i]) {
-        found = mydata.ws2812_bright_val[i];
+      if ((int)vemllux >= ws2812_lux_min[i]) {
+        found = ws2812_bright_val[i];
       }
     }
     target_bright = found;
   }
   FastLED.setBrightness(target_bright);
 
-  byte anim = mydata.ws2812_anim;
-  if (mydata.anim_by_mode) {
-    if (displayState == MODE_TIME) anim = mydata.anim_time_mode;
-    else anim = mydata.anim_data_mode;
+  byte anim = ws2812_anim;
+  if (anim_by_mode) {
+    if (displayState == MODE_TIME) anim = anim_time_mode;
+    else anim = anim_data_mode;
   }
   if (anim == 0) {
     byte interval;
-    if (display == 0) interval = max((byte)1, mydata.autoshow_min);
-    else interval = max((byte)1, mydata.autoshow_select_sec[display]);
+    if (display == 0) interval = max((byte)1, autoshow_min);
+    else interval = max((byte)1, autoshow_select_sec[display]);
     static byte prev_display = 0;
     if (display != prev_display) {
       ws2812_random_counter = 0;
@@ -58,7 +77,7 @@ void ws2812_effect() {
     anim = ws2812_rand_anim;
   }
 
-  if (mydata.ap_mode) {
+  if (ap_mode) {
     hue = 0;
     anim = 16;
   }
@@ -246,20 +265,24 @@ case 20: // Snow sparkle - falling snow
     if (snow_mask & (1 << i)) leds[i] = CRGB::White;
   break;
 }
+  default: break;
   }
   FastLED.show();
 }
 void loop2 (void* pvParameters) {
   while (1) {
+    if (timer0) {
+      timer0 = false;
+      uint32_t t = millis();
+      vemllux = veml.readLux();
+      if (millis() - t < 100) {
+        uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
+        prev_brigh_value = bright_value;
+        ledcWrite(PWM_CHANNEL, bright_value);
+      }
+    }
     ws2812_effect();
     delay(30);
-
-    if (timer0) {
-      vemllux = veml.readLux();
-      uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
-      prev_brigh_value = bright_value;
-      ledcWrite(PWM_CHANNEL, bright_value);
-      timer0 = false;
-    }
   }
 }
+
