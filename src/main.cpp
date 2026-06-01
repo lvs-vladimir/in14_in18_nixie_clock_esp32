@@ -32,6 +32,6 @@ void ValueTempUpdate() {
 
 #include <getTemp.h>
 #include <webui.h>
-#include <setup.h>
 #include <effects.h>
 #include <loop.h>
+#include <setup.h>

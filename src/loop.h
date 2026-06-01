@@ -80,9 +80,9 @@ void prepareDisplayTarget(byte targetDisplay)
           sensorDisplayDigits, mydata.autoshow_select_sec[targetDisplay]);
 }
 
-void loop()
-{
-  ArduinoOTA.handle();
+  void loop1 (void* pvParameters) {
+  while (1) {
+     ArduinoOTA.handle();
   ui.tick();
   fd.tick();
 
@@ -236,4 +236,11 @@ void loop()
   if (CoinUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED) {
     updateCryptoRates();
   }
+    vTaskDelay(1);
+  }
+}
+
+void loop()
+{
+ 
 }

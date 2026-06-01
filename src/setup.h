@@ -180,12 +180,22 @@ memset(log_entries, 0, sizeof(log_entries));
   xTaskCreatePinnedToCore (
     loop2,
     "loop2",
-    10000,
+    4096,
     NULL,
-    0,
+    1,
     NULL,
     0
   );
+   xTaskCreatePinnedToCore (
+    loop1,
+    "loop1",
+    20000,
+    NULL,
+    1,
+    NULL,
+    1
+  );
+  vTaskDelete(NULL); // удалить loopTask
 }
 
 static struct raw_pcb *ping_pcb = NULL;

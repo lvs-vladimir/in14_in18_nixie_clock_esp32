@@ -155,7 +155,8 @@ timerMinim SensorSelectTimer(3000);
 timerMinim NtpSyncTimer(3600000);
 timerMinim OwmUpdateTimer(300000);
 timerMinim CoinUpdateTimer(600000);
-
+timerMinim vemlRead(2000);
+timerMinim ws2812_timer(30);
 // Определение NTP-клиента для получения времени
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP,"pool.ntp.org", 7);//"pool.ntp.org"

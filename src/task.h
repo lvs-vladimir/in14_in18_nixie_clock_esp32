@@ -271,18 +271,24 @@ case 20: // Snow sparkle - falling snow
 }
 void loop2 (void* pvParameters) {
   while (1) {
-    if (timer0) {
-      timer0 = false;
-      uint32_t t = millis();
-      vemllux = veml.readLux();
-      if (millis() - t < 100) {
+   // if (timer0) {
+    //  timer0 = false;
+     // uint32_t t = millis();
+     if (vemlRead.isReady()) {
+      float lux = veml.readLux();
+     // if (millis() - t >= 1000) {
+        vemllux = lux;
         uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
         prev_brigh_value = bright_value;
         ledcWrite(PWM_CHANNEL, bright_value);
       }
-    }
-    ws2812_effect();
-    delay(30);
+   // }
+    if (ws2812_timer.isReady()) ws2812_effect();
+    vTaskDelay(1);
+    //delay(30);
   }
 }
+
+
+
 
