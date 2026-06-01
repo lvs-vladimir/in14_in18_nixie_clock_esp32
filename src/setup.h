@@ -72,6 +72,7 @@ memset(log_entries, 0, sizeof(log_entries));
     mydata.autoshow_select[3] = 3;
   }
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
+  if (mydata.offtime_end_h == 0 && mydata.offtime_end_m == 0) mydata.offtime_end_h = 8;
   if (mydata.animdots > 12) mydata.animdots = 0;
   if (mydata.autoshow_slots > 5) mydata.autoshow_slots = 5;
   if (mydata.autoshow_select[0] != 0) {
@@ -189,7 +190,7 @@ memset(log_entries, 0, sizeof(log_entries));
    xTaskCreatePinnedToCore (
     loop1,
     "loop1",
-    20000,
+    12288,
     NULL,
     1,
     NULL,

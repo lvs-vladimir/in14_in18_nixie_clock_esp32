@@ -61,6 +61,11 @@ struct Data {
   byte anim_time_mode;
   byte anim_data_mode;
   boolean ap_mode;
+  boolean offtime_enable;
+  byte offtime_start_h;
+  byte offtime_start_m;
+  byte offtime_end_h;
+  byte offtime_end_m;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
@@ -251,6 +256,15 @@ const int LED_OUTPUT_PIN = BL;
 
 uint16_t vemllux;
 uint8_t prev_brigh_value=255;
+bool offtime_active = false;
+
+static inline bool time_in_range(byte h, byte m, byte sh, byte sm, byte eh, byte em) {
+  int now = h * 60 + m;
+  int start = sh * 60 + sm;
+  int end = eh * 60 + em;
+  if (start <= end) return now >= start && now < end;
+  else return now >= start || now < end;
+}
 
 unsigned long previousMillis;
 

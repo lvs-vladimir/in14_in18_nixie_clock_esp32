@@ -63,3 +63,7 @@ const char* VEML_LUX_FROM[] = {"люкс от", "lux from"};
 const char* VEML_LUX_TO[] = {"до", "to"};
 const char* VEML_BRIGHT[] = {"ярк.", "bright"};
 const char* ADD_SLOT_BTN[] = {"+ Добавить", "+ Add"};
+const char* OFFTIME_LABEL[] = {"Отключение по времени", "Scheduled off"};
+const char* OFFTIME_ENABLE[] = {"Вкл/выкл", "On/Off"};
+const char* OFFTIME_START[] = {"Начало:", "Start:"};
+const char* OFFTIME_END[] = {"Конец:", "End:"};

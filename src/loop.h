@@ -86,6 +86,8 @@ void prepareDisplayTarget(byte targetDisplay)
   ui.tick();
   fd.tick();
 
+  offtime_active = mydata.offtime_enable && time_in_range(hour, minute, mydata.offtime_start_h, mydata.offtime_start_m, mydata.offtime_end_h, mydata.offtime_end_m);
+
   byte slots = getConfiguredSlotCount();
 
   if (mydata.autoshow_switch && slots > 0 && displayState == MODE_TIME && display == 0 &&
@@ -121,6 +123,7 @@ void prepareDisplayTarget(byte targetDisplay)
     }
   }
 
+  if (!offtime_active) {
   static int lastCrossFadeSecond = -1;
   if (displayState == MODE_TIME && display == 0 && timeon) {
     if (mydata.seconds_switch) {
@@ -167,6 +170,7 @@ void prepareDisplayTarget(byte targetDisplay)
   }
   UpdateDisplay();
   switch_effects();
+  }
 
   if (timer1) {
     calculateTime();

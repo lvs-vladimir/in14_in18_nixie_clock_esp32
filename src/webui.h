@@ -198,6 +198,12 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_MODE_ANIM_NAME[mydata.lng]); M_BOX(GP_RIGHT, GP.
 GP.HR();
 M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("seconds_switch", mydata.seconds_switch, GP_BLUE);););
     GP.HR();
+    M_BOX(GP_LEFT, GP.LABEL(OFFTIME_LABEL[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("offtime_enable", mydata.offtime_enable, GP_BLUE);););
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(OFFTIME_START[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("offtime_start_h", mydata.offtime_start_h, 0, 23, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(":"); GP.SPINNER("offtime_start_m", mydata.offtime_start_m, 0, 59, 1, 0, GP_BLUE, "50px", 0);););
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(OFFTIME_END[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("offtime_end_h", mydata.offtime_end_h, 0, 23, 1, 0, GP_BLUE, "50px", 0); GP.LABEL(":"); GP.SPINNER("offtime_end_m", mydata.offtime_end_m, 0, 59, 1, 0, GP_BLUE, "50px", 0);););
+    GP.HR();
     GP.BLOCK_END();
 
   GP.BLOCK_THIN_BEGIN();
@@ -415,6 +421,11 @@ void action(GyverPortal& ui) {
     mydata.autoshow_select[mydata.autoshow_slots] = 0;
     mydata.autoshow_select_sec[mydata.autoshow_slots] = 10;
   }
+  if (ui.clickInt("offtime_enable", mydata.offtime_enable));
+  if (ui.clickInt("offtime_start_h", mydata.offtime_start_h));
+  if (ui.clickInt("offtime_start_m", mydata.offtime_start_m));
+  if (ui.clickInt("offtime_end_h", mydata.offtime_end_h));
+  if (ui.clickInt("offtime_end_m", mydata.offtime_end_m));
     fd.updateNow();
   }
   if (ui.update()) {
