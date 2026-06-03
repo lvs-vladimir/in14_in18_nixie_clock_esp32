@@ -154,23 +154,24 @@ uint8_t brigh_value_indi(uint16_t veml_value, int lux_min[], int lux_max[], uint
   }
   return prev_brigh_value;
 }
-
+/*
 void IRAM_ATTR brightness_timer()
 {
   timer0=true;
 }
-
+*/
 void IRAM_ATTR second_timer()
 {
   timer1=true;
 }
 
 void init_timers(){
+  /*
   Timer0_Cfg = timerBegin(0, 80, true);
   timerAttachInterrupt(Timer0_Cfg, &brightness_timer, true);
   timerAlarmWrite(Timer0_Cfg, 2000000, true);
   timerAlarmEnable(Timer0_Cfg);
-
+*/
   Timer1_Cfg = timerBegin(1, 80, true);
   timerAttachInterrupt(Timer1_Cfg, &second_timer, true);
   timerAlarmWrite(Timer1_Cfg, 1000000, true);

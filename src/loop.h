@@ -6,8 +6,9 @@ int getSlotValue(byte slotIdx)
     return 0;
   }
 
-  int sensorIdx = dropdownIdx + 3;
-  if (dropdownIdx >= 4) sensorIdx = dropdownIdx + 3;
+  byte sensorIdx;
+  if (dropdownIdx <= 7) sensorIdx = dropdownIdx + 3;
+  else sensorIdx = dropdownIdx - 8;
   if (sensorIdx > 13) {
     log_add('W', "GETVAL slot=%d dropdown=%d invalid sensor=%d", slotIdx, dropdownIdx, sensorIdx);
     return 0;
@@ -15,10 +16,10 @@ int getSlotValue(byte slotIdx)
 
   int value = 0;
   switch (sensorIdx) {
-    case 0: value = (int)mydata.nrd_sens[0]; break;
-    case 1: value = (int)mydata.nrd_sens[1]; break;
-    case 2: value = (int)mydata.nrd_sens[2]; break;
-    case 3: value = (int)mydata.nrd_sens[3]; break;
+    case 0: value = nrd_values[0]; break;
+    case 1: value = nrd_values[1]; break;
+    case 2: value = nrd_values[2]; break;
+    case 3: value = nrd_values[3]; break;
     case 4: value = (int)optemperature; break;
     case 5: value = (int)oppressure; break;
     case 6: value = (int)ophumidity; break;
@@ -167,6 +168,14 @@ void prepareDisplayTarget(byte targetDisplay)
       }
     }
     else if (sel == 3) lamp_percent_hv32 = true;
+    else if (sel >= 8 && sel - 8 < mydata.nrd_sens_count) {
+      String s = SensorsDisplay[sel - 8];
+      if (s.endsWith("*")) {
+        lamp_celsius_hv31 = true;
+        if (sensorDisplayValue >= 0) lamp_plus_hv32 = true;
+        else lamp_dot_hv31 = true;
+      } else if (s.endsWith("%")) lamp_percent_hv32 = true;
+    }
   }
   UpdateDisplay();
   switch_effects();
@@ -236,6 +245,8 @@ void prepareDisplayTarget(byte targetDisplay)
     log_add('I', "OWM update");
     getTemp2(0);
   }
+
+  narodmonUpdate();
 
   if (CoinUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED) {
     updateCryptoRates();

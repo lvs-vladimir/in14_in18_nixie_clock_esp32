@@ -14,8 +14,7 @@
 #include <stdarg.h>
 #include "SPI.h"
 #include "timer2Minim.h"
-#define FASTLED_ESP32_I2S
-#include "FastLED.h"
+#include "ws2812_driver.h"
 #include "Adafruit_VEML7700.h"
 #include "lwip/raw.h"
 #include "lwip/ip4.h"
@@ -66,6 +65,7 @@ struct Data {
   byte offtime_start_m;
   byte offtime_end_h;
   byte offtime_end_m;
+  byte nrd_sens_count;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
@@ -74,7 +74,7 @@ char webLogin[16] = "";
 char webPass[32] = "admin";
 bool webAuthOk = false;
 
-#define LOG_ENTRIES 200
+#define LOG_ENTRIES 20
 #define LOG_LINE_LEN 160
 struct LogEntry {
   uint32_t time;

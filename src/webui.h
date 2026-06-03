@@ -8,7 +8,7 @@ GP.THEME(GP_DARK);
   GP.TITLE(DEVICE_NAME[mydata.lng]);
   GP.PAGE_TITLE(PAGE_TITLE[mydata.lng]);
   GP.HR();
-  GP.UPDATE("btc,eth,usdrub,lux,optemp,ophum,oppres,sens0,sens1,sens2,sens3");
+  GP.UPDATE("btc,eth,usdrub,lux,optemp,ophum,oppres,sens0,sens1,sens2,sens3,nrd0,nrd1,nrd2,nrd3,nrd4");
   if (ui.uri("/logout")) {
     webAuthOk = false;
   }
@@ -86,10 +86,24 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     GP.BREAK();
     M_BOX(GP_CENTER, GP.LABEL(SETTING_NAROD_SENSORS_LABEL[mydata.lng]););
     GP.HR();
-    M_BOX(GP_LEFT, GP.LABEL("", "sens0"); M_BOX(GP_RIGHT, GP.SELECT("type_sensor0", SETTING_NAROD_SENSORS[mydata.lng], mydata.nrd_type_sensor[0], 0, 0, 1); GP.SPINNER("sens0_narod", mydata.nrd_sens[0], 0, 20, 1, 0, GP_BLUE, "45px", 0);););
-    M_BOX(GP_LEFT, GP.LABEL("", "sens1"); M_BOX(GP_RIGHT, GP.SELECT("type_sensor1", DATA_TYPE_SENSOR, mydata.nrd_type_sensor[1], 0, 0, 1); GP.SPINNER("sens1_narod", mydata.nrd_sens[1], 0, 20, 1, 0, GP_BLUE, "45px", 0);););
-    M_BOX(GP_LEFT, GP.LABEL("", "sens2"); M_BOX(GP_RIGHT, GP.SELECT("type_sensor2", DATA_TYPE_SENSOR, mydata.nrd_type_sensor[2], 0, 0, 1); GP.SPINNER("sens2_narod", mydata.nrd_sens[2], 0, 20, 1, 0, GP_BLUE, "45px", 0);););
-    GP.BREAK();
+    for (byte i = 0; i < mydata.nrd_sens_count; i++) {
+      char buf[32];
+      snprintf(buf, sizeof(buf), "sens%d_narod", i);
+      char lbl[8];
+      snprintf(lbl, sizeof(lbl), "%d:", i + 1);
+      char rm[16];
+      snprintf(rm, sizeof(rm), "rm_sens%d", i);
+      M_BOX(GP_LEFT,
+        GP.LABEL(lbl);
+        GP.SELECT(buf, NarodmonSensorNames.length() > 0 ? NarodmonSensorNames : F("Sync first"), mydata.nrd_sens[i], 0, 0, 1);
+        GP.BUTTON_MINI(rm, "X", "", GP_RED, "20px", 0, 1);
+      );
+      GP.BREAK();
+    }
+    if (mydata.nrd_sens_count < 5) {
+      GP.BUTTON_MINI("add_sens", ADD_SLOT_BTN[mydata.lng], "", GP_BLUE, "80px", 0, 1);
+      GP.BREAK();
+    }
     M_BOX(GP_CENTER, GP.BUTTON_MINI("narod_btn", SETTING_NAROD_SYNC_BTN[mydata.lng], "", GP_BLUE, "", 0, 1););
     GP.BLOCK_END();
 
@@ -159,6 +173,18 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
       M_BOX(GP_LEFT, GP.LABEL("Temperature:"); GP.LABEL(" ", "optemp"); GP.LABEL("C"); GP.BREAK(););
       M_BOX(GP_LEFT, GP.LABEL("Humidity:"); GP.LABEL(" ", "ophum"); GP.LABEL("%"); GP.BREAK(););
       M_BOX(GP_LEFT, GP.LABEL("Pressure:"); GP.LABEL(" ", "oppres"); GP.LABEL("hPa"); GP.BREAK(););
+      GP.BLOCK_END();
+    }
+
+    if (mydata.NarodmoonApi[0] != '\0' && mydata.NarodmoonID[0] != '\0') {
+      GP.BLOCK_THIN_BEGIN();
+      M_BOX(GP_CENTER, GP.LABEL(F("Narodmon.ru")););
+      GP.HR();
+      for (byte i = 0; i < mydata.nrd_sens_count; i++) {
+        char lblId[16];
+        snprintf(lblId, sizeof(lblId), "nrd%d", i);
+        M_BOX(GP_LEFT, GP.LABEL(nrd_names[i] + ":"); GP.LABEL(" ", lblId); GP.BREAK(););
+      }
       GP.BLOCK_END();
     }
 
@@ -332,16 +358,26 @@ void action(GyverPortal& ui) {
     if (ui.clickStr("ct", mydata.owCity));
     if (ui.clickStr("api_narod", mydata.NarodmoonApi));
     if (ui.clickStr("id_narod", mydata.NarodmoonID));
-    if (ui.clickInt("sens0_narod", mydata.nrd_sens[0]));
-    if (ui.clickInt("sens1_narod", mydata.nrd_sens[1]));
-    if (ui.clickInt("sens2_narod", mydata.nrd_sens[2]));
+    for (byte i = 0; i < mydata.nrd_sens_count; i++) {
+      char buf[32];
+      snprintf(buf, sizeof(buf), "sens%d_narod", i);
+      if (ui.click(buf)) mydata.nrd_sens[i] = ui.getInt(buf);
+      snprintf(buf, sizeof(buf), "rm_sens%d", i);
+      if (ui.click(buf)) {
+        for (byte j = i; j < mydata.nrd_sens_count - 1; j++)
+          mydata.nrd_sens[j] = mydata.nrd_sens[j + 1];
+        mydata.nrd_sens[mydata.nrd_sens_count - 1] = 0;
+        mydata.nrd_sens_count--;
+      }
+    }
+    if (ui.click("add_sens") && mydata.nrd_sens_count < 5) {
+      mydata.nrd_sens[mydata.nrd_sens_count] = 0;
+      mydata.nrd_sens_count++;
+    }
     if (ui.click("WiFi_List_Select")) {
       ui.copyInt("WiFi_List_Select", scan_list_idx);
       strcpy(mydata.ssid, GPlistIdx(WiFI_List, scan_list_idx).c_str());
     }
-    if (ui.click("type_sensor0")) mydata.nrd_type_sensor[0] = ui.getInt("type_sensor0");
-    if (ui.click("type_sensor1")) mydata.nrd_type_sensor[1] = ui.getInt("type_sensor1");
-    if (ui.click("type_sensor2")) mydata.nrd_type_sensor[2] = ui.getInt("type_sensor2");
   if (ui.click("timeZone")) {
     int8_t new_gmt = ui.getInt("timeZone") - 12;
     hour += new_gmt - mydata.GMT;
@@ -441,5 +477,10 @@ void action(GyverPortal& ui) {
     if (ui.update("sens1")) ui.answer(SensorsDisplay[1]);
     if (ui.update("sens2")) ui.answer(SensorsDisplay[2]);
     if (ui.update("sens3")) ui.answer(SensorsDisplay[3]);
+    if (ui.update("nrd0")) ui.answer(nrd_values[0]);
+    if (ui.update("nrd1")) ui.answer(nrd_values[1]);
+    if (ui.update("nrd2")) ui.answer(nrd_values[2]);
+    if (ui.update("nrd3")) ui.answer(nrd_values[3]);
+    if (ui.update("nrd4")) ui.answer(nrd_values[4]);
   }
 }

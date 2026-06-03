@@ -2,8 +2,9 @@ void disablePing();
 
 void setup()
 {
+  setCpuFrequencyMhz(240);
   init_timers();
-  Serial.begin(115200);
+  //Serial.begin(115200);
   NtpSyncTimer.stop();
   OwmUpdateTimer.stop();
   CoinUpdateTimer.stop();
@@ -73,6 +74,7 @@ memset(log_entries, 0, sizeof(log_entries));
   }
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
   if (mydata.offtime_end_h == 0 && mydata.offtime_end_m == 0) mydata.offtime_end_h = 8;
+  if (mydata.nrd_sens_count == 0 || mydata.nrd_sens_count > 5) mydata.nrd_sens_count = 3;
   if (mydata.animdots > 12) mydata.animdots = 0;
   if (mydata.autoshow_slots > 5) mydata.autoshow_slots = 5;
   if (mydata.autoshow_select[0] != 0) {
@@ -84,15 +86,16 @@ memset(log_entries, 0, sizeof(log_entries));
     mydata.autoshow_select[0] = 0;
     fd.updateNow();
   }
-  if (mydata.autoshow_slots > 0 && mydata.autoshow_select[1] > 7) {
+  byte max_select = 7 + mydata.nrd_sens_count;
+  if (mydata.autoshow_slots > 0 && mydata.autoshow_select[1] > max_select) {
     log_add('W', "Slot1 invalid (%d), reset to temp", mydata.autoshow_select[1]);
     mydata.autoshow_select[1] = 1;
   }
-  if (mydata.autoshow_slots > 1 && mydata.autoshow_select[2] > 7) {
+  if (mydata.autoshow_slots > 1 && mydata.autoshow_select[2] > max_select) {
     log_add('W', "Slot2 invalid (%d), reset to pressure", mydata.autoshow_select[2]);
     mydata.autoshow_select[2] = 2;
   }
-  if (mydata.autoshow_slots > 2 && mydata.autoshow_select[3] > 7) {
+  if (mydata.autoshow_slots > 2 && mydata.autoshow_select[3] > max_select) {
     log_add('W', "Slot3 invalid (%d), reset to humidity", mydata.autoshow_select[3]);
     mydata.autoshow_select[3] = 3;
   }
@@ -135,9 +138,7 @@ memset(log_entries, 0, sizeof(log_entries));
     mydata.nixie_lux_min[5] = 700; mydata.nixie_lux_max[5] = 15000; mydata.nixie_bright_val[5] = 255;
   }
 
-  FastLED.addLeds<WS2812B, LEDS_PIN, GRB>(leds, LEDS_COUNT);
-  FastLED.setMaxRefreshRate(100);
-  FastLED.setBrightness(mydata.ws2812_enable ? mydata.ws2812_brightness : 0);
+  ws2812_set_brightness(mydata.ws2812_enable ? mydata.ws2812_brightness : 0);
 
   ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
   ledcAttachPin(LED_OUTPUT_PIN, PWM_CHANNEL);
@@ -162,6 +163,8 @@ memset(log_entries, 0, sizeof(log_entries));
     log_add('I', "OWM init update");
     if (strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) getTemp2(0);
   }
+  log_add('I', "Narodmon init update");
+  narodmonUpdate();
   rebuildSensorsAutoShowSelect();
   log_add('I', "Sensor select list initialized: len=%d", SensorsAutoShowSelect2.length());
   OwmUpdateTimer.start();
@@ -190,7 +193,7 @@ memset(log_entries, 0, sizeof(log_entries));
    xTaskCreatePinnedToCore (
     loop1,
     "loop1",
-    12288,
+    12288,//12288
     NULL,
     1,
     NULL,

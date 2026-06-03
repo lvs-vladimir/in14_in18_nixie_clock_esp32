@@ -30,9 +30,9 @@ void ws2812_effect() {
   int displayState = ::displayState;
 
   if (!ws2812_enable && !ap_mode) {
-    FastLED.setBrightness(0);
+    ws2812_set_brightness(0);
     fill_solid(leds, LEDS_COUNT, CRGB::Black);
-  FastLED.show();
+  ws2812_show(leds, LEDS_COUNT, LEDS_PIN);
   if (ap_mode) hue = 0;
     return;
   }
@@ -48,7 +48,7 @@ void ws2812_effect() {
     }
     target_bright = found;
   }
-  FastLED.setBrightness(target_bright);
+  ws2812_set_brightness(target_bright);
 
   byte anim = ws2812_anim;
   if (anim_by_mode) {
@@ -63,7 +63,7 @@ void ws2812_effect() {
     if (display != prev_display) {
       ws2812_random_counter = 0;
       byte next;
-      do { next = random(1, 21); } while (next == ws2812_rand_anim);
+      do { next = random(1, 20); } while (next == ws2812_rand_anim);
       ws2812_rand_anim = next;
       prev_display = display;
     }
@@ -71,7 +71,7 @@ void ws2812_effect() {
     if (ws2812_random_counter >= interval * 33) {
       ws2812_random_counter = 0;
       byte next;
-      do { next = random(1, 21); } while (next == ws2812_rand_anim);
+      do { next = random(1, 20); } while (next == ws2812_rand_anim);
       ws2812_rand_anim = next;
     }
     anim = ws2812_rand_anim;
@@ -79,7 +79,7 @@ void ws2812_effect() {
 
   if (ap_mode) {
     hue = 0;
-    anim = 16;
+    anim = 15;
   }
 
   switch (anim) {
@@ -149,39 +149,33 @@ void ws2812_effect() {
       phase++;
       break;
 
-    case 9: // Scanner (KITT)
-      fadeToBlackBy(leds, LEDS_COUNT, 30);
-      leds[idex] = CRGB(CHSV(hue, 255, 255));
-      if (bouncedirection == 0) { idex++; if (idex >= LEDS_COUNT) { bouncedirection = 1; idex--; } }
-      else { idex--; if (idex < 0) { bouncedirection = 0; idex++; } }
-      break;
 
-    case 10: // Sparkle
+    case 9: // Sparkle
       for (int i = 0; i < LEDS_COUNT; i++) {
         if (random8() < 5) leds[i] = CRGB::White;
         else leds[i].nscale8(220);
       }
       break;
 
-    case 11: // Static warm white
+    case 10: // Static warm white
       fill_solid(leds, LEDS_COUNT, CRGB(255, 160, 60));
       break;
 
-    case 12: // Theater chase
+    case 11: // Theater chase
       for (int i = 0; i < LEDS_COUNT; i++)
         leds[i] = ((i + phase / 4) % 3 == 0) ? CRGB(CHSV(hue, 255, 255)) : CRGB::Black;
       phase++;
       hue++;
       break;
 
-    case 13: // Theater chase rainbow
+    case 12: // Theater chase rainbow
       for (int i = 0; i < LEDS_COUNT; i++)
         leds[i] = ((i + phase / 4) % 3 == 0) ? CRGB(CHSV(hue + i * 30, 255, 255)) : CRGB::Black;
       phase++;
       hue++;
       break;
 
-    case 14: // Running lights
+    case 13: // Running lights
       for (int i = 0; i < LEDS_COUNT; i++) {
         int p = (i + phase / 2) * 64 / LEDS_COUNT;
         leds[i] = CHSV(hue, 255, sin8(p));
@@ -190,14 +184,14 @@ void ws2812_effect() {
       phase++;
       break;
 
-    case 15: // Color wipe
+    case 14: // Color wipe
       leds[(phase / 4) % LEDS_COUNT] = CRGB(CHSV(hue, 255, 255));
       if (phase % 4 == 0)
         if ((phase / 4) % LEDS_COUNT == 0) hue += 8;
       phase++;
       break;
 
-    case 16: { // Pulse one color
+    case 15: { // Pulse one color
   static uint8_t hp = 0;
   uint8_t b;
   if (hp < 8) b = sin8(hp * 32);
@@ -216,7 +210,7 @@ void ws2812_effect() {
 break;
     }
 
-    case 17: { // Bouncing balls
+    case 16: { // Bouncing balls
       if (!ball_init) { ball_init = 1; for (int i = 0; i < 3; i++) { ball_pos[i] = i * 85; ball_speed[i] = 4 + i * 2; } }
       for (int i = 0; i < 3; i++) {
         ball_pos[i] += ball_speed[i];
@@ -232,7 +226,7 @@ break;
       break;
     }
 
-    case 18: { // Pacman
+    case 17: { // Pacman
       byte pos = (phase / 4) % (LEDS_COUNT + 3);
       byte on = (phase / 4) % (LEDS_COUNT * 2) < LEDS_COUNT;
       fadeToBlackBy(leds, LEDS_COUNT, 20);
@@ -242,7 +236,7 @@ break;
       break;
     }
 
-    case 19: // Matrix rain
+    case 18: // Matrix rain
       for (int i = 0; i < LEDS_COUNT; i++) {
         if (random8() < 10) leds[i] = CRGB::Green;
         else if (random8() < 30) leds[i] = CRGB(0, 50, 0);
@@ -250,7 +244,7 @@ break;
       }
       break;
 
-case 20: // Snow sparkle - falling snow
+case 19: // Snow sparkle - falling snow
 {
   static uint8_t snow_mask = 0;
   static uint8_t snow_step = 0;
@@ -267,16 +261,16 @@ case 20: // Snow sparkle - falling snow
 }
   default: break;
   }
-  FastLED.show();
+  ws2812_show(leds, LEDS_COUNT, LEDS_PIN);
 }
 void loop2 (void* pvParameters) {
   while (1) {
     if (offtime_active) {
       ledcWrite(PWM_CHANNEL, 0);
       if (ws2812_timer.isReady()) {
-        FastLED.setBrightness(0);
+        ws2812_set_brightness(0);
         fill_solid(leds, LEDS_COUNT, CRGB::Black);
-        FastLED.show();
+        ws2812_show(leds, LEDS_COUNT, LEDS_PIN);
       }
     } else {
      if (vemlRead.isReady()) {
@@ -288,7 +282,7 @@ void loop2 (void* pvParameters) {
       }
     if (ws2812_timer.isReady()) ws2812_effect();
     }
-    vTaskDelay(1);
+    vTaskDelay(2);
   }
 }
 

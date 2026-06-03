@@ -2,92 +2,184 @@ void updateCryptoRates()
 {
   if (WiFi.status() != WL_CONNECTED) return;
 
-  String payload = httpGETRequest("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd");
+  unsigned long deadline = millis() + 6000;
+  String payload;
+
+  payload = httpGETRequest("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd");
   JSONVar json = JSON.parse(payload);
   if (JSON.typeof(json) != "undefined") {
-    if (JSON.typeof(json["bitcoin"]["usd"]) != "undefined") pricebtc = (int)json["bitcoin"]["usd"];
-    if (JSON.typeof(json["ethereum"]["usd"]) != "undefined") priceeth = (int)json["ethereum"]["usd"];
+    if (JSON.typeof(json["bitcoin"]) != "undefined" && JSON.typeof(json["bitcoin"]["usd"]) != "undefined")
+      pricebtc = (int)json["bitcoin"]["usd"];
+    if (JSON.typeof(json["ethereum"]) != "undefined" && JSON.typeof(json["ethereum"]["usd"]) != "undefined")
+      priceeth = (int)json["ethereum"]["usd"];
   }
 
-  payload = httpGETRequest("https://www.cbr-xml-daily.ru/daily_json.js");
-  json = JSON.parse(payload);
-  if (JSON.typeof(json) != "undefined" && JSON.typeof(json["Valute"]["USD"]["Value"]) != "undefined") {
-    usdRubRate = (int)((double)json["Valute"]["USD"]["Value"] + 0.5);
+  if (millis() < deadline) {
+    payload = httpGETRequest("https://www.cbr-xml-daily.ru/daily_json.js");
+    json = JSON.parse(payload);
+    if (JSON.typeof(json) != "undefined" && JSON.typeof(json["Valute"]) != "undefined" && JSON.typeof(json["Valute"]["USD"]) != "undefined" && JSON.typeof(json["Valute"]["USD"]["Value"]) != "undefined") {
+      usdRubRate = (int)((double)json["Valute"]["USD"]["Value"] + 0.5);
+    }
   }
 
   log_add('I', "Rates update BTC=%d ETH=%d USD/RUB=%d", pricebtc, priceeth, usdRubRate);
 }
 
-//***************Получаем темперутуру с openweathermap.org и narodmon.ru**********************************
-void getTemp2(byte i){
+static timerMinim narodmonTimer(300000);
+String NarodmonSensorNames;
+int nrd_values[5];
+String nrd_names[5];
 
-  String serverPath;
-  if (i==0) serverPath = "https://api.openweathermap.org/data/2.5/weather?q=" + (String)mydata.owCity + "&APPID=" + (String)mydata.owMapApiKey +"&units=metric";
-  else if (i==1) serverPath = "https://narodmon.ru/api/sensorsOnDevice?id="+(String)mydata.NarodmoonID+"&uuid="+(String)mydata.NarodmoonApiMD5+"&api_key="+(String)mydata.NarodmoonApi+"&lang=ru";
-  else if (i>1) return;
-  String jsonBuffer = httpGETRequest(serverPath.c_str());
-  JSONVar myObject = JSON.parse(jsonBuffer);
-  if (i==0) {
-    byte j=4;
-    while (j<=6) {
-      SensorsAutoShow[j]="";//очистка
-      SensorsDisplay[j]="";//очистка
-      j++;
-    }
-        optemperature = myObject["main"]["temp"];
-        TempValue = optemperature;
-        log_add('I', "OWM temp update opt=%d TempValue=%d", optemperature, TempValue);
-        oppressure = myObject["main"]["pressure"];
-        ophumidity = myObject["main"]["humidity"];
+void narodmonUpdate()
+{
+  if (WiFi.status() != WL_CONNECTED) return;
+  static bool firstRun = true;
+  if (!firstRun && !narodmonTimer.isReady()) return;
+  firstRun = false;
+  if (strlen(mydata.NarodmoonID) == 0 || strlen(mydata.NarodmoonApi) == 0) return;
 
-        SensorsAutoShow[4]+=",";
-        SensorsAutoShow[4]+=optemperature;
-        SensorsAutoShow[4]+="*";
-    
-        SensorsAutoShow[5]+=",";
-        SensorsAutoShow[5]+=oppressure;
-        SensorsAutoShow[5]+="mHg";
-  
-        SensorsAutoShow[6]+=",";
-        SensorsAutoShow[6]+=ophumidity;
-        SensorsAutoShow[6]+="%";
-  
-        SensorsDisplay[4]+=",";
-        SensorsDisplay[4]+=optemperature;
-        SensorsDisplay[4]+="*";
-        SensorsDisplay[5]+=",";
-        SensorsDisplay[5]+=oppressure;
-        SensorsDisplay[5]+="mHg";
-        SensorsDisplay[6]+=",";
-        SensorsDisplay[6]+=ophumidity;
-        SensorsDisplay[6]+="%";
+  md5(mydata.NarodmoonApi);
 
+  String body = "{\"cmd\":\"sensorsOnDevice\",\"devices\":[";
+  body += mydata.NarodmoonID;
+  body += "],\"uuid\":\"";
+  body += mydata.NarodmoonApiMD5;
+  body += "\",\"lang\":\"ru\"}";
+
+  WiFiClient client;
+  HTTPClient http;
+  http.begin(client, "http://api.narodmon.ru");
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("Narodmon-Api-Key", mydata.NarodmoonApi);
+  http.addHeader("User-Agent", "NixieClock");
+  http.setTimeout(5000);
+
+  unsigned long t = millis();
+  int httpCode = http.POST(body);
+  String payload = "{}";
+  if (httpCode == HTTP_CODE_OK) {
+    payload = http.getString();
+  } else {
+    log_add('W', "Narodmon HTTP %d", httpCode);
   }
-  if (i==1) {
-    byte j=0;
-    while (j<=3) {
-      SensorsAutoShow[j]="";//очистка
-      SensorsDisplay[j]="";//очистка
+  http.end();
+  log_add('D', "Narodmon %dms", millis() - t);
+
+  JSONVar json = JSON.parse(payload);
+  if (JSON.typeof(json) == "undefined") {
+    log_add('W', "Narodmon JSON parse failed, raw: %.80s", payload.c_str());
+    return;
+  }
+
+  for (byte j = 0; j < mydata.nrd_sens_count; j++) {
+    SensorsAutoShow[j] = "";
+    SensorsDisplay[j] = "";
+    nrd_values[j] = 0;
+    nrd_names[j] = "";
+  }
+
+  if (JSON.typeof(json["devices"]) == "undefined" || json["devices"].length() == 0) {
+    log_add('W', "Narodmon no devices in response");
+    return;
+  }
+
+  JSONVar sensors = json["devices"][0]["sensors"];
+  if (JSON.typeof(sensors) == "undefined") {
+    log_add('W', "Narodmon no sensors in device");
+    return;
+  }
+
+  for (byte i = 0; i < mydata.nrd_sens_count; i++) {
+    byte idx = mydata.nrd_sens[i];
+    if (idx >= sensors.length()) continue;
+    JSONVar s = sensors[idx];
+    if (JSON.typeof(s) == "undefined") continue;
+
+    int val = (int)s["value"];
+    nrd_values[i] = val;
+    const char* n = (const char*)s["name"];
+    nrd_names[i] = n ? String(n) : "";
+    const char* u = (const char*)s["unit"];
+    String unit = u ? String(u) : "";
+    if (unit == "°") unit = "*";
+    else if (unit == "mmHg") unit = "mHg";
+
+    SensorsAutoShow[i] = "," + String(val) + unit;
+    SensorsDisplay[i] = String(val) + unit;
+  }
+
+  NarodmonSensorNames = "";
+  for (byte i = 0; i < sensors.length(); i++) {
+    JSONVar s = sensors[i];
+    if (JSON.typeof(s) == "undefined") continue;
+    int val = (int)s["value"];
+    const char* n = (const char*)s["name"];
+    const char* u = (const char*)s["unit"];
+    String unit = u ? String(u) : "";
+    if (unit == "°") unit = "*";
+    else if (unit == "mmHg") unit = "mHg";
+    String name = n ? String(n) : String(i);
+    if (i > 0) NarodmonSensorNames += ",";
+    NarodmonSensorNames += String(i) + ": " + String(val) + unit + " " + name;
+  }
+  log_add('I', "Narodmon sensors: %s", NarodmonSensorNames.c_str());
+  log_add('I', "Narodmon update OK");
+  narodmonTimer.reset();
+}
+
+void getTemp2(byte i)
+{
+  if (i == 0) {
+    String serverPath = "https://api.openweathermap.org/data/2.5/weather?q=" + (String)mydata.owCity + "&APPID=" + (String)mydata.owMapApiKey + "&units=metric";
+    String jsonBuffer = httpGETRequest(serverPath.c_str());
+    JSONVar myObject = JSON.parse(jsonBuffer);
+    if (JSON.typeof(myObject) == "undefined") {
+      log_add('W', "OWM JSON parse failed");
+      return;
+    }
+    if (JSON.typeof(myObject["main"]) == "undefined") {
+      log_add('W', "OWM response missing 'main', raw: %.80s", jsonBuffer.c_str());
+      return;
+    }
+    byte j = 4;
+    while (j <= 6) {
+      SensorsAutoShow[j] = "";
+      SensorsDisplay[j] = "";
       j++;
     }
-    byte f=0;
-    while (f<=20) {
-      f++;
+    if (JSON.typeof(myObject["main"]["temp"]) != "undefined") {
+      optemperature = (int)myObject["main"]["temp"];
+      TempValue = optemperature;
     }
-    for(byte i=0; i<=3; i++){
-     int b= myObject["sensors"][mydata.nrd_sens[i]]["value"];
-     String c = myObject["sensors"][mydata.nrd_sens[i]]["unit"];
+    if (JSON.typeof(myObject["main"]["pressure"]) != "undefined") oppressure = (int)myObject["main"]["pressure"];
+    if (JSON.typeof(myObject["main"]["humidity"]) != "undefined") ophumidity = (int)myObject["main"]["humidity"];
+    log_add('I', "OWM update opt=%d press=%d hum=%d", optemperature, oppressure, ophumidity);
 
-     if (c.length()!=0){
-      if(c=="°") {c=""; c+="*";}
-      if(c=="mmHg") {c=""; c+="mHg";}
-      SensorsAutoShow[i]+=",";
-      SensorsAutoShow[i]+=b;
-      SensorsAutoShow[i]+=c;
-      SensorsDisplay[i]+=b;
-      SensorsDisplay[i]+=c;
-     }
-    }
+    SensorsAutoShow[4] += ",";
+    SensorsAutoShow[4] += optemperature;
+    SensorsAutoShow[4] += "*";
+
+    SensorsAutoShow[5] += ",";
+    SensorsAutoShow[5] += oppressure;
+    SensorsAutoShow[5] += "mHg";
+
+    SensorsAutoShow[6] += ",";
+    SensorsAutoShow[6] += ophumidity;
+    SensorsAutoShow[6] += "%";
+
+    SensorsDisplay[4] += ",";
+    SensorsDisplay[4] += optemperature;
+    SensorsDisplay[4] += "*";
+
+    SensorsDisplay[5] += ",";
+    SensorsDisplay[5] += oppressure;
+    SensorsDisplay[5] += "mHg";
+
+    SensorsDisplay[6] += ",";
+    SensorsDisplay[6] += ophumidity;
+    SensorsDisplay[6] += "%";
+  } else if (i == 1) {
+    narodmonUpdate();
   }
 }
 
@@ -112,6 +204,15 @@ void rebuildSensorsAutoShowSelect()
   for (byte k = 0; k < 4; k++) {
     if (hasItem) SensorsAutoShowSelect2 += ",";
     SensorsAutoShowSelect2 += extra[k];
+    hasItem = true;
+  }
+
+  for (byte k = 0; k < mydata.nrd_sens_count; k++) {
+    String item = SensorsAutoShow[k];
+    while (item.startsWith(",")) item.remove(0, 1);
+    if (item.length() == 0) item = "s" + String(k + 1);
+    if (hasItem) SensorsAutoShowSelect2 += ",";
+    SensorsAutoShowSelect2 += item;
     hasItem = true;
   }
   log_add('D', "SELECTLIST len=%d sel1=%d sel2=%d list=%s",

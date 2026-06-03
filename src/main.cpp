@@ -11,18 +11,22 @@ void md5(char * apimd5) {
 }
 
 String httpGETRequest(const char * serverName) {
+  WiFiClientSecure client;
+  client.setInsecure();
+  client.setTimeout(3000);
   HTTPClient http;
-  String a;
-  http.begin(serverName);
+  http.begin(client, serverName);
+  http.setTimeout(3000);
+  unsigned long t = millis();
   int httpResponseCode = http.GET();
   String payload = "{}";
   if (httpResponseCode == HTTP_CODE_OK) {
     payload = http.getString();
   } else {
-    http.end();
-    return a;
+    log_add('W', "HTTP %d -> %s", httpResponseCode, serverName);
   }
   http.end();
+  log_add('D', "HTTP %dms %s", millis() - t, serverName);
   return payload;
 }
 
