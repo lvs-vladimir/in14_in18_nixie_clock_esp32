@@ -66,6 +66,15 @@ struct Data {
   byte offtime_end_h;
   byte offtime_end_m;
   byte nrd_sens_count;
+  boolean buzzer_enable;
+  byte buzzer_interval;
+  unsigned int buzzer_duration;
+  boolean alarm_enable;
+  byte alarm_hour;
+  byte alarm_minute;
+  byte alarm_melody_idx;
+  byte alarm_duration;
+  byte alarm_volume;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
@@ -162,6 +171,391 @@ timerMinim OwmUpdateTimer(300000);
 timerMinim CoinUpdateTimer(600000);
 timerMinim vemlRead(2000);
 timerMinim ws2812_timer(30);
+timerMinim buzzerTimer(150);
+timerMinim alarmTimer(100);
+
+#define NOTE_C4  262
+#define NOTE_CS4 277
+#define NOTE_D4  294
+#define NOTE_DS4 311
+#define NOTE_E4  330
+#define NOTE_F4  349
+#define NOTE_FS4 370
+#define NOTE_G4  392
+#define NOTE_GS4 415
+#define NOTE_A4  440
+#define NOTE_AS4 466
+#define NOTE_B4  494
+#define NOTE_C5  523
+#define NOTE_CS5 554
+#define NOTE_D5  587
+#define NOTE_DS5 622
+#define NOTE_E5  659
+#define NOTE_F5  698
+#define NOTE_FS5 740
+#define NOTE_G5  784
+#define NOTE_GS5 831
+#define NOTE_A5  880
+#define NOTE_AS5 932
+#define NOTE_B5  988
+#define NOTE_C6  1047
+#define NOTE_CS6 1109
+#define NOTE_D6  1175
+#define NOTE_DS6 1245
+#define NOTE_E6  1319
+#define NOTE_F6  1397
+#define NOTE_FS6 1480
+#define NOTE_G6  1568
+
+struct MelodyNote {
+  uint16_t freq;
+  uint16_t dur;
+};
+
+static const MelodyNote melody_chime[] = {
+  {NOTE_C5, 200}, {NOTE_E5, 200}, {NOTE_G5, 200}, {NOTE_C6, 400},
+  {0, 120},
+  {NOTE_B5, 150}, {NOTE_G5, 150}, {NOTE_E5, 150}, {NOTE_C5, 400},
+  {0, 120},
+  {NOTE_D5, 150}, {NOTE_G5, 150}, {NOTE_B5, 200},
+  {NOTE_G5, 150}, {NOTE_E5, 150}, {NOTE_C5, 300},
+  {0, 120},
+  {NOTE_E5, 150}, {NOTE_G5, 150}, {NOTE_C6, 300},
+  {NOTE_B5, 150}, {NOTE_C6, 150}, {NOTE_G5, 200},
+  {NOTE_E5, 200}, {NOTE_C5, 500},
+  {0, 0}
+};
+
+static const MelodyNote melody_morning[] = {
+  {NOTE_E5, 150}, {NOTE_G5, 150}, {NOTE_C6, 200}, {NOTE_E6, 200},
+  {NOTE_C6, 150}, {NOTE_G5, 150}, {NOTE_E5, 150}, {NOTE_C5, 300},
+  {0, 100},
+  {NOTE_D5, 150}, {NOTE_G5, 150}, {NOTE_B5, 200}, {NOTE_D6, 200},
+  {NOTE_B5, 150}, {NOTE_G5, 150}, {NOTE_D5, 150}, {NOTE_G5, 300},
+  {0, 100},
+  {NOTE_C5, 150}, {NOTE_E5, 150}, {NOTE_G5, 150}, {NOTE_C6, 200},
+  {NOTE_E6, 300}, {NOTE_D6, 150}, {NOTE_C6, 150},
+  {NOTE_G5, 150}, {NOTE_C6, 200}, {NOTE_E5, 200}, {NOTE_C5, 400},
+  {0, 0}
+};
+
+static const MelodyNote melody_classical[] = {
+  {NOTE_G5, 200}, {NOTE_C6, 200}, {NOTE_E6, 200}, {NOTE_C6, 200},
+  {NOTE_F5, 150}, {NOTE_A5, 150}, {NOTE_C6, 200}, {NOTE_A5, 150},
+  {NOTE_F5, 150}, {NOTE_D5, 300},
+  {0, 100},
+  {NOTE_E5, 150}, {NOTE_G5, 150}, {NOTE_C6, 200}, {NOTE_G5, 150},
+  {NOTE_E5, 150}, {NOTE_C5, 300},
+  {0, 100},
+  {NOTE_F5, 150}, {NOTE_A5, 150}, {NOTE_D6, 200}, {NOTE_A5, 150},
+  {NOTE_F5, 150}, {NOTE_E5, 200}, {NOTE_D5, 200}, {NOTE_C5, 400},
+  {0, 0}
+};
+
+static const MelodyNote melody_simple[] = {
+  {NOTE_C5, 200}, {0, 100},
+  {NOTE_E5, 200}, {0, 100},
+  {NOTE_G5, 200}, {0, 100},
+  {NOTE_C6, 400}, {0, 200},
+  {NOTE_G5, 200}, {0, 100},
+  {NOTE_E5, 200}, {0, 100},
+  {NOTE_C5, 500},
+  {0, 0}
+};
+
+static const MelodyNote melody_tetris[] = {
+  {NOTE_E5, 416}, {NOTE_B4, 208}, {NOTE_C5, 208}, {NOTE_D5, 416},
+  {NOTE_C5, 208}, {NOTE_B4, 208}, {NOTE_A4, 416}, {NOTE_A4, 208},
+  {NOTE_C5, 208}, {NOTE_E5, 416}, {NOTE_D5, 208}, {NOTE_C5, 208},
+  {NOTE_B4, 624}, {NOTE_C5, 208}, {NOTE_D5, 416}, {NOTE_E5, 416},
+  {NOTE_C5, 416}, {NOTE_A4, 416}, {NOTE_A4, 416}, {0, 416},
+  {0, 208}, {NOTE_D5, 416}, {NOTE_F5, 208}, {NOTE_A5, 416},
+  {NOTE_G5, 208}, {NOTE_F5, 208}, {NOTE_E5, 624}, {NOTE_C5, 208},
+  {NOTE_E5, 416}, {NOTE_D5, 208}, {NOTE_C5, 208}, {NOTE_B4, 416},
+  {NOTE_B4, 208}, {NOTE_C5, 208}, {NOTE_D5, 416}, {NOTE_E5, 416},
+  {NOTE_C5, 416}, {NOTE_A4, 416}, {NOTE_A4, 416}, {0, 416},
+  {NOTE_E5, 833}, {NOTE_C5, 833}, {NOTE_D5, 833}, {NOTE_B4, 833},
+  {NOTE_C5, 833}, {NOTE_A4, 833}, {NOTE_B4, 1666},
+  {NOTE_E5, 833}, {NOTE_C5, 833}, {NOTE_D5, 833}, {NOTE_B4, 833},
+  {NOTE_C5, 416}, {NOTE_E5, 416}, {NOTE_A5, 833}, {NOTE_GS5, 1666},
+  {NOTE_E5, 416}, {NOTE_B4, 208}, {NOTE_C5, 208}, {NOTE_D5, 416},
+  {NOTE_C5, 208}, {NOTE_B4, 208}, {NOTE_A4, 416}, {NOTE_A4, 208},
+  {NOTE_C5, 208}, {NOTE_E5, 416}, {NOTE_D5, 208}, {NOTE_C5, 208},
+  {NOTE_B4, 624}, {NOTE_C5, 208}, {NOTE_D5, 416}, {NOTE_E5, 416},
+  {NOTE_C5, 416}, {NOTE_A4, 416}, {NOTE_A4, 416}, {0, 416},
+  {0, 208}, {NOTE_D5, 416}, {NOTE_F5, 208}, {NOTE_A5, 416},
+  {NOTE_G5, 208}, {NOTE_F5, 208}, {0, 208}, {NOTE_E5, 416},
+  {NOTE_C5, 208}, {NOTE_E5, 416}, {NOTE_D5, 208}, {NOTE_C5, 208},
+  {0, 208}, {NOTE_B4, 416}, {NOTE_C5, 208}, {NOTE_D5, 416},
+  {NOTE_E5, 416}, {0, 208}, {NOTE_C5, 416}, {NOTE_A4, 208},
+  {NOTE_A4, 416}, {0, 416},
+  {0, 0}
+};
+
+static const MelodyNote melody_mario[] = {
+  {NOTE_E5, 135}, {0, 15}, {NOTE_E5, 135}, {0, 15},
+  {0, 150}, {NOTE_E5, 135}, {0, 15}, {0, 150},
+  {NOTE_C5, 135}, {0, 15}, {NOTE_E5, 135}, {0, 15},
+  {NOTE_G5, 270}, {0, 30}, {0, 300}, {NOTE_G4, 135},
+  {0, 15}, {0, 300}, {NOTE_C5, 405}, {0, 45},
+  {NOTE_G4, 135}, {0, 15}, {0, 300}, {NOTE_E4, 405},
+  {0, 45}, {NOTE_A4, 270}, {0, 30}, {NOTE_B4, 270},
+  {0, 30}, {NOTE_AS4, 135}, {0, 15}, {NOTE_A4, 270},
+  {0, 30}, {NOTE_G4, 202}, {0, 23}, {NOTE_E5, 202},
+  {0, 23}, {NOTE_G5, 202}, {0, 23}, {NOTE_A5, 270},
+  {0, 30}, {NOTE_F5, 135}, {0, 15}, {NOTE_G5, 135},
+  {0, 15}, {0, 150}, {NOTE_E5, 270}, {0, 30},
+  {NOTE_C5, 135}, {0, 15}, {NOTE_D5, 135}, {0, 15},
+  {NOTE_B4, 405}, {0, 45}, {NOTE_C5, 405}, {0, 45},
+  {NOTE_G4, 135}, {0, 15}, {0, 300}, {NOTE_E4, 405},
+  {0, 45}, {NOTE_A4, 270}, {0, 30}, {NOTE_B4, 270},
+  {0, 30}, {NOTE_AS4, 135}, {0, 15}, {NOTE_A4, 270},
+  {0, 30}, {NOTE_G4, 202}, {0, 23}, {NOTE_E5, 202},
+  {0, 23}, {NOTE_G5, 202}, {0, 23}, {NOTE_A5, 270},
+  {0, 30}, {NOTE_F5, 135}, {0, 15}, {NOTE_G5, 135},
+  {0, 15}, {0, 150}, {NOTE_E5, 270}, {0, 30},
+  {NOTE_C5, 135}, {0, 15}, {NOTE_D5, 135}, {0, 15},
+  {NOTE_B4, 405}, {0, 45}, {0, 300}, {NOTE_G5, 135},
+  {0, 15}, {NOTE_FS5, 135}, {0, 15}, {NOTE_F5, 135},
+  {0, 15}, {NOTE_DS5, 270}, {0, 30}, {NOTE_E5, 135},
+  {0, 15}, {0, 150}, {NOTE_GS4, 135}, {0, 15},
+  {NOTE_A4, 135}, {0, 15}, {NOTE_C4, 135}, {0, 15},
+  {0, 150}, {NOTE_A4, 135}, {0, 15}, {NOTE_C5, 135},
+  {0, 15}, {NOTE_D5, 135}, {0, 15}, {0, 300},
+  {NOTE_DS5, 270}, {0, 30}, {0, 150}, {NOTE_D5, 405},
+  {0, 45}, {NOTE_C5, 540}, {0, 60}, {0, 600},
+  {0, 300}, {NOTE_G5, 135}, {0, 15}, {NOTE_FS5, 135},
+  {0, 15}, {NOTE_F5, 135}, {0, 15}, {NOTE_DS5, 270},
+  {0, 30}, {NOTE_E5, 135}, {0, 15}, {0, 150},
+  {NOTE_GS4, 135}, {0, 15}, {NOTE_A4, 135}, {0, 15},
+  {NOTE_C4, 135}, {0, 15}, {0, 150}, {NOTE_A4, 135},
+  {0, 15}, {NOTE_C5, 135}, {0, 15}, {NOTE_D5, 135},
+  {0, 15}, {0, 300}, {NOTE_DS5, 270}, {0, 30},
+  {0, 150}, {NOTE_D5, 405}, {0, 45}, {NOTE_C5, 540},
+  {0, 60}, {0, 600}, {NOTE_C5, 135}, {0, 15},
+  {NOTE_C5, 270}, {0, 30}, {NOTE_C5, 135}, {0, 15},
+  {0, 150}, {NOTE_C5, 135}, {0, 15}, {NOTE_D5, 270},
+  {0, 30}, {NOTE_E5, 135}, {0, 15}, {NOTE_C5, 270},
+  {0, 30}, {NOTE_A4, 135}, {0, 15}, {NOTE_G4, 540},
+  {0, 60}, {NOTE_C5, 135}, {0, 15}, {NOTE_C5, 270},
+  {0, 30}, {NOTE_C5, 135}, {0, 15}, {0, 150},
+  {NOTE_C5, 135}, {0, 15}, {NOTE_D5, 135}, {0, 15},
+  {NOTE_E5, 135}, {0, 15}, {0, 1200}, {NOTE_C5, 135},
+  {0, 15}, {NOTE_C5, 270}, {0, 30}, {NOTE_C5, 135},
+  {0, 15}, {0, 150}, {NOTE_C5, 135}, {0, 15},
+  {NOTE_D5, 270}, {0, 30}, {NOTE_E5, 135}, {0, 15},
+  {NOTE_C5, 270}, {0, 30}, {NOTE_A4, 135}, {0, 15},
+  {NOTE_G4, 540}, {0, 60}, {NOTE_E5, 135}, {0, 15},
+  {NOTE_E5, 135}, {0, 15}, {0, 150}, {NOTE_E5, 135},
+  {0, 15}, {0, 150}, {NOTE_C5, 135}, {0, 15},
+  {NOTE_E5, 270}, {0, 30}, {NOTE_G5, 270}, {0, 30},
+  {0, 300}, {NOTE_G4, 270}, {0, 30}, {0, 300},
+  {NOTE_C5, 405}, {0, 45}, {NOTE_G4, 135}, {0, 15},
+  {0, 300}, {NOTE_E4, 405}, {0, 45}, {NOTE_A4, 270},
+  {0, 30}, {NOTE_B4, 270}, {0, 30}, {NOTE_AS4, 135},
+  {0, 15}, {NOTE_A4, 270}, {0, 30}, {NOTE_G4, 202},
+  {0, 23}, {NOTE_E5, 202}, {0, 23}, {NOTE_G5, 202},
+  {0, 23}, {NOTE_A5, 270}, {0, 30}, {NOTE_F5, 135},
+  {0, 15}, {NOTE_G5, 135}, {0, 15}, {0, 150},
+  {NOTE_E5, 270}, {0, 30}, {NOTE_C5, 135}, {0, 15},
+  {NOTE_D5, 135}, {0, 15}, {NOTE_B4, 405}, {0, 45},
+  {NOTE_C5, 405}, {0, 45}, {NOTE_G4, 135}, {0, 15},
+  {0, 300}, {NOTE_E4, 405}, {0, 45}, {NOTE_A4, 270},
+  {0, 30}, {NOTE_B4, 270}, {0, 30}, {NOTE_AS4, 135},
+  {0, 15}, {NOTE_A4, 270}, {0, 30}, {NOTE_G4, 202},
+  {0, 23}, {NOTE_E5, 202}, {0, 23}, {NOTE_G5, 202},
+  {0, 23}, {NOTE_A5, 270}, {0, 30}, {NOTE_F5, 135},
+  {0, 15}, {NOTE_G5, 135}, {0, 15}, {0, 150},
+  {NOTE_E5, 270}, {0, 30}, {NOTE_C5, 135}, {0, 15},
+  {NOTE_D5, 135}, {0, 15}, {NOTE_B4, 405}, {0, 45},
+  {NOTE_E5, 135}, {0, 15}, {NOTE_C5, 270}, {0, 30},
+  {NOTE_G4, 135}, {0, 15}, {0, 300}, {NOTE_GS4, 270},
+  {0, 30}, {NOTE_A4, 135}, {0, 15}, {NOTE_F5, 270},
+  {0, 30}, {NOTE_F5, 135}, {0, 15}, {NOTE_A4, 540},
+  {0, 60}, {NOTE_D5, 202}, {0, 23}, {NOTE_A5, 202},
+  {0, 23}, {NOTE_A5, 202}, {0, 23}, {NOTE_A5, 202},
+  {0, 23}, {NOTE_G5, 202}, {0, 23}, {NOTE_F5, 202},
+  {0, 23}, {NOTE_E5, 135}, {0, 15}, {NOTE_C5, 270},
+  {0, 30}, {NOTE_A4, 135}, {0, 15}, {NOTE_G4, 540},
+  {0, 60}, {NOTE_E5, 135}, {0, 15}, {NOTE_C5, 270},
+  {0, 30}, {NOTE_G4, 135}, {0, 15}, {0, 300},
+  {NOTE_GS4, 270}, {0, 30}, {NOTE_A4, 135}, {0, 15},
+  {NOTE_F5, 270}, {0, 30}, {NOTE_F5, 135}, {0, 15},
+  {NOTE_A4, 540}, {0, 60}, {NOTE_B4, 135}, {0, 15},
+  {NOTE_F5, 270}, {0, 30}, {NOTE_F5, 135}, {0, 15},
+  {NOTE_F5, 202}, {0, 23}, {NOTE_E5, 202}, {0, 23},
+  {NOTE_D5, 202}, {0, 23}, {NOTE_C5, 135}, {0, 15},
+  {NOTE_E4, 270}, {0, 30}, {NOTE_E4, 135}, {0, 15},
+  {NOTE_C4, 540}, {0, 60}, {NOTE_E5, 135}, {0, 15},
+  {NOTE_C5, 270}, {0, 30}, {NOTE_G4, 135}, {0, 15},
+  {0, 300}, {NOTE_GS4, 270}, {0, 30}, {NOTE_A4, 135},
+  {0, 15}, {NOTE_F5, 270}, {0, 30}, {NOTE_F5, 135},
+  {0, 15}, {NOTE_A4, 540}, {0, 60}, {NOTE_D5, 202},
+  {0, 23}, {NOTE_A5, 202}, {0, 23}, {NOTE_A5, 202},
+  {0, 23}, {NOTE_A5, 202}, {0, 23}, {NOTE_G5, 202},
+  {0, 23}, {NOTE_F5, 202}, {0, 23}, {NOTE_E5, 135},
+  {0, 15}, {NOTE_C5, 270}, {0, 30}, {NOTE_A4, 135},
+  {0, 15}, {NOTE_G4, 540}, {0, 60}, {NOTE_E5, 135},
+  {0, 15}, {NOTE_C5, 270}, {0, 30}, {NOTE_G4, 135},
+  {0, 15}, {0, 300}, {NOTE_GS4, 270}, {0, 30},
+  {NOTE_A4, 135}, {0, 15}, {NOTE_F5, 270}, {0, 30},
+  {NOTE_F5, 135}, {0, 15}, {NOTE_A4, 540}, {0, 60},
+  {NOTE_B4, 135}, {0, 15}, {NOTE_F5, 270}, {0, 30},
+  {NOTE_F5, 135}, {0, 15}, {NOTE_F5, 202}, {0, 23},
+  {NOTE_E5, 202}, {0, 23}, {NOTE_D5, 202}, {0, 23},
+  {NOTE_C5, 135}, {0, 15}, {NOTE_E4, 270}, {0, 30},
+  {NOTE_E4, 135}, {0, 15}, {NOTE_C4, 540}, {0, 60},
+  {NOTE_C5, 135}, {0, 15}, {NOTE_C5, 270}, {0, 30},
+  {NOTE_C5, 135}, {0, 15}, {0, 150}, {NOTE_C5, 135},
+  {0, 15}, {NOTE_D5, 135}, {0, 15}, {NOTE_E5, 135},
+  {0, 15}, {0, 1200}, {NOTE_C5, 135}, {0, 15},
+  {NOTE_C5, 270}, {0, 30}, {NOTE_C5, 135}, {0, 15},
+  {0, 150}, {NOTE_C5, 135}, {0, 15}, {NOTE_D5, 270},
+  {0, 30}, {NOTE_E5, 135}, {0, 15}, {NOTE_C5, 270},
+  {0, 30}, {NOTE_A4, 135}, {0, 15}, {NOTE_G4, 540},
+  {0, 60}, {NOTE_E5, 135}, {0, 15}, {NOTE_E5, 135},
+  {0, 15}, {0, 150}, {NOTE_E5, 135}, {0, 15},
+  {0, 150}, {NOTE_C5, 135}, {0, 15}, {NOTE_E5, 270},
+  {0, 30}, {NOTE_G5, 270}, {0, 30}, {0, 300},
+  {NOTE_G4, 270}, {0, 30}, {0, 300}, {NOTE_E5, 135},
+  {0, 15}, {NOTE_C5, 270}, {0, 30}, {NOTE_G4, 135},
+  {0, 15}, {0, 300}, {NOTE_GS4, 270}, {0, 30},
+  {NOTE_A4, 135}, {0, 15}, {NOTE_F5, 270}, {0, 30},
+  {NOTE_F5, 135}, {0, 15}, {NOTE_A4, 540}, {0, 60},
+  {NOTE_D5, 202}, {0, 23}, {NOTE_A5, 202}, {0, 23},
+  {NOTE_A5, 202}, {0, 23}, {NOTE_A5, 202}, {0, 23},
+  {NOTE_G5, 202}, {0, 23}, {NOTE_F5, 202}, {0, 23},
+  {NOTE_E5, 135}, {0, 15}, {NOTE_C5, 270}, {0, 30},
+  {NOTE_A4, 135}, {0, 15}, {NOTE_G4, 540}, {0, 60},
+  {NOTE_E5, 135}, {0, 15}, {NOTE_C5, 270}, {0, 30},
+  {NOTE_G4, 135}, {0, 15}, {0, 300}, {NOTE_GS4, 270},
+  {0, 30}, {NOTE_A4, 135}, {0, 15}, {NOTE_F5, 270},
+  {0, 30}, {NOTE_F5, 135}, {0, 15}, {NOTE_A4, 540},
+  {0, 60}, {NOTE_B4, 135}, {0, 15}, {NOTE_F5, 270},
+  {0, 30}, {NOTE_F5, 135}, {0, 15}, {NOTE_F5, 202},
+  {0, 23}, {NOTE_E5, 202}, {0, 23}, {NOTE_D5, 202},
+  {0, 23}, {NOTE_C5, 135}, {0, 15}, {NOTE_E4, 270},
+  {0, 30}, {NOTE_E4, 135}, {0, 15}, {NOTE_C4, 540},
+  {0, 60}, {NOTE_C5, 405}, {0, 45}, {NOTE_G4, 405},
+  {0, 45}, {NOTE_E4, 270}, {0, 30}, {NOTE_A4, 202},
+  {0, 23}, {NOTE_B4, 202}, {0, 23}, {NOTE_A4, 202},
+  {0, 23}, {NOTE_GS4, 202}, {0, 23}, {NOTE_AS4, 202},
+  {0, 23}, {NOTE_GS4, 202}, {0, 23}, {NOTE_G4, 135},
+  {0, 15}, {NOTE_D4, 135}, {0, 15}, {NOTE_E4, 810},
+  {0, 90},
+  {0, 0}
+};
+
+static const MelodyNote melody_imperial[] = {
+  {NOTE_A4, 675}, {0, 75}, {NOTE_A4, 675}, {0, 75},
+  {NOTE_A4, 112}, {0, 13}, {NOTE_A4, 112}, {0, 13},
+  {NOTE_A4, 112}, {0, 13}, {NOTE_A4, 112}, {0, 13},
+  {NOTE_F4, 225}, {0, 25}, {0, 250}, {NOTE_A4, 675},
+  {0, 75}, {NOTE_A4, 675}, {0, 75}, {NOTE_A4, 112},
+  {0, 13}, {NOTE_A4, 112}, {0, 13}, {NOTE_A4, 112},
+  {0, 13}, {NOTE_A4, 112}, {0, 13}, {NOTE_F4, 225},
+  {0, 25}, {0, 250}, {NOTE_A4, 450}, {0, 50},
+  {NOTE_A4, 450}, {0, 50}, {NOTE_A4, 450}, {0, 50},
+  {NOTE_F4, 337}, {0, 38}, {NOTE_C5, 112}, {0, 13},
+  {NOTE_A4, 450}, {0, 50}, {NOTE_F4, 337}, {0, 38},
+  {NOTE_C5, 112}, {0, 13}, {NOTE_A4, 900}, {0, 100},
+  {NOTE_E5, 450}, {0, 50}, {NOTE_E5, 450}, {0, 50},
+  {NOTE_E5, 450}, {0, 50}, {NOTE_F5, 337}, {0, 38},
+  {NOTE_C5, 112}, {0, 13}, {NOTE_A4, 450}, {0, 50},
+  {NOTE_F4, 337}, {0, 38}, {NOTE_C5, 112}, {0, 13},
+  {NOTE_A4, 900}, {0, 100}, {NOTE_A5, 450}, {0, 50},
+  {NOTE_A4, 337}, {0, 38}, {NOTE_A4, 112}, {0, 13},
+  {NOTE_A5, 450}, {0, 50}, {NOTE_GS5, 337}, {0, 38},
+  {NOTE_G5, 112}, {0, 13}, {NOTE_DS5, 112}, {0, 13},
+  {NOTE_D5, 112}, {0, 13}, {NOTE_DS5, 225}, {0, 25},
+  {0, 250}, {NOTE_A4, 225}, {0, 25}, {NOTE_DS5, 450},
+  {0, 50}, {NOTE_D5, 337}, {0, 38}, {NOTE_CS5, 112},
+  {0, 13}, {NOTE_C5, 112}, {0, 13}, {NOTE_B4, 112},
+  {0, 13}, {NOTE_C5, 112}, {0, 13}, {0, 250},
+  {NOTE_F4, 225}, {0, 25}, {NOTE_GS4, 450}, {0, 50},
+  {NOTE_F4, 337}, {0, 38}, {NOTE_A4, 168}, {0, 19},
+  {NOTE_C5, 450}, {0, 50}, {NOTE_A4, 337}, {0, 38},
+  {NOTE_C5, 112}, {0, 13}, {NOTE_E5, 900}, {0, 100},
+  {NOTE_A5, 450}, {0, 50}, {NOTE_A4, 337}, {0, 38},
+  {NOTE_A4, 112}, {0, 13}, {NOTE_A5, 450}, {0, 50},
+  {NOTE_GS5, 337}, {0, 38}, {NOTE_G5, 112}, {0, 13},
+  {NOTE_DS5, 112}, {0, 13}, {NOTE_D5, 112}, {0, 13},
+  {NOTE_DS5, 225}, {0, 25}, {0, 250}, {NOTE_A4, 225},
+  {0, 25}, {NOTE_DS5, 450}, {0, 50}, {NOTE_D5, 337},
+  {0, 38}, {NOTE_CS5, 112}, {0, 13}, {NOTE_C5, 112},
+  {0, 13}, {NOTE_B4, 112}, {0, 13}, {NOTE_C5, 112},
+  {0, 13}, {0, 250}, {NOTE_F4, 225}, {0, 25},
+  {NOTE_GS4, 450}, {0, 50}, {NOTE_F4, 337}, {0, 38},
+  {NOTE_A4, 168}, {0, 19}, {NOTE_A4, 450}, {0, 50},
+  {NOTE_F4, 337}, {0, 38}, {NOTE_C5, 112}, {0, 13},
+  {NOTE_A4, 900}, {0, 100},
+  {0, 0}
+};
+
+static const MelodyNote melody_takeonme[] = {
+  {NOTE_FS5, 192}, {0, 22}, {NOTE_FS5, 192}, {0, 22},
+  {NOTE_D5, 192}, {0, 22}, {NOTE_B4, 192}, {0, 22},
+  {0, 214}, {NOTE_B4, 192}, {0, 22}, {0, 214},
+  {NOTE_E5, 192}, {0, 22}, {0, 214}, {NOTE_E5, 192},
+  {0, 22}, {0, 214}, {NOTE_E5, 192}, {0, 22},
+  {NOTE_GS5, 192}, {0, 22}, {NOTE_GS5, 192}, {0, 22},
+  {NOTE_A5, 192}, {0, 22}, {NOTE_B5, 192}, {0, 22},
+  {NOTE_A5, 192}, {0, 22}, {NOTE_A5, 192}, {0, 22},
+  {NOTE_A5, 192}, {0, 22}, {NOTE_E5, 192}, {0, 22},
+  {0, 214}, {NOTE_D5, 192}, {0, 22}, {0, 214},
+  {NOTE_FS5, 192}, {0, 22}, {0, 214}, {NOTE_FS5, 192},
+  {0, 22}, {0, 214}, {NOTE_FS5, 192}, {0, 22},
+  {NOTE_E5, 192}, {0, 22}, {NOTE_E5, 192}, {0, 22},
+  {NOTE_FS5, 192}, {0, 22}, {NOTE_E5, 192}, {0, 22},
+  {NOTE_FS5, 192}, {0, 22}, {NOTE_FS5, 192}, {0, 22},
+  {NOTE_D5, 192}, {0, 22}, {NOTE_B4, 192}, {0, 22},
+  {0, 214}, {NOTE_B4, 192}, {0, 22}, {0, 214},
+  {NOTE_E5, 192}, {0, 22}, {0, 214}, {NOTE_E5, 192},
+  {0, 22}, {0, 214}, {NOTE_E5, 192}, {0, 22},
+  {NOTE_GS5, 192}, {0, 22}, {NOTE_GS5, 192}, {0, 22},
+  {NOTE_A5, 192}, {0, 22}, {NOTE_B5, 192}, {0, 22},
+  {NOTE_A5, 192}, {0, 22}, {NOTE_A5, 192}, {0, 22},
+  {NOTE_A5, 192}, {0, 22}, {NOTE_E5, 192}, {0, 22},
+  {0, 214}, {NOTE_D5, 192}, {0, 22}, {0, 214},
+  {NOTE_FS5, 192}, {0, 22}, {0, 214}, {NOTE_FS5, 192},
+  {0, 22}, {0, 214}, {NOTE_FS5, 192}, {0, 22},
+  {NOTE_E5, 192}, {0, 22}, {NOTE_E5, 192}, {0, 22},
+  {NOTE_FS5, 192}, {0, 22}, {NOTE_E5, 192}, {0, 22},
+  {NOTE_FS5, 192}, {0, 22}, {NOTE_FS5, 192}, {0, 22},
+  {NOTE_D5, 192}, {0, 22}, {NOTE_B4, 192}, {0, 22},
+  {0, 214}, {NOTE_B4, 192}, {0, 22}, {0, 214},
+  {NOTE_E5, 192}, {0, 22}, {0, 214}, {NOTE_E5, 192},
+  {0, 22}, {0, 214}, {NOTE_E5, 192}, {0, 22},
+  {NOTE_GS5, 192}, {0, 22}, {NOTE_GS5, 192}, {0, 22},
+  {NOTE_A5, 192}, {0, 22}, {NOTE_B5, 192}, {0, 22},
+  {NOTE_A5, 192}, {0, 22}, {NOTE_A5, 192}, {0, 22},
+  {NOTE_A5, 192}, {0, 22}, {NOTE_E5, 192}, {0, 22},
+  {0, 214}, {NOTE_D5, 192}, {0, 22}, {0, 214},
+  {NOTE_FS5, 192}, {0, 22}, {0, 214}, {NOTE_FS5, 192},
+  {0, 22}, {0, 214}, {NOTE_FS5, 192}, {0, 22},
+  {NOTE_E5, 192}, {0, 22}, {NOTE_E5, 192}, {0, 22},
+  {NOTE_FS5, 192}, {0, 22}, {NOTE_E5, 192}, {0, 22},
+  {0, 0}
+};
+
+#define MELODY_COUNT 8
+
+static const MelodyNote* const melodies[MELODY_COUNT] = {
+  melody_chime,
+  melody_morning,
+  melody_classical,
+  melody_simple,
+  melody_tetris,
+  melody_mario,
+  melody_imperial,
+  melody_takeonme
+};
+
+enum AlarmState : byte { ALARM_IDLE, ALARM_PLAYING, ALARM_DONE };
+AlarmState alarm_state = ALARM_IDLE;
+uint16_t alarm_note_idx = 0;
+unsigned long alarm_start_ms = 0;
+
 // Определение NTP-клиента для получения времени
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP,"pool.ntp.org", 7);//"pool.ntp.org"
@@ -253,6 +647,13 @@ const int PWM_RESOLUTION = 8; // Мы будем использовать то �
 // Максимальное значение рабочего цикла, основанное на разрешении ШИМ (будет 255, если разрешение составляет 8 бит)
 const int MAX_DUTY_CYCLE = (int)(pow(2, PWM_RESOLUTION) - 1);
 const int LED_OUTPUT_PIN = BL;
+
+const int BUZZER_CHANNEL = 2;
+const int BUZZER_PIN = 27;
+const int BUZZER_FREQ = 1000;
+
+static enum {IDLE, ACTIVE, COOLDOWN}
+buzzer_state = IDLE;
 
 uint16_t vemllux;
 uint8_t prev_brigh_value=255;

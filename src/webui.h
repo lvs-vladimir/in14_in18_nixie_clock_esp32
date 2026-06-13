@@ -189,6 +189,42 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     }
 
     GP.BLOCK_THIN_BEGIN();
+    M_BOX(GP_CENTER, GP.LABEL(ALARM_LABEL[mydata.lng]););
+    GP.HR();
+    M_BOX(GP_LEFT, GP.LABEL(ALARM_ENABLE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("alarm_enable", mydata.alarm_enable, GP_RED);););
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(ALARM_TIME[mydata.lng]);
+      GP.SPINNER("alarm_hour", mydata.alarm_hour, 0, 23, 1, 0, GP_BLUE, "40px", 0);
+      GP.LABEL(":");
+      GP.SPINNER("alarm_min", mydata.alarm_minute, 0, 59, 1, 0, GP_BLUE, "40px", 0);
+    );
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(ALARM_MELODY[mydata.lng]);
+      GP.SELECT("alarm_melody", ALARM_MELODY_OPTIONS[mydata.lng], mydata.alarm_melody_idx, 0, 0, 1);
+    );
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(ALARM_DURATION[mydata.lng]);
+      M_BOX(GP_RIGHT, GP.SPINNER("alarm_duration", mydata.alarm_duration, 5, 120, 5, 0, GP_BLUE, "50px", 0););
+    );
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(ALARM_VOLUME[mydata.lng]);
+      M_BOX(GP_RIGHT, GP.SPINNER("alarm_volume", mydata.alarm_volume, 0, 100, 5, 0, GP_BLUE, "50px", 0););
+    );
+    GP.BREAK();
+    GP.BLOCK_END();
+
+    GP.BLOCK_THIN_BEGIN();
+    M_BOX(GP_CENTER, GP.LABEL(BUZZER_LABEL[mydata.lng]););
+    GP.HR();
+    M_BOX(GP_LEFT, GP.LABEL(BUZZER_ENABLE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("buzzer_enable", mydata.buzzer_enable, GP_BLUE);););
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(BUZZER_INTERVAL[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("buzzer_interval", mydata.buzzer_interval, 1, 60, 1, 0, GP_BLUE, "50px", 0);););
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(BUZZER_DURATION[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("buzzer_duration", mydata.buzzer_duration, 50, 2000, 50, 0, GP_BLUE, "60px", 0);););
+    GP.BREAK();
+    GP.BLOCK_END();
+
+    GP.BLOCK_THIN_BEGIN();
     M_BOX(GP_CENTER, GP.LABEL(DISPLAY_DATA_LABEL[mydata.lng]););
     GP.HR();
     M_BOX(GP_LEFT, GP.LABEL(DISPLAY_DATA_SHOW_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("auto_show_switch", mydata.autoshow_switch, GP_BLUE); GP.SPINNER("autoshow_sec", mydata.autoshow_min, 5, 255, 1, 0, GP_BLUE, "50px", 0);););
@@ -462,6 +498,15 @@ void action(GyverPortal& ui) {
   if (ui.clickInt("offtime_start_m", mydata.offtime_start_m));
   if (ui.clickInt("offtime_end_h", mydata.offtime_end_h));
   if (ui.clickInt("offtime_end_m", mydata.offtime_end_m));
+  if (ui.clickInt("alarm_enable", mydata.alarm_enable));
+  if (ui.clickInt("alarm_hour", mydata.alarm_hour));
+  if (ui.clickInt("alarm_min", mydata.alarm_minute));
+  if (ui.click("alarm_melody")) mydata.alarm_melody_idx = ui.getInt("alarm_melody");
+  if (ui.clickInt("alarm_duration", mydata.alarm_duration));
+  if (ui.clickInt("alarm_volume", mydata.alarm_volume));
+  if (ui.clickInt("buzzer_enable", mydata.buzzer_enable));
+  if (ui.clickInt("buzzer_interval", mydata.buzzer_interval));
+  if (ui.clickInt("buzzer_duration", mydata.buzzer_duration));
     fd.updateNow();
   }
   if (ui.update()) {

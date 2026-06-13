@@ -75,6 +75,14 @@ memset(log_entries, 0, sizeof(log_entries));
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
   if (mydata.offtime_end_h == 0 && mydata.offtime_end_m == 0) mydata.offtime_end_h = 8;
   if (mydata.nrd_sens_count == 0 || mydata.nrd_sens_count > 5) mydata.nrd_sens_count = 3;
+  if (mydata.buzzer_interval == 0) mydata.buzzer_interval = 1;
+  if (mydata.buzzer_duration == 0 || mydata.buzzer_duration > 2000) mydata.buzzer_duration = 150;
+  if (!mydata.alarm_enable && mydata.alarm_hour == 0 && mydata.alarm_minute == 0) {
+    mydata.alarm_hour = 8;
+    mydata.alarm_volume = 100;
+  }
+  if (mydata.alarm_volume > 100) mydata.alarm_volume = 100;
+  if (mydata.alarm_duration == 0) mydata.alarm_duration = 30;
   if (mydata.animdots > 12) mydata.animdots = 0;
   if (mydata.autoshow_slots > 5) mydata.autoshow_slots = 5;
   if (mydata.autoshow_select[0] != 0) {
@@ -144,6 +152,12 @@ memset(log_entries, 0, sizeof(log_entries));
   ledcAttachPin(LED_OUTPUT_PIN, PWM_CHANNEL);
   ledcWrite(PWM_CHANNEL, 255);
 
+
+
+  ledcSetup(BUZZER_CHANNEL, BUZZER_FREQ, PWM_RESOLUTION);
+  ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
+  ledcWrite(BUZZER_CHANNEL, 0);
+
   hour = 23;
   minute = 22;
   second = 00;
@@ -180,6 +194,11 @@ memset(log_entries, 0, sizeof(log_entries));
   veml.setHighThreshold(20000);
   veml.interruptEnable(true);
   Wire.setTimeOut(50);
+
+  //pinMode(BUZZER_PIN, OUTPUT);
+  //digitalWrite(BUZZER_PIN, LOW);
+
+
 
   xTaskCreatePinnedToCore (
     loop2,

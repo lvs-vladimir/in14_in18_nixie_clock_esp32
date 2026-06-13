@@ -251,6 +251,76 @@ void prepareDisplayTarget(byte targetDisplay)
   if (CoinUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED) {
     updateCryptoRates();
   }
+  if (alarm_state == ALARM_PLAYING) {
+    if (alarmTimer.isReady()) {
+      alarm_note_idx++;
+      byte idx = mydata.alarm_melody_idx;
+      if (idx >= MELODY_COUNT) idx = 0;
+      MelodyNote n = melodies[idx][alarm_note_idx];
+      if (n.freq == 0 && n.dur == 0) {
+        if (mydata.alarm_duration > 0
+            && millis() - alarm_start_ms < (unsigned long)mydata.alarm_duration * 1000UL) {
+          alarm_note_idx = 0;
+          n = melodies[idx][0];
+          if (n.freq > 0) {
+            ledcWriteTone(BUZZER_CHANNEL, n.freq);
+            ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.alarm_volume * 511UL) / 100UL);
+          } else {
+            ledcWrite(BUZZER_CHANNEL, 0);
+          }
+          alarmTimer.setInterval(n.dur);
+          alarmTimer.reset();
+        } else {
+          ledcWrite(BUZZER_CHANNEL, 0);
+          alarm_state = ALARM_DONE;
+        }
+      } else if (n.freq > 0) {
+        ledcWriteTone(BUZZER_CHANNEL, n.freq);
+        ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.alarm_volume * 511UL) / 100UL);
+        alarmTimer.setInterval(n.dur);
+        alarmTimer.reset();
+      } else {
+        ledcWrite(BUZZER_CHANNEL, 0);
+        alarmTimer.setInterval(n.dur);
+        alarmTimer.reset();
+      }
+    }
+  } else if (mydata.alarm_enable && alarm_state == ALARM_IDLE
+      && hour == mydata.alarm_hour && minute == mydata.alarm_minute && second < 3) {
+    alarm_note_idx = 0;
+    alarm_state = ALARM_PLAYING;
+    alarm_start_ms = millis();
+    buzzer_state = IDLE;
+    byte idx = mydata.alarm_melody_idx;
+    if (idx >= MELODY_COUNT) idx = 0;
+    ledcWrite(BUZZER_CHANNEL, 0);
+    MelodyNote n = melodies[idx][0];
+    if (n.freq > 0) {
+      ledcWriteTone(BUZZER_CHANNEL, n.freq);
+      ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.alarm_volume * 511UL) / 100UL);
+    }
+    alarmTimer.setInterval(n.dur);
+    alarmTimer.reset();
+  } else if (alarm_state == ALARM_DONE
+      && (hour != mydata.alarm_hour || minute != mydata.alarm_minute || second > 10)) {
+    alarm_state = ALARM_IDLE;
+  }
+
+  if (alarm_state != ALARM_PLAYING && mydata.buzzer_enable) {
+    if (buzzer_state == IDLE && minute % mydata.buzzer_interval == 0 && second == 0) {
+      ledcWrite(BUZZER_CHANNEL, 255);
+      buzzer_state = ACTIVE;
+      buzzerTimer.setInterval(mydata.buzzer_duration);
+      buzzerTimer.reset();
+    }
+    if (buzzer_state == ACTIVE && buzzerTimer.isReady()) {
+      ledcWrite(BUZZER_CHANNEL, 0);
+      buzzer_state = COOLDOWN;
+    }
+    if (buzzer_state == COOLDOWN && second > 0) {
+      buzzer_state = IDLE;
+    }
+  }
     vTaskDelay(1);
   }
 }

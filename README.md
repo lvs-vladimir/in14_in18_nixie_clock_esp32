@@ -167,3 +167,32 @@ pio run -e in14-ota -t upload --upload-port IN14-NIXIE.local
 - `gyverlibs/GyverPortal` — веб-портал
 - `gyverlibs/FileData` — работа с файлами конфигурации
 - Встроенные библиотеки: `NTPClient`, `Freenove_WS2812_Lib_for_ESP32`, `SPI`, `ArduinoMD5`
+
+
+[env:in14-serial]
+platform = espressif32 @ ^6.10.0
+board = esp32dev
+framework = arduino
+board_build.filesystem = littlefs
+lib_deps =  adafruit/Adafruit VEML7700 Library@^2.1.6
+        gyverlibs/GyverPortal@^3.6.6
+        gyverlibs/FileData@^1.0.3
+        arduino-libraries/Arduino_JSON@^0.2.0
+monitor_speed = 115200
+monitor_port = /dev/ttyACM1
+upload_port = /dev/ttyACM1
+upload_protocol = esptool
+
+[env:in18-ota]
+platform = espressif32 @ ^6.10.0
+board = esp32dev
+framework = arduino
+board_build.filesystem = littlefs
+lib_deps =  adafruit/Adafruit VEML7700 Library@^2.1.6
+        gyverlibs/GyverPortal@^3.6.6
+        gyverlibs/FileData@^1.0.3
+        arduino-libraries/Arduino_JSON@^0.2.0
+monitor_speed = 115200
+monitor_port = /dev/ttyACM1
+upload_port = IN18-NIXIE.local
+upload_protocol = espota
