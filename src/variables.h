@@ -163,17 +163,18 @@ SPIClass *hspi = NULL;
 
 hw_timer_t *Timer0_Cfg = NULL;
 hw_timer_t *Timer1_Cfg = NULL;
+hw_timer_t *ws2812Timer = NULL;
+volatile bool ws2812_timer_flag = false;
 
 timerMinim DotTimer(91);
 timerMinim mooveNixie(100);
-timerMinim SwitchDisplayTimer(40);
 timerMinim ChangeCathodeTimer(60);
+timerMinim SwitchDisplayTimer(40);
 timerMinim SensorSelectTimer(3000);
 timerMinim NtpSyncTimer(3600000);
 timerMinim OwmUpdateTimer(300000);
 timerMinim CoinUpdateTimer(600000);
 timerMinim vemlRead(2000);
-timerMinim ws2812_timer(30);
 timerMinim buzzerTimer(150);
 timerMinim alarmTimer(100);
 

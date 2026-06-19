@@ -165,6 +165,11 @@ void IRAM_ATTR second_timer()
   timer1=true;
 }
 
+void IRAM_ATTR ws2812_timer_isr()
+{
+  ws2812_timer_flag = true;
+}
+
 void init_timers(){
   /*
   Timer0_Cfg = timerBegin(0, 80, true);
@@ -176,6 +181,11 @@ void init_timers(){
   timerAttachInterrupt(Timer1_Cfg, &second_timer, true);
   timerAlarmWrite(Timer1_Cfg, 1000000, true);
   timerAlarmEnable(Timer1_Cfg);
+
+  ws2812Timer = timerBegin(2, 80, true);
+  timerAttachInterrupt(ws2812Timer, &ws2812_timer_isr, true);
+  timerAlarmWrite(ws2812Timer, 30000, true);
+  timerAlarmEnable(ws2812Timer);
 }
 
 void UpdateDisplay()

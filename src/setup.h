@@ -206,7 +206,7 @@ memset(log_entries, 0, sizeof(log_entries));
   xTaskCreatePinnedToCore (
     loop2,
     "loop2",
-    4096,
+    8192,
     NULL,
     1,
     NULL,
