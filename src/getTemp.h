@@ -68,6 +68,20 @@ void narodmonUpdate()
   JSONVar json = JSON.parse(payload);
   if (JSON.typeof(json) == "undefined") {
     log_add('W', "Narodmon JSON parse failed, raw: %.80s", payload.c_str());
+    narodmonTimer.reset();
+    return;
+  }
+
+  if (JSON.typeof(json["devices"]) == "undefined" || json["devices"].length() == 0) {
+    log_add('W', "Narodmon no devices in response");
+    narodmonTimer.reset();
+    return;
+  }
+
+  JSONVar sensors = json["devices"][0]["sensors"];
+  if (JSON.typeof(sensors) == "undefined") {
+    log_add('W', "Narodmon no sensors in device");
+    narodmonTimer.reset();
     return;
   }
 
@@ -76,17 +90,6 @@ void narodmonUpdate()
     SensorsDisplay[j] = "";
     nrd_values[j] = 0;
     nrd_names[j] = "";
-  }
-
-  if (JSON.typeof(json["devices"]) == "undefined" || json["devices"].length() == 0) {
-    log_add('W', "Narodmon no devices in response");
-    return;
-  }
-
-  JSONVar sensors = json["devices"][0]["sensors"];
-  if (JSON.typeof(sensors) == "undefined") {
-    log_add('W', "Narodmon no sensors in device");
-    return;
   }
 
   for (byte i = 0; i < mydata.nrd_sens_count; i++) {
@@ -141,12 +144,6 @@ void getTemp2(byte i)
       log_add('W', "OWM response missing 'main', raw: %.80s", jsonBuffer.c_str());
       return;
     }
-    byte j = 4;
-    while (j <= 6) {
-      SensorsAutoShow[j] = "";
-      SensorsDisplay[j] = "";
-      j++;
-    }
     if (JSON.typeof(myObject["main"]["temp"]) != "undefined") {
       optemperature = (int)myObject["main"]["temp"];
       TempValue = optemperature;
@@ -155,29 +152,13 @@ void getTemp2(byte i)
     if (JSON.typeof(myObject["main"]["humidity"]) != "undefined") ophumidity = (int)myObject["main"]["humidity"];
     log_add('I', "OWM update opt=%d press=%d hum=%d", optemperature, oppressure, ophumidity);
 
-    SensorsAutoShow[4] += ",";
-    SensorsAutoShow[4] += optemperature;
-    SensorsAutoShow[4] += "*";
+    SensorsAutoShow[4] = "," + String(optemperature) + "*";
+    SensorsAutoShow[5] = "," + String(oppressure) + "mHg";
+    SensorsAutoShow[6] = "," + String(ophumidity) + "%";
 
-    SensorsAutoShow[5] += ",";
-    SensorsAutoShow[5] += oppressure;
-    SensorsAutoShow[5] += "mHg";
-
-    SensorsAutoShow[6] += ",";
-    SensorsAutoShow[6] += ophumidity;
-    SensorsAutoShow[6] += "%";
-
-    SensorsDisplay[4] += ",";
-    SensorsDisplay[4] += optemperature;
-    SensorsDisplay[4] += "*";
-
-    SensorsDisplay[5] += ",";
-    SensorsDisplay[5] += oppressure;
-    SensorsDisplay[5] += "mHg";
-
-    SensorsDisplay[6] += ",";
-    SensorsDisplay[6] += ophumidity;
-    SensorsDisplay[6] += "%";
+    SensorsDisplay[4] = String(optemperature) + "*";
+    SensorsDisplay[5] = String(oppressure) + "mHg";
+    SensorsDisplay[6] = String(ophumidity) + "%";
   } else if (i == 1) {
     narodmonUpdate();
   }

@@ -83,6 +83,9 @@ memset(log_entries, 0, sizeof(log_entries));
   }
   if (mydata.alarm_volume > 100) mydata.alarm_volume = 100;
   if (mydata.alarm_duration == 0) mydata.alarm_duration = 30;
+  if (!mydata.reboot_enable && mydata.reboot_hour == 0 && mydata.reboot_minute == 0) {
+    mydata.reboot_hour = 3;
+  }
   if (mydata.animdots > 12) mydata.animdots = 0;
   if (mydata.autoshow_slots > 5) mydata.autoshow_slots = 5;
   if (mydata.autoshow_select[0] != 0) {

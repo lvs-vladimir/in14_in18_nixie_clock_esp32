@@ -27,7 +27,7 @@ GP.THEME(GP_DARK);
     return;
   }
 
-  GP.NAV_TABS_LINKS("/,/setting,/info,/firmware,/log,/readme", TAB_LINKS_NAMES[mydata.lng], GP_BLUE);
+  GP.NAV_TABS_LINKS("/,/setting,/info,/firmware,/readme", TAB_LINKS_NAMES[mydata.lng], GP_BLUE);
 
   if (ui.uri("/setting")) {
     GP.FORM_BEGIN("/setting");
@@ -112,6 +112,19 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("seconds_switch", mydata.seconds_switch, GP_BLUE);););
     GP.BLOCK_END();
 
+    GP.BLOCK_THIN_BEGIN();
+    M_BOX(GP_CENTER, GP.LABEL(REBOOT_LABEL[mydata.lng]););
+    GP.HR();
+    M_BOX(GP_LEFT, GP.LABEL(REBOOT_ENABLE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("reboot_enable", mydata.reboot_enable, GP_BLUE);););
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(REBOOT_TIME[mydata.lng]);
+      GP.SPINNER("reboot_hour", mydata.reboot_hour, 0, 23, 1, 0, GP_BLUE, "40px", 0);
+      GP.LABEL(":");
+      GP.SPINNER("reboot_min", mydata.reboot_minute, 0, 59, 1, 0, GP_BLUE, "40px", 0);
+    );
+    GP.BREAK();
+    GP.BLOCK_END();
+
     GP.BUTTON_MINI("rst", SETTING_RESTART_BTN[mydata.lng], "", GP_BLUE, "", 0, 1);
     GP.FORM_END();
 
@@ -125,24 +138,6 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     GP.OTA_FIRMWARE("OTA firmware", GP_BLUE);
     GP.OTA_FILESYSTEM("OTA filesystem", GP_BLUE);
     GP.FILE_UPLOAD("file_upload", "Upload file");
-    GP.BLOCK_END();
-
-  } else if (ui.uri("/log")) {
-    GP.JS_BEGIN();
-    *_GPP += F("setInterval(function(){location.reload()},3000)");
-    GP.JS_END();
-    GP.BLOCK_THIN_BEGIN();
-    M_BOX(GP_CENTER, GP.LABEL("System Log"););
-    GP.HR();
-    byte idx = (log_count < LOG_ENTRIES) ? 0 : log_write_idx;
-    byte cnt = log_count;
-    for (byte i = 0; i < cnt; i++) {
-      byte n = (idx + i) % LOG_ENTRIES;
-      char line[LOG_LINE_LEN + 16];
-      snprintf(line, sizeof(line), "[%5lu] %c: %s", log_entries[n].time, log_entries[n].level, log_entries[n].msg);
-      GP.LABEL(line, "", GP_DEFAULT, 10, false, true);
-      GP.BREAK();
-    }
     GP.BLOCK_END();
 
   } else if (ui.uri("/readme")) {
@@ -504,6 +499,9 @@ void action(GyverPortal& ui) {
   if (ui.click("alarm_melody")) mydata.alarm_melody_idx = ui.getInt("alarm_melody");
   if (ui.clickInt("alarm_duration", mydata.alarm_duration));
   if (ui.clickInt("alarm_volume", mydata.alarm_volume));
+  if (ui.clickInt("reboot_enable", mydata.reboot_enable));
+  if (ui.clickInt("reboot_hour", mydata.reboot_hour));
+  if (ui.clickInt("reboot_min", mydata.reboot_minute));
   if (ui.clickInt("buzzer_enable", mydata.buzzer_enable));
   if (ui.clickInt("buzzer_interval", mydata.buzzer_interval));
   if (ui.clickInt("buzzer_duration", mydata.buzzer_duration));

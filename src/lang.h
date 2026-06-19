@@ -1,5 +1,5 @@
 const char* DEVICE_NAME[] = {"<a href='https://github.com/lvs-vladimir/in14_in18_nixie_clock_esp32' style='text-decoration:none;color:inherit'>Часы на IN-14/IN-18</a>", "<a href='https://github.com/lvs-vladimir/in14_in18_nixie_clock_esp32' style='text-decoration:none;color:inherit'>IN-14/IN-18 Nixie clock</a>"};
-const char* TAB_LINKS_NAMES[] = {"Главная,Настройки,Инфо,Прошивка,Логи,Readme", "Home,Setting,Info,Firmware,Logs,Readme"};
+const char* TAB_LINKS_NAMES[] = {"Главная,Настройки,Инфо,Прошивка,Readme", "Home,Setting,Info,Firmware,Readme"};
 const char* PAGE_TITLE[] = {"Газоразрядные часы", "Nixie tube clock"};
 const char* SETTING_LANGUAGE[] = {"Язык", "Language"};
 const char* SETTING_LANGUAGE_ARRAY = "  RU  ,  EN  ";
@@ -78,3 +78,6 @@ const char* ALARM_MELODY[] = {"Мелодия:", "Melody:"};
 const char* ALARM_MELODY_OPTIONS[] = {"Перелив,Утро,Классика,Простой,Тетрис,Марио,Имперский марш,Take On Me", "Chime,Morning,Classical,Simple,Tetris,Mario,Imperial March,Take On Me"};
 const char* ALARM_DURATION[] = {"Длительность (сек):", "Duration (sec):"};
 const char* ALARM_VOLUME[] = {"Громкость:", "Volume:"};
+const char* REBOOT_LABEL[] = {"Перезагрузка по расписанию", "Scheduled reboot"};
+const char* REBOOT_ENABLE[] = {"Вкл/выкл", "On/Off"};
+const char* REBOOT_TIME[] = {"Время:", "Time:"};

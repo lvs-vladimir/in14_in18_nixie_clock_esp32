@@ -75,6 +75,9 @@ struct Data {
   byte alarm_melody_idx;
   byte alarm_duration;
   byte alarm_volume;
+  boolean reboot_enable;
+  byte reboot_hour;
+  byte reboot_minute;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
@@ -650,7 +653,7 @@ const int LED_OUTPUT_PIN = BL;
 
 const int BUZZER_CHANNEL = 2;
 const int BUZZER_PIN = 27;
-const int BUZZER_FREQ = 1000;
+const int BUZZER_FREQ = 5000;
 
 static enum {IDLE, ACTIVE, COOLDOWN}
 buzzer_state = IDLE;

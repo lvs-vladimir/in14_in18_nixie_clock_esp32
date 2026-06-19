@@ -89,6 +89,12 @@ void prepareDisplayTarget(byte targetDisplay)
 
   offtime_active = mydata.offtime_enable && time_in_range(hour, minute, mydata.offtime_start_h, mydata.offtime_start_m, mydata.offtime_end_h, mydata.offtime_end_m);
 
+  if (mydata.reboot_enable && hour == mydata.reboot_hour && minute == mydata.reboot_minute && second == 0) {
+    log_add('I', "Scheduled reboot");
+    delay(100);
+    ESP.restart();
+  }
+
   byte slots = getConfiguredSlotCount();
 
   if (mydata.autoshow_switch && slots > 0 && displayState == MODE_TIME && display == 0 &&
@@ -308,6 +314,8 @@ void prepareDisplayTarget(byte targetDisplay)
 
   if (alarm_state != ALARM_PLAYING && mydata.buzzer_enable) {
     if (buzzer_state == IDLE && minute % mydata.buzzer_interval == 0 && second == 0) {
+      ledcSetup(BUZZER_CHANNEL, BUZZER_FREQ, PWM_RESOLUTION);
+      ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
       ledcWrite(BUZZER_CHANNEL, 255);
       buzzer_state = ACTIVE;
       buzzerTimer.setInterval(mydata.buzzer_duration);
