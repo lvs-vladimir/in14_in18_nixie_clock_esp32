@@ -164,7 +164,7 @@ SPIClass *hspi = NULL;
 hw_timer_t *Timer0_Cfg = NULL;
 hw_timer_t *Timer1_Cfg = NULL;
 
-timerMinim DotTimer(84);          // 11 - 84, 12 - 76 посекундный таймер для часов
+timerMinim DotTimer(91);
 timerMinim mooveNixie(100);
 timerMinim SwitchDisplayTimer(40);
 timerMinim ChangeCathodeTimer(60);

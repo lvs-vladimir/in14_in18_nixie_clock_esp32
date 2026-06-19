@@ -225,14 +225,6 @@ void UpdateDisplay()
         dmooveleft = false;
         dmooveright = true;
       }
-      if (dmoove == 11)
-      {
-        DotTimer.setInterval(76);
-      }
-      if (dmoove == 10)
-      {
-        DotTimer.setInterval(84);
-      }
       // Serial.println(dmoove);
     }
     bufer[buferDot[dmoove]] |= (1 << DotMooveBufer[dmoove]);

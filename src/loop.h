@@ -191,6 +191,19 @@ void prepareDisplayTarget(byte targetDisplay)
     calculateTime();
     timer1 = false;
 
+    if (display == 0 && timeon) {
+      if (second % 2 == 0) {
+        dmoove = 0;
+        dmooveright = true;
+        dmooveleft = false;
+      } else {
+        dmoove = 11;
+        dmooveright = false;
+        dmooveleft = true;
+      }
+      DotTimer.reset();
+    }
+
     {
   static byte rotateCounter = 0;
   if (mydata.anim_change == 0) {
