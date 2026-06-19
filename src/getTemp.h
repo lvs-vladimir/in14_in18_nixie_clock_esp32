@@ -85,18 +85,12 @@ void narodmonUpdate()
     return;
   }
 
-  for (byte j = 0; j < mydata.nrd_sens_count; j++) {
-    SensorsAutoShow[j] = "";
-    SensorsDisplay[j] = "";
-    nrd_values[j] = 0;
-    nrd_names[j] = "";
-  }
-
   for (byte i = 0; i < mydata.nrd_sens_count; i++) {
     byte idx = mydata.nrd_sens[i];
     if (idx >= sensors.length()) continue;
     JSONVar s = sensors[idx];
     if (JSON.typeof(s) == "undefined") continue;
+    if (JSON.typeof(s["value"]) == "undefined") continue;
 
     int val = (int)s["value"];
     nrd_values[i] = val;
