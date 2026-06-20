@@ -1,3 +1,7 @@
+void getTemp2(byte i);
+void narodmonUpdate();
+void updateCryptoRates();
+
 static byte hue = 0;
 static byte idex = 0;
 static int bouncedirection = 0;
@@ -359,6 +363,22 @@ void loop2 (void* pvParameters) {
       buzzer_state = IDLE;
     }
   }
+
+  if (alarm_state != ALARM_PLAYING) {
+    if (OwmUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) {
+      log_add('I', "OWM update");
+      getTemp2(0);
+    }
+
+    if (strlen(mydata.NarodmoonApi) > 0 && strlen(mydata.NarodmoonID) > 0) {
+      narodmonUpdate();
+    }
+
+    if (CoinUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED) {
+      updateCryptoRates();
+    }
+  }
+
     vTaskDelay(2);
   }
 }

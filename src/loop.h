@@ -260,16 +260,6 @@ void prepareDisplayTarget(byte targetDisplay)
     NtpSyncTimer.start();
   }
 
-  if (OwmUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) {
-    log_add('I', "OWM update");
-    getTemp2(0);
-  }
-
-  narodmonUpdate();
-
-  if (CoinUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED) {
-    updateCryptoRates();
-  }
     vTaskDelay(1);
   }
 }
