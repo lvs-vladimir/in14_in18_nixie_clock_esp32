@@ -7,7 +7,9 @@
 void md5(char * apimd5) {
   unsigned char * hash = MD5::make_hash(apimd5);
   char * md5str = MD5::make_digest(hash, 16);
-  sprintf_P(mydata.NarodmoonApiMD5, (PGM_P) F("%S"), md5str);
+  snprintf(mydata.NarodmoonApiMD5, sizeof(mydata.NarodmoonApiMD5), "%s", md5str);
+  free(md5str);
+  free(hash);
 }
 
 String httpGETRequest(const char * serverName) {

@@ -3,7 +3,7 @@ void narodmonUpdate();
 void updateCryptoRates();
 
 static byte hue = 0;
-static byte idex = 0;
+static int idex = 0;
 static int bouncedirection = 0;
 static int phase = 0;
 static byte fire_heat[LEDS_COUNT];
@@ -85,6 +85,8 @@ void ws2812_effect() {
     hue = 0;
     anim = 15;
   }
+
+  if (idex < 0 || idex >= LEDS_COUNT) idex = 0;
 
   switch (anim) {
     case 1: // Rainbow fade
@@ -278,7 +280,7 @@ void loop2 (void* pvParameters) {
         ws2812_show(leds, LEDS_COUNT, LEDS_PIN);
       }
     } else {
-     if (vemlRead.isReady()) {
+     if (mydata.veml_enable && veml_ok && vemlRead.isReady()) {
       float lux = veml.readLux();
         vemllux = lux;
         uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
@@ -304,32 +306,48 @@ void loop2 (void* pvParameters) {
           n = melodies[idx][0];
           if (n.freq > 0) {
             ledcWriteTone(BUZZER_CHANNEL, n.freq);
-            ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.alarm_volume * 511UL) / 100UL);
+            ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.alarm_volume * 128UL) / 100UL);
           } else {
             ledcWrite(BUZZER_CHANNEL, 0);
           }
+          alarm_note_start_ms = millis();
           alarmTimer.setInterval(n.dur);
           alarmTimer.reset();
         } else {
+          ledcWriteTone(BUZZER_CHANNEL, 0);
           ledcWrite(BUZZER_CHANNEL, 0);
           alarm_state = ALARM_DONE;
         }
       } else if (n.freq > 0) {
         ledcWriteTone(BUZZER_CHANNEL, n.freq);
-        ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.alarm_volume * 511UL) / 100UL);
+        ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.alarm_volume * 128UL) / 100UL);
+        alarm_note_start_ms = millis();
         alarmTimer.setInterval(n.dur);
         alarmTimer.reset();
       } else {
         ledcWrite(BUZZER_CHANNEL, 0);
+        alarm_note_start_ms = millis();
         alarmTimer.setInterval(n.dur);
         alarmTimer.reset();
       }
+    }
+    if (millis() - alarm_note_start_ms > 5000UL) {
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+      ledcWrite(BUZZER_CHANNEL, 0);
+      alarm_state = ALARM_DONE;
+    }
+    if (mydata.alarm_duration > 0
+        && millis() - alarm_start_ms >= (unsigned long)mydata.alarm_duration * 1000UL) {
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+      ledcWrite(BUZZER_CHANNEL, 0);
+      alarm_state = ALARM_DONE;
     }
   } else if (mydata.alarm_enable && alarm_state == ALARM_IDLE
       && hour == mydata.alarm_hour && minute == mydata.alarm_minute && second < 3) {
     alarm_note_idx = 0;
     alarm_state = ALARM_PLAYING;
     alarm_start_ms = millis();
+    alarm_note_start_ms = millis();
     buzzer_state = IDLE;
     byte idx = mydata.alarm_melody_idx;
     if (idx >= MELODY_COUNT) idx = 0;
@@ -337,7 +355,7 @@ void loop2 (void* pvParameters) {
     MelodyNote n = melodies[idx][0];
     if (n.freq > 0) {
       ledcWriteTone(BUZZER_CHANNEL, n.freq);
-      ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.alarm_volume * 511UL) / 100UL);
+      ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.alarm_volume * 128UL) / 100UL);
     }
     alarmTimer.setInterval(n.dur);
     alarmTimer.reset();
@@ -346,16 +364,21 @@ void loop2 (void* pvParameters) {
     alarm_state = ALARM_IDLE;
   }
 
-  if (alarm_state != ALARM_PLAYING && mydata.buzzer_enable) {
-    if (buzzer_state == IDLE && minute % mydata.buzzer_interval == 0 && second == 0) {
-      ledcSetup(BUZZER_CHANNEL, BUZZER_FREQ, PWM_RESOLUTION);
-      ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
-      ledcWrite(BUZZER_CHANNEL, 255);
+  if (alarm_state != ALARM_PLAYING) {
+    if (!mydata.buzzer_enable && buzzer_state != IDLE) {
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+      ledcWrite(BUZZER_CHANNEL, 0);
+      buzzer_state = IDLE;
+    }
+    if (mydata.buzzer_enable && buzzer_state == IDLE && minute % mydata.buzzer_interval == 0 && second == 0) {
+      ledcWriteTone(BUZZER_CHANNEL, BUZZER_FREQ);
+      ledcWrite(BUZZER_CHANNEL, 128);
       buzzer_state = ACTIVE;
       buzzerTimer.setInterval(mydata.buzzer_duration);
       buzzerTimer.reset();
     }
     if (buzzer_state == ACTIVE && buzzerTimer.isReady()) {
+      ledcWriteTone(BUZZER_CHANNEL, 0);
       ledcWrite(BUZZER_CHANNEL, 0);
       buzzer_state = COOLDOWN;
     }
@@ -364,7 +387,7 @@ void loop2 (void* pvParameters) {
     }
   }
 
-  if (alarm_state != ALARM_PLAYING) {
+  if (alarm_state != ALARM_PLAYING && buzzer_state != ACTIVE) {
     if (OwmUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) {
       log_add('I', "OWM update");
       getTemp2(0);

@@ -192,11 +192,15 @@ memset(log_entries, 0, sizeof(log_entries));
   CoinUpdateTimer.start();
 
   SwitchDisplayTimer.stop();
-  veml.begin();
-  veml.setLowThreshold(10000);
-  veml.setHighThreshold(20000);
-  veml.interruptEnable(true);
   Wire.setTimeOut(50);
+  veml_ok = veml.begin();
+  if (veml_ok) {
+    veml.setLowThreshold(10000);
+    veml.setHighThreshold(20000);
+    veml.interruptEnable(true);
+  } else {
+    log_add('W', "VEML7700 not found, lux disabled");
+  }
 
   //pinMode(BUZZER_PIN, OUTPUT);
   //digitalWrite(BUZZER_PIN, LOW);

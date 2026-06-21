@@ -162,7 +162,9 @@ void IRAM_ATTR brightness_timer()
 */
 void IRAM_ATTR second_timer()
 {
-  timer1=true;
+  portENTER_CRITICAL_ISR(&secondTimerMux);
+  second_ticks++;
+  portEXIT_CRITICAL_ISR(&secondTimerMux);
 }
 
 void IRAM_ATTR ws2812_timer_isr()
@@ -190,7 +192,7 @@ void init_timers(){
 
 void UpdateDisplay()
 {
-  uint32_t hv5222_1, hv5222_2, hv5222_3;
+  uint32_t hv5222_1 = 0, hv5222_2 = 0, hv5222_3 = 0;
 
   bufer[5] = masshv5522[Nixie[5]];
   bufer[4] = masshv5522[Nixie[4]];

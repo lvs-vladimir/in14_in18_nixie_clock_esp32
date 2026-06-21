@@ -83,11 +83,22 @@ void prepareDisplayTarget(byte targetDisplay)
 
   void loop1 (void* pvParameters) {
   while (1) {
-     ArduinoOTA.handle();
-  ui.tick();
-  fd.tick();
+    ArduinoOTA.handle();
+    ui.tick();
+    fd.tick();
 
-  offtime_active = mydata.offtime_enable && time_in_range(hour, minute, mydata.offtime_start_h, mydata.offtime_start_m, mydata.offtime_end_h, mydata.offtime_end_m);
+    if (alarm_state == ALARM_PLAYING) {
+      unsigned long now_ms = millis();
+      if (now_ms - alarm_note_start_ms > 5000UL
+          || (mydata.alarm_duration > 0
+              && now_ms - alarm_start_ms >= (unsigned long)mydata.alarm_duration * 1000UL)) {
+        ledcWriteTone(BUZZER_CHANNEL, 0);
+        ledcWrite(BUZZER_CHANNEL, 0);
+        alarm_state = ALARM_DONE;
+      }
+    }
+
+    offtime_active = mydata.offtime_enable && time_in_range(hour, minute, mydata.offtime_start_h, mydata.offtime_start_m, mydata.offtime_end_h, mydata.offtime_end_m);
 
   if (mydata.reboot_enable && hour == mydata.reboot_hour && minute == mydata.reboot_minute && second == 0) {
     log_add('I', "Scheduled reboot");
@@ -187,9 +198,13 @@ void prepareDisplayTarget(byte targetDisplay)
   switch_effects();
   }
 
-  if (timer1) {
-    calculateTime();
-    timer1 = false;
+  uint32_t ticks = 0;
+  portENTER_CRITICAL(&secondTimerMux);
+  ticks = second_ticks;
+  second_ticks = 0;
+  portEXIT_CRITICAL(&secondTimerMux);
+  if (ticks > 0) {
+    while (ticks--) calculateTime();
 
     if (display == 0 && timeon) {
       if (second % 2 == 0) {

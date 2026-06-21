@@ -157,6 +157,7 @@ void log_add(char level, const char* fmt, ...) {
 
 CRGB leds[LEDS_COUNT];
 Adafruit_VEML7700 veml = Adafruit_VEML7700();
+bool veml_ok = false;
 
 SPIClass *vspi = NULL;
 SPIClass *hspi = NULL;
@@ -542,7 +543,51 @@ static const MelodyNote melody_takeonme[] = {
   {0, 0}
 };
 
-#define MELODY_COUNT 8
+static const MelodyNote melody_nokia[] = {
+  {NOTE_E6, 180}, {NOTE_D6, 180}, {NOTE_FS5, 360}, {NOTE_GS5, 360},
+  {NOTE_CS6, 180}, {NOTE_B5, 180}, {NOTE_D5, 360}, {NOTE_E5, 360},
+  {NOTE_B5, 180}, {NOTE_A5, 180}, {NOTE_CS5, 360}, {NOTE_E5, 360},
+  {NOTE_A5, 720},
+  {0, 0}
+};
+
+static const MelodyNote melody_starwars[] = {
+  {NOTE_F5, 180}, {0, 40}, {NOTE_F5, 180}, {0, 40}, {NOTE_F5, 180}, {0, 80},
+  {NOTE_AS5, 700}, {0, 80}, {NOTE_F6, 700}, {0, 80},
+  {NOTE_DS6, 180}, {0, 40}, {NOTE_D6, 180}, {0, 40}, {NOTE_C6, 180}, {0, 80},
+  {NOTE_AS5, 800}, {0, 120},
+  {NOTE_F6, 350}, {0, 60},
+  {NOTE_DS6, 180}, {0, 40}, {NOTE_D6, 180}, {0, 40}, {NOTE_C6, 180}, {0, 80},
+  {NOTE_AS5, 800}, {0, 120},
+  {NOTE_F6, 350}, {0, 60},
+  {NOTE_DS6, 180}, {0, 40}, {NOTE_D6, 180}, {0, 40}, {NOTE_DS6, 180}, {0, 80},
+  {NOTE_C6, 1000},
+  {0, 0}
+};
+
+static const MelodyNote melody_jingle[] = {
+  {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 360}, {0, 120},
+  {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 360}, {0, 120},
+  {NOTE_E5, 180}, {0, 40}, {NOTE_G5, 180}, {0, 40}, {NOTE_C5, 260}, {0, 40},
+  {NOTE_D5, 260}, {0, 40}, {NOTE_E5, 720}, {0, 120},
+  {NOTE_F5, 180}, {0, 40}, {NOTE_F5, 180}, {0, 40}, {NOTE_F5, 180}, {0, 40},
+  {NOTE_F5, 180}, {0, 40}, {NOTE_F5, 360}, {0, 80},
+  {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 180}, {0, 40},
+  {NOTE_E5, 180}, {0, 80}, {NOTE_D5, 180}, {0, 40}, {NOTE_D5, 180}, {0, 40},
+  {NOTE_E5, 180}, {0, 40}, {NOTE_D5, 360}, {0, 80}, {NOTE_G5, 720}, {0, 160},
+  {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 360}, {0, 120},
+  {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 360}, {0, 120},
+  {NOTE_E5, 180}, {0, 40}, {NOTE_G5, 180}, {0, 40}, {NOTE_C5, 260}, {0, 40},
+  {NOTE_D5, 260}, {0, 40}, {NOTE_E5, 720}, {0, 120},
+  {NOTE_F5, 180}, {0, 40}, {NOTE_F5, 180}, {0, 40}, {NOTE_F5, 180}, {0, 40},
+  {NOTE_F5, 180}, {0, 40}, {NOTE_F5, 360}, {0, 80},
+  {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 180}, {0, 40}, {NOTE_E5, 180}, {0, 40},
+  {NOTE_E5, 180}, {0, 80}, {NOTE_G5, 180}, {0, 40}, {NOTE_G5, 180}, {0, 40},
+  {NOTE_F5, 180}, {0, 40}, {NOTE_D5, 360}, {0, 80}, {NOTE_C5, 720},
+  {0, 0}
+};
+
+#define MELODY_COUNT 11
 
 static const MelodyNote* const melodies[MELODY_COUNT] = {
   melody_chime,
@@ -552,13 +597,17 @@ static const MelodyNote* const melodies[MELODY_COUNT] = {
   melody_tetris,
   melody_mario,
   melody_imperial,
-  melody_takeonme
+  melody_takeonme,
+  melody_nokia,
+  melody_starwars,
+  melody_jingle
 };
 
 enum AlarmState : byte { ALARM_IDLE, ALARM_PLAYING, ALARM_DONE };
-AlarmState alarm_state = ALARM_IDLE;
+volatile AlarmState alarm_state = ALARM_IDLE;
 uint16_t alarm_note_idx = 0;
-unsigned long alarm_start_ms = 0;
+volatile unsigned long alarm_start_ms = 0;
+volatile unsigned long alarm_note_start_ms = 0;
 
 // Определение NTP-клиента для получения времени
 WiFiUDP ntpUDP;
@@ -618,7 +667,8 @@ boolean lamp_celsius_hv31 = false;
 boolean lamp_percent_hv32 = false;
 boolean timeon = true;
 boolean timer0 = false;
-boolean timer1 = false;
+volatile uint32_t second_ticks = 0;
+portMUX_TYPE secondTimerMux = portMUX_INITIALIZER_UNLOCKED;
 
 int pricebtc, priceeth, TempValue;
 int sensorDisplayValue = 0;
