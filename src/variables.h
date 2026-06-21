@@ -78,6 +78,8 @@ struct Data {
   boolean reboot_enable;
   byte reboot_hour;
   byte reboot_minute;
+  byte buzzer_volume;
+  byte buzzer_melody_idx;
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
@@ -165,7 +167,11 @@ SPIClass *hspi = NULL;
 hw_timer_t *Timer0_Cfg = NULL;
 hw_timer_t *Timer1_Cfg = NULL;
 hw_timer_t *ws2812Timer = NULL;
+hw_timer_t *vemlTimer = NULL;
 volatile bool ws2812_timer_flag = false;
+volatile bool veml_timer_flag = false;
+volatile uint32_t ws2812_hw_ticks = 0;
+TaskHandle_t ws2812TaskHandle = NULL;
 
 timerMinim DotTimer(91);
 timerMinim mooveNixie(100);
@@ -175,7 +181,6 @@ timerMinim SensorSelectTimer(3000);
 timerMinim NtpSyncTimer(3600000);
 timerMinim OwmUpdateTimer(300000);
 timerMinim CoinUpdateTimer(600000);
-timerMinim vemlRead(2000);
 timerMinim buzzerTimer(150);
 timerMinim alarmTimer(100);
 
@@ -608,6 +613,7 @@ volatile AlarmState alarm_state = ALARM_IDLE;
 uint16_t alarm_note_idx = 0;
 volatile unsigned long alarm_start_ms = 0;
 volatile unsigned long alarm_note_start_ms = 0;
+volatile unsigned long loop2_heartbeat_ms = 0;
 
 // Определение NTP-клиента для получения времени
 WiFiUDP ntpUDP;
@@ -711,7 +717,7 @@ buzzer_state = IDLE;
 
 uint16_t vemllux;
 uint8_t prev_brigh_value=255;
-bool offtime_active = false;
+volatile bool offtime_active = false;
 
 static inline bool time_in_range(byte h, byte m, byte sh, byte sm, byte eh, byte em) {
   int now = h * 60 + m;

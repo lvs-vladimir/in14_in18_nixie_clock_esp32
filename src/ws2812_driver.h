@@ -107,6 +107,7 @@ static uint8_t gBrightness = 255;
 static inline void ws2812_set_brightness(uint8_t b) { gBrightness = b; }
 
 static inline void ws2812_show(CRGB *leds, int count, int pin) {
+  if (count > 6) count = 6;
   if (!rmt_inited) {
     rmt_config_t cfg;
     memset(&cfg, 0, sizeof(cfg));
@@ -145,8 +146,10 @@ static inline void ws2812_show(CRGB *leds, int count, int pin) {
       idx++;
     }
   }
-  rmt_write_items(rmt_ch, buf, idx, true);
-  delayMicroseconds(300);
+  if (rmt_write_items(rmt_ch, buf, idx, false) == ESP_OK) {
+    rmt_wait_tx_done(rmt_ch, pdMS_TO_TICKS(5));
+  }
+  delayMicroseconds(80);
 }
 
 #endif

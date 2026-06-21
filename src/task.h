@@ -10,8 +10,45 @@ static byte fire_heat[LEDS_COUNT];
 static int ball_pos[3];
 static int ball_speed[3];
 static byte ball_init = 0;
-static byte ws2812_random_counter = 0;
+static uint32_t ws2812_last_random_tick = 0;
 static byte ws2812_rand_anim = 1;
+static byte buzzer_note_idx = 0;
+#define BUZZER_MELODY_COUNT 6
+static const MelodyNote buzzer_double[] = {
+  {2500, 60}, {0, 20}, {2500, 70}, {0, 0}
+};
+static const MelodyNote buzzer_triple[] = {
+  {2200, 45}, {0, 10}, {2800, 45}, {0, 10}, {2200, 40}, {0, 0}
+};
+static const MelodyNote buzzer_up[] = {
+  {1800, 45}, {0, 10}, {2400, 45}, {0, 10}, {3200, 40}, {0, 0}
+};
+static const MelodyNote buzzer_down[] = {
+  {3200, 45}, {0, 10}, {2400, 45}, {0, 10}, {1800, 40}, {0, 0}
+};
+static const MelodyNote buzzer_siren[] = {
+  {1800, 35}, {2400, 35}, {3000, 35}, {2400, 20}, {1800, 25}, {0, 0}
+};
+static const MelodyNote buzzer_short[] = {
+  {3000, 150}, {0, 0}
+};
+static const MelodyNote* const buzzer_melodies[BUZZER_MELODY_COUNT] = {
+  buzzer_double,
+  buzzer_triple,
+  buzzer_up,
+  buzzer_down,
+  buzzer_siren,
+  buzzer_short
+};
+
+uint16_t buzzerScaledDuration(uint16_t dur) {
+  uint16_t total = mydata.buzzer_duration;
+  if (total < 50) total = 50;
+  uint32_t scaled = ((uint32_t)dur * total) / 150UL;
+  if (scaled < 10) scaled = 10;
+  if (scaled > 2000) scaled = 2000;
+  return (uint16_t)scaled;
+}
 
 void ws2812_effect() {
   bool ws2812_enable = mydata.ws2812_enable;
@@ -64,16 +101,16 @@ void ws2812_effect() {
     if (display == 0) interval = max((byte)1, autoshow_min);
     else interval = max((byte)1, autoshow_select_sec[display]);
     static byte prev_display = 0;
+    uint32_t ticks = ws2812_hw_ticks;
     if (display != prev_display) {
-      ws2812_random_counter = 0;
+      ws2812_last_random_tick = ticks;
       byte next;
       do { next = random(1, 20); } while (next == ws2812_rand_anim);
       ws2812_rand_anim = next;
       prev_display = display;
     }
-    ws2812_random_counter++;
-    if (ws2812_random_counter >= interval * 33) {
-      ws2812_random_counter = 0;
+    if (ticks - ws2812_last_random_tick >= (uint32_t)interval * 33UL) {
+      ws2812_last_random_tick = ticks;
       byte next;
       do { next = random(1, 20); } while (next == ws2812_rand_anim);
       ws2812_rand_anim = next;
@@ -269,28 +306,34 @@ case 19: // Snow sparkle - falling snow
   }
   ws2812_show(leds, LEDS_COUNT, LEDS_PIN);
 }
+void ws2812Task(void* pvParameters) {
+  while (1) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    ws2812_timer_flag = false;
+    if (offtime_active) {
+      ws2812_set_brightness(0);
+      fill_solid(leds, LEDS_COUNT, CRGB::Black);
+      ws2812_show(leds, LEDS_COUNT, LEDS_PIN);
+    } else {
+      ws2812_effect();
+    }
+  }
+}
+
 void loop2 (void* pvParameters) {
   while (1) {
+    loop2_heartbeat_ms = millis();
     if (offtime_active) {
       ledcWrite(PWM_CHANNEL, 0);
-      if (ws2812_timer_flag) {
-        ws2812_timer_flag = false;
-        ws2812_set_brightness(0);
-        fill_solid(leds, LEDS_COUNT, CRGB::Black);
-        ws2812_show(leds, LEDS_COUNT, LEDS_PIN);
-      }
     } else {
-     if (mydata.veml_enable && veml_ok && vemlRead.isReady()) {
+     if (alarm_state != ALARM_PLAYING && mydata.veml_enable && veml_ok && veml_timer_flag) {
+      veml_timer_flag = false;
       float lux = veml.readLux();
         vemllux = lux;
         uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
         prev_brigh_value = bright_value;
         ledcWrite(PWM_CHANNEL, bright_value);
       }
-    if (ws2812_timer_flag) {
-      ws2812_timer_flag = false;
-      ws2812_effect();
-    }
     }
 
   if (alarm_state == ALARM_PLAYING) {
@@ -371,16 +414,38 @@ void loop2 (void* pvParameters) {
       buzzer_state = IDLE;
     }
     if (mydata.buzzer_enable && buzzer_state == IDLE && minute % mydata.buzzer_interval == 0 && second == 0) {
-      ledcWriteTone(BUZZER_CHANNEL, BUZZER_FREQ);
-      ledcWrite(BUZZER_CHANNEL, 128);
+      buzzer_note_idx = 0;
+      byte idx = mydata.buzzer_melody_idx;
+      if (idx >= BUZZER_MELODY_COUNT) idx = 0;
+      const MelodyNote* melody = buzzer_melodies[idx];
+      MelodyNote n = melody[buzzer_note_idx];
+      ledcWriteTone(BUZZER_CHANNEL, n.freq);
+      ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.buzzer_volume * 255UL) / 100UL);
       buzzer_state = ACTIVE;
-      buzzerTimer.setInterval(mydata.buzzer_duration);
+      buzzerTimer.setInterval(buzzerScaledDuration(n.dur));
       buzzerTimer.reset();
     }
     if (buzzer_state == ACTIVE && buzzerTimer.isReady()) {
-      ledcWriteTone(BUZZER_CHANNEL, 0);
-      ledcWrite(BUZZER_CHANNEL, 0);
-      buzzer_state = COOLDOWN;
+      buzzer_note_idx++;
+      byte idx = mydata.buzzer_melody_idx;
+      if (idx >= BUZZER_MELODY_COUNT) idx = 0;
+      const MelodyNote* melody = buzzer_melodies[idx];
+      MelodyNote n = melody[buzzer_note_idx];
+      if (n.freq == 0 && n.dur == 0) {
+        ledcWriteTone(BUZZER_CHANNEL, 0);
+        ledcWrite(BUZZER_CHANNEL, 0);
+        buzzer_state = COOLDOWN;
+      } else {
+        if (n.freq > 0) {
+          ledcWriteTone(BUZZER_CHANNEL, n.freq);
+          ledcWrite(BUZZER_CHANNEL, ((uint16_t)mydata.buzzer_volume * 255UL) / 100UL);
+        } else {
+          ledcWriteTone(BUZZER_CHANNEL, 0);
+          ledcWrite(BUZZER_CHANNEL, 0);
+        }
+        buzzerTimer.setInterval(buzzerScaledDuration(n.dur));
+        buzzerTimer.reset();
+      }
     }
     if (buzzer_state == COOLDOWN && second > 0) {
       buzzer_state = IDLE;

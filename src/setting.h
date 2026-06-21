@@ -170,6 +170,17 @@ void IRAM_ATTR second_timer()
 void IRAM_ATTR ws2812_timer_isr()
 {
   ws2812_timer_flag = true;
+  ws2812_hw_ticks++;
+  if (ws2812TaskHandle != NULL) {
+    BaseType_t higherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(ws2812TaskHandle, &higherPriorityTaskWoken);
+    if (higherPriorityTaskWoken) portYIELD_FROM_ISR();
+  }
+}
+
+void IRAM_ATTR veml_timer_isr()
+{
+  veml_timer_flag = true;
 }
 
 void init_timers(){
@@ -188,6 +199,11 @@ void init_timers(){
   timerAttachInterrupt(ws2812Timer, &ws2812_timer_isr, true);
   timerAlarmWrite(ws2812Timer, 30000, true);
   timerAlarmEnable(ws2812Timer);
+
+  vemlTimer = timerBegin(3, 80, true);
+  timerAttachInterrupt(vemlTimer, &veml_timer_isr, true);
+  timerAlarmWrite(vemlTimer, 2000000, true);
+  timerAlarmEnable(vemlTimer);
 }
 
 void UpdateDisplay()

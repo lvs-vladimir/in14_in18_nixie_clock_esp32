@@ -213,9 +213,13 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     GP.HR();
     M_BOX(GP_LEFT, GP.LABEL(BUZZER_ENABLE[mydata.lng]); M_BOX(GP_RIGHT, GP.SWITCH("buzzer_enable", mydata.buzzer_enable, GP_BLUE);););
     GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(BUZZER_MELODY[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("buzzer_melody", BUZZER_MELODY_OPTIONS[mydata.lng], mydata.buzzer_melody_idx, 0, 0, 1);););
+    GP.BREAK();
     M_BOX(GP_LEFT, GP.LABEL(BUZZER_INTERVAL[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("buzzer_interval", mydata.buzzer_interval, 1, 60, 1, 0, GP_BLUE, "50px", 0);););
     GP.BREAK();
     M_BOX(GP_LEFT, GP.LABEL(BUZZER_DURATION[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("buzzer_duration", mydata.buzzer_duration, 50, 2000, 50, 0, GP_BLUE, "60px", 0);););
+    GP.BREAK();
+    M_BOX(GP_LEFT, GP.LABEL(BUZZER_VOLUME[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("buzzer_volume", mydata.buzzer_volume, 5, 100, 5, 0, GP_BLUE, "50px", 0);););
     GP.BREAK();
     GP.BLOCK_END();
 
@@ -503,8 +507,10 @@ void action(GyverPortal& ui) {
   if (ui.clickInt("reboot_hour", mydata.reboot_hour));
   if (ui.clickInt("reboot_min", mydata.reboot_minute));
   if (ui.clickInt("buzzer_enable", mydata.buzzer_enable));
+  if (ui.click("buzzer_melody")) mydata.buzzer_melody_idx = ui.getInt("buzzer_melody");
   if (ui.clickInt("buzzer_interval", mydata.buzzer_interval));
   if (ui.clickInt("buzzer_duration", mydata.buzzer_duration));
+  if (ui.clickInt("buzzer_volume", mydata.buzzer_volume));
     fd.updateNow();
   }
   if (ui.update()) {

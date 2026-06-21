@@ -87,8 +87,8 @@ void prepareDisplayTarget(byte targetDisplay)
     ui.tick();
     fd.tick();
 
+    unsigned long now_ms = millis();
     if (alarm_state == ALARM_PLAYING) {
-      unsigned long now_ms = millis();
       if (now_ms - alarm_note_start_ms > 5000UL
           || (mydata.alarm_duration > 0
               && now_ms - alarm_start_ms >= (unsigned long)mydata.alarm_duration * 1000UL)) {
@@ -96,6 +96,11 @@ void prepareDisplayTarget(byte targetDisplay)
         ledcWrite(BUZZER_CHANNEL, 0);
         alarm_state = ALARM_DONE;
       }
+    }
+    if (loop2_heartbeat_ms > 0 && now_ms - loop2_heartbeat_ms > 10000UL) {
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+      ledcWrite(BUZZER_CHANNEL, 0);
+      if (alarm_state == ALARM_PLAYING) alarm_state = ALARM_DONE;
     }
 
     offtime_active = mydata.offtime_enable && time_in_range(hour, minute, mydata.offtime_start_h, mydata.offtime_start_m, mydata.offtime_end_h, mydata.offtime_end_m);

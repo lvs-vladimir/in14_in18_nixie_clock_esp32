@@ -77,6 +77,9 @@ memset(log_entries, 0, sizeof(log_entries));
   if (mydata.nrd_sens_count == 0 || mydata.nrd_sens_count > 5) mydata.nrd_sens_count = 3;
   if (mydata.buzzer_interval == 0) mydata.buzzer_interval = 1;
   if (mydata.buzzer_duration == 0 || mydata.buzzer_duration > 2000) mydata.buzzer_duration = 150;
+  if (mydata.buzzer_volume == 0) mydata.buzzer_volume = 100;
+  if (mydata.buzzer_volume > 100) mydata.buzzer_volume = 100;
+  if (mydata.buzzer_melody_idx >= BUZZER_MELODY_COUNT) mydata.buzzer_melody_idx = 0;
   if (!mydata.alarm_enable && mydata.alarm_hour == 0 && mydata.alarm_minute == 0) {
     mydata.alarm_hour = 8;
     mydata.alarm_volume = 100;
@@ -207,6 +210,15 @@ memset(log_entries, 0, sizeof(log_entries));
 
 
 
+  xTaskCreatePinnedToCore (
+    ws2812Task,
+    "ws2812",
+    4096,
+    NULL,
+    2,
+    &ws2812TaskHandle,
+    0
+  );
   xTaskCreatePinnedToCore (
     loop2,
     "loop2",
