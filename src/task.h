@@ -320,20 +320,25 @@ void ws2812Task(void* pvParameters) {
   }
 }
 
+void vemlTask(void* pvParameters) {
+  while (1) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    veml_timer_flag = false;
+    if (!mydata.veml_enable || !veml_ok || offtime_active) continue;
+    float lux = veml.readLux();
+    if (!isfinite(lux)) continue;
+    vemllux = lux;
+    uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
+    prev_brigh_value = bright_value;
+    ledcWrite(PWM_CHANNEL, bright_value);
+  }
+}
+
 void loop2 (void* pvParameters) {
   while (1) {
     loop2_heartbeat_ms = millis();
     if (offtime_active) {
       ledcWrite(PWM_CHANNEL, 0);
-    } else {
-     if (alarm_state != ALARM_PLAYING && mydata.veml_enable && veml_ok && veml_timer_flag) {
-      veml_timer_flag = false;
-      float lux = veml.readLux();
-        vemllux = lux;
-        uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
-        prev_brigh_value = bright_value;
-        ledcWrite(PWM_CHANNEL, bright_value);
-      }
     }
 
   if (alarm_state == ALARM_PLAYING) {

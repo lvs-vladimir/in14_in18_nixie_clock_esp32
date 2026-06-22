@@ -1,5 +1,19 @@
 #include <lang.h>
 
+byte buzzerIntervalToIdx(byte interval) {
+  if (interval == 10) return 1;
+  if (interval == 30) return 2;
+  if (interval == 60) return 3;
+  return 0;
+}
+
+byte buzzerIdxToInterval(byte idx) {
+  if (idx == 1) return 10;
+  if (idx == 2) return 30;
+  if (idx == 3) return 60;
+  return 5;
+}
+
 void build() {
   GP.BUILD_BEGIN(500);
   GP.THEME(GP_DARK);
@@ -215,7 +229,7 @@ M_BOX(GP_CENTER, GP.LABEL(F("<a href=\"https://openweathermap.org\" target=\"_bl
     GP.BREAK();
     M_BOX(GP_LEFT, GP.LABEL(BUZZER_MELODY[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("buzzer_melody", BUZZER_MELODY_OPTIONS[mydata.lng], mydata.buzzer_melody_idx, 0, 0, 1);););
     GP.BREAK();
-    M_BOX(GP_LEFT, GP.LABEL(BUZZER_INTERVAL[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("buzzer_interval", mydata.buzzer_interval, 1, 60, 1, 0, GP_BLUE, "50px", 0);););
+    M_BOX(GP_LEFT, GP.LABEL(BUZZER_INTERVAL[mydata.lng]); M_BOX(GP_RIGHT, GP.SELECT("buzzer_interval", BUZZER_INTERVAL_OPTIONS[mydata.lng], buzzerIntervalToIdx(mydata.buzzer_interval), 0, 0, 1);););
     GP.BREAK();
     M_BOX(GP_LEFT, GP.LABEL(BUZZER_DURATION[mydata.lng]); M_BOX(GP_RIGHT, GP.SPINNER("buzzer_duration", mydata.buzzer_duration, 50, 2000, 50, 0, GP_BLUE, "60px", 0);););
     GP.BREAK();
@@ -508,7 +522,7 @@ void action(GyverPortal& ui) {
   if (ui.clickInt("reboot_min", mydata.reboot_minute));
   if (ui.clickInt("buzzer_enable", mydata.buzzer_enable));
   if (ui.click("buzzer_melody")) mydata.buzzer_melody_idx = ui.getInt("buzzer_melody");
-  if (ui.clickInt("buzzer_interval", mydata.buzzer_interval));
+  if (ui.click("buzzer_interval")) mydata.buzzer_interval = buzzerIdxToInterval(ui.getInt("buzzer_interval"));
   if (ui.clickInt("buzzer_duration", mydata.buzzer_duration));
   if (ui.clickInt("buzzer_volume", mydata.buzzer_volume));
     fd.updateNow();

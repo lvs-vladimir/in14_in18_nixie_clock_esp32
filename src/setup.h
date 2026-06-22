@@ -75,7 +75,7 @@ memset(log_entries, 0, sizeof(log_entries));
   if (!mydata.autoshow_switch) mydata.autoshow_switch = true;
   if (mydata.offtime_end_h == 0 && mydata.offtime_end_m == 0) mydata.offtime_end_h = 8;
   if (mydata.nrd_sens_count == 0 || mydata.nrd_sens_count > 5) mydata.nrd_sens_count = 3;
-  if (mydata.buzzer_interval == 0) mydata.buzzer_interval = 1;
+  if (mydata.buzzer_interval != 5 && mydata.buzzer_interval != 10 && mydata.buzzer_interval != 30 && mydata.buzzer_interval != 60) mydata.buzzer_interval = 5;
   if (mydata.buzzer_duration == 0 || mydata.buzzer_duration > 2000) mydata.buzzer_duration = 150;
   if (mydata.buzzer_volume == 0) mydata.buzzer_volume = 100;
   if (mydata.buzzer_volume > 100) mydata.buzzer_volume = 100;
@@ -218,6 +218,15 @@ memset(log_entries, 0, sizeof(log_entries));
     2,
     &ws2812TaskHandle,
     0
+  );
+  xTaskCreatePinnedToCore (
+    vemlTask,
+    "veml",
+    4096,
+    NULL,
+    0,
+    &vemlTaskHandle,
+    1
   );
   xTaskCreatePinnedToCore (
     loop2,

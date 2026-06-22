@@ -181,6 +181,11 @@ void IRAM_ATTR ws2812_timer_isr()
 void IRAM_ATTR veml_timer_isr()
 {
   veml_timer_flag = true;
+  if (vemlTaskHandle != NULL) {
+    BaseType_t higherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(vemlTaskHandle, &higherPriorityTaskWoken);
+    if (higherPriorityTaskWoken) portYIELD_FROM_ISR();
+  }
 }
 
 void init_timers(){

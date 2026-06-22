@@ -172,6 +172,7 @@ volatile bool ws2812_timer_flag = false;
 volatile bool veml_timer_flag = false;
 volatile uint32_t ws2812_hw_ticks = 0;
 TaskHandle_t ws2812TaskHandle = NULL;
+TaskHandle_t vemlTaskHandle = NULL;
 
 timerMinim DotTimer(91);
 timerMinim mooveNixie(100);

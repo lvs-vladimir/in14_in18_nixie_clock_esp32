@@ -104,6 +104,9 @@ void prepareDisplayTarget(byte targetDisplay)
     }
 
     offtime_active = mydata.offtime_enable && time_in_range(hour, minute, mydata.offtime_start_h, mydata.offtime_start_m, mydata.offtime_end_h, mydata.offtime_end_m);
+    if (offtime_active) {
+      ledcWrite(PWM_CHANNEL, 0);
+    }
 
   if (mydata.reboot_enable && hour == mydata.reboot_hour && minute == mydata.reboot_minute && second == 0) {
     log_add('I', "Scheduled reboot");
