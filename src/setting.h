@@ -207,7 +207,7 @@ void init_timers(){
 
   vemlTimer = timerBegin(3, 80, true);
   timerAttachInterrupt(vemlTimer, &veml_timer_isr, true);
-  timerAlarmWrite(vemlTimer, 2000000, true);
+  timerAlarmWrite(vemlTimer, 10000000, true);
   timerAlarmEnable(vemlTimer);
 }
 

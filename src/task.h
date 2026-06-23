@@ -334,6 +334,26 @@ void vemlTask(void* pvParameters) {
   }
 }
 
+void networkTask(void* pvParameters) {
+  while (1) {
+    if (alarm_state != ALARM_PLAYING && buzzer_state != ACTIVE) {
+      if (OwmUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) {
+        log_add('I', "OWM update");
+        getTemp2(0);
+      }
+
+      if (strlen(mydata.NarodmoonApi) > 0 && strlen(mydata.NarodmoonID) > 0) {
+        narodmonUpdate();
+      }
+
+      if (CoinUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED) {
+        updateCryptoRates();
+      }
+    }
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  }
+}
+
 void loop2 (void* pvParameters) {
   while (1) {
     loop2_heartbeat_ms = millis();
@@ -454,21 +474,6 @@ void loop2 (void* pvParameters) {
     }
     if (buzzer_state == COOLDOWN && second > 0) {
       buzzer_state = IDLE;
-    }
-  }
-
-  if (alarm_state != ALARM_PLAYING && buzzer_state != ACTIVE) {
-    if (OwmUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED && strlen(mydata.owMapApiKey) > 0 && strlen(mydata.owCity) > 0) {
-      log_add('I', "OWM update");
-      getTemp2(0);
-    }
-
-    if (strlen(mydata.NarodmoonApi) > 0 && strlen(mydata.NarodmoonID) > 0) {
-      narodmonUpdate();
-    }
-
-    if (CoinUpdateTimer.isReady() && WiFi.status() == WL_CONNECTED) {
-      updateCryptoRates();
     }
   }
 

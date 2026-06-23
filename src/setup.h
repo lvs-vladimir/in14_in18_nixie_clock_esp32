@@ -229,6 +229,15 @@ memset(log_entries, 0, sizeof(log_entries));
     1
   );
   xTaskCreatePinnedToCore (
+    networkTask,
+    "network",
+    8192,
+    NULL,
+    0,
+    NULL,
+    0
+  );
+  xTaskCreatePinnedToCore (
     loop2,
     "loop2",
     8192,
