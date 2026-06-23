@@ -13,6 +13,8 @@ static byte ball_init = 0;
 static uint32_t ws2812_last_random_tick = 0;
 static byte ws2812_rand_anim = 1;
 static byte buzzer_note_idx = 0;
+static byte buzzer_last_hour = 255;
+static byte buzzer_last_minute = 255;
 #define BUZZER_MELODY_COUNT 6
 static const MelodyNote buzzer_double[] = {
   {2500, 60}, {0, 20}, {2500, 70}, {0, 0}
@@ -438,7 +440,12 @@ void loop2 (void* pvParameters) {
       ledcWrite(BUZZER_CHANNEL, 0);
       buzzer_state = IDLE;
     }
-    if (mydata.buzzer_enable && buzzer_state == IDLE && minute % mydata.buzzer_interval == 0 && second == 0) {
+    byte buzzer_interval = mydata.buzzer_interval;
+    if (buzzer_interval != 5 && buzzer_interval != 10 && buzzer_interval != 30 && buzzer_interval != 60) buzzer_interval = 5;
+    if (mydata.buzzer_enable && buzzer_state == IDLE && minute % buzzer_interval == 0 && second < 3
+        && (hour != buzzer_last_hour || minute != buzzer_last_minute)) {
+      buzzer_last_hour = hour;
+      buzzer_last_minute = minute;
       buzzer_note_idx = 0;
       byte idx = mydata.buzzer_melody_idx;
       if (idx >= BUZZER_MELODY_COUNT) idx = 0;
