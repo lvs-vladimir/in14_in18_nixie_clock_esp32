@@ -6,31 +6,29 @@ int getSlotValue(byte slotIdx)
     return 0;
   }
 
-  byte sensorIdx;
-  if (dropdownIdx <= 7) sensorIdx = dropdownIdx + 3;
-  else sensorIdx = dropdownIdx - 8;
-  if (sensorIdx > 13) {
-    log_add('W', "GETVAL slot=%d dropdown=%d invalid sensor=%d", slotIdx, dropdownIdx, sensorIdx);
+  if (dropdownIdx >= sizeof(autoshow_value_map)) {
+    log_add('W', "GETVAL slot=%d dropdown=%d invalid", slotIdx, dropdownIdx);
     return 0;
   }
 
+  byte source = autoshow_value_map[dropdownIdx];
   int value = 0;
-  switch (sensorIdx) {
-    case 0: value = nrd_values[0]; break;
-    case 1: value = nrd_values[1]; break;
-    case 2: value = nrd_values[2]; break;
-    case 3: value = nrd_values[3]; break;
-    case 4: value = (int)optemperature; break;
-    case 5: value = (int)oppressure; break;
-    case 6: value = (int)ophumidity; break;
-    case 7: value = (int)pricebtc; break;
-    case 8: value = (int)priceeth; break;
-    case 9: value = (int)usdRubRate; break;
-    case 10: value = dayOfMonth * 10000 + (month + 1) * 100 + year; break;
-    default: value = 0; break;
+  if (source >= AUTOSHOW_SRC_NRD_BASE && source < AUTOSHOW_SRC_NRD_BASE + 5) {
+    value = nrd_values[source - AUTOSHOW_SRC_NRD_BASE];
+  } else {
+    switch (source) {
+      case AUTOSHOW_SRC_OWM_TEMP: value = (int)optemperature; break;
+      case AUTOSHOW_SRC_OWM_PRESS: value = (int)oppressure; break;
+      case AUTOSHOW_SRC_OWM_HUM: value = (int)ophumidity; break;
+      case AUTOSHOW_SRC_BTC: value = (int)pricebtc; break;
+      case AUTOSHOW_SRC_ETH: value = (int)priceeth; break;
+      case AUTOSHOW_SRC_USD_RUB: value = (int)usdRubRate; break;
+      case AUTOSHOW_SRC_DATE: value = dayOfMonth * 10000 + (month + 1) * 100 + year; break;
+      default: value = 0; break;
+    }
   }
 
-  log_add('D', "GETVAL slot=%d dropdown=%d sensor=%d value=%d", slotIdx, dropdownIdx, sensorIdx, value);
+  log_add('D', "GETVAL slot=%d dropdown=%d source=%d value=%d", slotIdx, dropdownIdx, source, value);
   return value;
 }
 
@@ -184,7 +182,8 @@ void prepareDisplayTarget(byte targetDisplay)
   lamp_plus_hv32 = false;
   if (!mydata.ap_mode && display > 0 && off_effects == 0 && on_effects == 0) {
     byte sel = mydata.autoshow_select[display];
-    if (sel == 1) {
+    byte source = sel < sizeof(autoshow_value_map) ? autoshow_value_map[sel] : AUTOSHOW_SRC_NONE;
+    if (source == AUTOSHOW_SRC_OWM_TEMP) {
       lamp_celsius_hv31 = true;
       if (sensorDisplayValue >= 0) {
         lamp_plus_hv32 = true;
@@ -192,9 +191,9 @@ void prepareDisplayTarget(byte targetDisplay)
         lamp_dot_hv31 = true;
       }
     }
-    else if (sel == 3) lamp_percent_hv32 = true;
-    else if (sel >= 8 && sel - 8 < mydata.nrd_sens_count) {
-      String s = SensorsDisplay[sel - 8];
+    else if (source == AUTOSHOW_SRC_OWM_HUM) lamp_percent_hv32 = true;
+    else if (source >= AUTOSHOW_SRC_NRD_BASE && source < AUTOSHOW_SRC_NRD_BASE + mydata.nrd_sens_count) {
+      String s = SensorsDisplay[source - AUTOSHOW_SRC_NRD_BASE];
       if (s.endsWith("*")) {
         lamp_celsius_hv31 = true;
         if (sensorDisplayValue >= 0) lamp_plus_hv32 = true;

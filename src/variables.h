@@ -80,6 +80,9 @@ struct Data {
   byte reboot_minute;
   byte buzzer_volume;
   byte buzzer_melody_idx;
+  int ws2812_lux_min_extra[2];
+  int ws2812_lux_max_extra[2];
+  byte ws2812_bright_val_extra[2];
 };
 Data mydata;
 FileData fd(&LittleFS, "/setting.dat", 'B', &mydata, sizeof(mydata));
@@ -160,6 +163,7 @@ void log_add(char level, const char* fmt, ...) {
 CRGB leds[LEDS_COUNT];
 Adafruit_VEML7700 veml = Adafruit_VEML7700();
 bool veml_ok = false;
+bool veml_initialized = false;
 
 SPIClass *vspi = NULL;
 SPIClass *hspi = NULL;
@@ -733,6 +737,16 @@ unsigned long previousMillis;
 String SensorsAutoShow[20];
 String SensorsDisplay[20];
 String SensorsAutoShowSelect2;
+#define AUTOSHOW_SRC_NONE 255
+#define AUTOSHOW_SRC_OWM_TEMP 4
+#define AUTOSHOW_SRC_OWM_PRESS 5
+#define AUTOSHOW_SRC_OWM_HUM 6
+#define AUTOSHOW_SRC_BTC 7
+#define AUTOSHOW_SRC_ETH 8
+#define AUTOSHOW_SRC_USD_RUB 9
+#define AUTOSHOW_SRC_DATE 10
+#define AUTOSHOW_SRC_NRD_BASE 20
+byte autoshow_value_map[16];
 String WiFI_List;
 char textbuffer[7] = "";
 char buffer[7] = "";

@@ -154,6 +154,39 @@ uint8_t brigh_value_indi(uint16_t veml_value, int lux_min[], int lux_max[], uint
   }
   return prev_brigh_value;
 }
+
+bool vemlInit(bool log_result) {
+  Wire.setTimeOut(50);
+  Wire.beginTransmission(VEML7700_I2CADDR_DEFAULT);
+  if (Wire.endTransmission() != 0) {
+    veml_ok = false;
+    if (log_result) log_add('W', "VEML7700 not found, lux disabled");
+    return false;
+  }
+  if (!veml_initialized) {
+    veml_ok = veml.begin();
+    veml_initialized = veml_ok;
+  } else {
+    veml_ok = true;
+  }
+  if (veml_ok) {
+    veml.setLowThreshold(10000);
+    veml.setHighThreshold(20000);
+    veml.interruptEnable(true);
+    if (log_result) log_add('I', "VEML7700 init OK");
+  } else if (log_result) {
+    log_add('W', "VEML7700 not found, lux disabled");
+  }
+  return veml_ok;
+}
+
+bool vemlRecover(bool log_result) {
+  Wire.end();
+  delay(10);
+  Wire.begin();
+  delay(10);
+  return vemlInit(log_result);
+}
 /*
 void IRAM_ATTR brightness_timer()
 {

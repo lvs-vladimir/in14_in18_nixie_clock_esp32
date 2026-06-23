@@ -57,11 +57,13 @@ void ws2812_effect() {
   bool ap_mode = mydata.ap_mode;
   uint8_t ws2812_brightness = mydata.ws2812_brightness;
   bool veml_enable = mydata.veml_enable;
-  uint8_t ws2812_bright_val[4];
-  memcpy(ws2812_bright_val, mydata.ws2812_bright_val, sizeof(ws2812_bright_val));
+  uint8_t ws2812_bright_val[6];
+  memcpy(ws2812_bright_val, mydata.ws2812_bright_val, sizeof(mydata.ws2812_bright_val));
+  memcpy(ws2812_bright_val + 4, mydata.ws2812_bright_val_extra, sizeof(mydata.ws2812_bright_val_extra));
   uint8_t ws2812_br_ranges = mydata.ws2812_br_ranges;
-  int ws2812_lux_min[4];
-  memcpy(ws2812_lux_min, mydata.ws2812_lux_min, sizeof(ws2812_lux_min));
+  int ws2812_lux_min[6];
+  memcpy(ws2812_lux_min, mydata.ws2812_lux_min, sizeof(mydata.ws2812_lux_min));
+  memcpy(ws2812_lux_min + 4, mydata.ws2812_lux_min_extra, sizeof(mydata.ws2812_lux_min_extra));
   uint8_t ws2812_anim = mydata.ws2812_anim;
   uint8_t anim_by_mode = mydata.anim_by_mode;
   uint8_t anim_time_mode = mydata.anim_time_mode;
@@ -84,7 +86,7 @@ void ws2812_effect() {
   if (veml_enable) {
     byte found = ws2812_bright_val[0];
     byte num = ws2812_br_ranges;
-    for (int i = 0; i < 4 && i < num; i++) {
+    for (int i = 0; i < 6 && i < num; i++) {
       if ((int)vemllux >= ws2812_lux_min[i]) {
         found = ws2812_bright_val[i];
       }
@@ -323,13 +325,43 @@ void ws2812Task(void* pvParameters) {
 }
 
 void vemlTask(void* pvParameters) {
+  static byte veml_retry_count = 0;
+  static byte veml_bad_count = 0;
   while (1) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     veml_timer_flag = false;
-    if (!mydata.veml_enable || !veml_ok || offtime_active) continue;
-    float lux = veml.readLux();
-    if (!isfinite(lux)) continue;
-    vemllux = lux;
+    if (!mydata.veml_enable || offtime_active) continue;
+    if (!veml_ok) {
+      veml_retry_count++;
+      if (veml_retry_count >= 6) {
+        veml_retry_count = 0;
+        vemlRecover(true);
+      }
+      continue;
+    }
+    Wire.beginTransmission(VEML7700_I2CADDR_DEFAULT);
+    byte i2c_err = Wire.endTransmission();
+    if (i2c_err != 0) {
+      veml_ok = false;
+      veml_bad_count = 0;
+      log_add('W', "VEML7700 I2C err=%d", i2c_err);
+      vemlRecover(true);
+      continue;
+    }
+    float lux = veml.readLux(VEML_LUX_NORMAL_NOWAIT);
+    if (!isfinite(lux) || lux < 0 || lux > 150000) {
+      veml_bad_count++;
+      if (veml_bad_count >= 3) {
+        veml_ok = false;
+        veml_bad_count = 0;
+        log_add('W', "VEML7700 bad lux");
+        vemlRecover(true);
+      }
+      continue;
+    }
+    veml_bad_count = 0;
+    if (lux > 65535) lux = 65535;
+    vemllux = (uint16_t)lux;
     uint8_t bright_value = brigh_value_indi(vemllux, mydata.nixie_lux_min, mydata.nixie_lux_max, mydata.nixie_bright_val, prev_brigh_value);
     prev_brigh_value = bright_value;
     ledcWrite(PWM_CHANNEL, bright_value);

@@ -137,12 +137,20 @@ memset(log_entries, 0, sizeof(log_entries));
   if (mydata.ws2812_brightness == 0) mydata.ws2812_brightness = 100;
   if (mydata.ws2812_random_sec == 0) mydata.ws2812_random_sec = 10;
   if (mydata.ws2812_br_ranges == 0) {
-    mydata.ws2812_br_ranges = 4;
-    mydata.ws2812_lux_min[0] = 0; mydata.ws2812_lux_max[0] = 15; mydata.ws2812_bright_val[0] = 10;
-    mydata.ws2812_lux_min[1] = 20; mydata.ws2812_lux_max[1] = 200; mydata.ws2812_bright_val[1] = 60;
-    mydata.ws2812_lux_min[2] = 300; mydata.ws2812_lux_max[2] = 700; mydata.ws2812_bright_val[2] = 130;
-    mydata.ws2812_lux_min[3] = 1000; mydata.ws2812_lux_max[3] = 15000; mydata.ws2812_bright_val[3] = 200;
+    mydata.ws2812_lux_min[0] = 0; mydata.ws2812_lux_max[0] = 12; mydata.ws2812_bright_val[0] = 10;
+    mydata.ws2812_lux_min[1] = 15; mydata.ws2812_lux_max[1] = 47; mydata.ws2812_bright_val[1] = 30;
+    mydata.ws2812_lux_min[2] = 50; mydata.ws2812_lux_max[2] = 97; mydata.ws2812_bright_val[2] = 60;
+    mydata.ws2812_lux_min[3] = 100; mydata.ws2812_lux_max[3] = 297; mydata.ws2812_bright_val[3] = 100;
+    mydata.ws2812_lux_min_extra[0] = 300; mydata.ws2812_lux_max_extra[0] = 697; mydata.ws2812_bright_val_extra[0] = 150;
+    mydata.ws2812_lux_min_extra[1] = 700; mydata.ws2812_lux_max_extra[1] = 15000; mydata.ws2812_bright_val_extra[1] = 200;
+    mydata.ws2812_br_ranges = 6;
   }
+  if (mydata.ws2812_br_ranges < 6) {
+    mydata.ws2812_lux_min_extra[0] = 700; mydata.ws2812_lux_max_extra[0] = 999; mydata.ws2812_bright_val_extra[0] = 170;
+    mydata.ws2812_lux_min_extra[1] = 1000; mydata.ws2812_lux_max_extra[1] = 15000; mydata.ws2812_bright_val_extra[1] = 200;
+    mydata.ws2812_br_ranges = 6;
+  }
+  if (mydata.ws2812_br_ranges > 6) mydata.ws2812_br_ranges = 6;
   if (mydata.nixie_lux_min[0] == 0 && mydata.nixie_lux_max[0] == 0) {
     mydata.nixie_lux_min[0] = 0; mydata.nixie_lux_max[0] = 12; mydata.nixie_bright_val[0] = 15;
     mydata.nixie_lux_min[1] = 15; mydata.nixie_lux_max[1] = 47; mydata.nixie_bright_val[1] = 40;
@@ -195,15 +203,7 @@ memset(log_entries, 0, sizeof(log_entries));
   CoinUpdateTimer.start();
 
   SwitchDisplayTimer.stop();
-  Wire.setTimeOut(50);
-  veml_ok = veml.begin();
-  if (veml_ok) {
-    veml.setLowThreshold(10000);
-    veml.setHighThreshold(20000);
-    veml.interruptEnable(true);
-  } else {
-    log_add('W', "VEML7700 not found, lux disabled");
-  }
+  vemlInit(true);
 
   //pinMode(BUZZER_PIN, OUTPUT);
   //digitalWrite(BUZZER_PIN, LOW);

@@ -161,17 +161,23 @@ void getTemp2(byte i)
 void rebuildSensorsAutoShowSelect()
 {
   SensorsAutoShowSelect2 = ",";
+  for (byte i = 0; i < sizeof(autoshow_value_map); i++) autoshow_value_map[i] = AUTOSHOW_SRC_NONE;
+  byte optionIdx = 0;
   bool hasItem = false;
+
   for (byte k = 4; k <= 6; k++) {
     String item = SensorsAutoShow[k];
     while (item.startsWith(",")) item.remove(0, 1);
     if (item.length() == 0) continue;
     if (hasItem) SensorsAutoShowSelect2 += ",";
     SensorsAutoShowSelect2 += item;
+    optionIdx++;
+    if (optionIdx < sizeof(autoshow_value_map)) autoshow_value_map[optionIdx] = k;
     hasItem = true;
   }
 
   String extra[4];
+  byte extraSrc[4] = {AUTOSHOW_SRC_BTC, AUTOSHOW_SRC_ETH, AUTOSHOW_SRC_USD_RUB, AUTOSHOW_SRC_DATE};
   extra[0] = String(pricebtc) + "$ BTC";
   extra[1] = String(priceeth) + "$ ETH";
   extra[2] = String(usdRubRate) + " RUB/USD";
@@ -179,6 +185,8 @@ void rebuildSensorsAutoShowSelect()
   for (byte k = 0; k < 4; k++) {
     if (hasItem) SensorsAutoShowSelect2 += ",";
     SensorsAutoShowSelect2 += extra[k];
+    optionIdx++;
+    if (optionIdx < sizeof(autoshow_value_map)) autoshow_value_map[optionIdx] = extraSrc[k];
     hasItem = true;
   }
 
@@ -188,9 +196,14 @@ void rebuildSensorsAutoShowSelect()
     if (item.length() == 0) item = "s" + String(k + 1);
     if (hasItem) SensorsAutoShowSelect2 += ",";
     SensorsAutoShowSelect2 += item;
+    optionIdx++;
+    if (optionIdx < sizeof(autoshow_value_map)) autoshow_value_map[optionIdx] = AUTOSHOW_SRC_NRD_BASE + k;
     hasItem = true;
   }
-  log_add('D', "SELECTLIST len=%d sel1=%d sel2=%d list=%s",
-          SensorsAutoShowSelect2.length(), mydata.autoshow_select[1], mydata.autoshow_select[2],
-          SensorsAutoShowSelect2.c_str());
+  byte sel1 = mydata.autoshow_select[1];
+  byte sel2 = mydata.autoshow_select[2];
+  byte src1 = sel1 < sizeof(autoshow_value_map) ? autoshow_value_map[sel1] : AUTOSHOW_SRC_NONE;
+  byte src2 = sel2 < sizeof(autoshow_value_map) ? autoshow_value_map[sel2] : AUTOSHOW_SRC_NONE;
+  log_add('D', "SELECTLIST len=%d sel1=%d src1=%d sel2=%d src2=%d list=%s",
+          SensorsAutoShowSelect2.length(), sel1, src1, sel2, src2, SensorsAutoShowSelect2.c_str());
 }

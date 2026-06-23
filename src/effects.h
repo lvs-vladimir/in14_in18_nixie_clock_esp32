@@ -152,7 +152,7 @@ void flip_nixiebuffer()
   }
 
   byte dropdownIdx = mydata.autoshow_select[display];
-  byte si = dropdownIdx > 0 ? dropdownIdx + 3 : 0;
+  byte si = dropdownIdx < sizeof(autoshow_value_map) ? autoshow_value_map[dropdownIdx] : AUTOSHOW_SRC_NONE;
   for (byte i = 0; i < 6; i++) NixieBuffer[i] = 10;
 
   long value = sensorDisplayValue;

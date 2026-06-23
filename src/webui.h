@@ -310,6 +310,8 @@ M_BOX(GP_LEFT, GP.LABEL(DISPLAY_SECONDS_SWITCH[mydata.lng]); M_BOX(GP_RIGHT, GP.
     *_GPP += F("<div style='white-space:nowrap'>"); GP.SPINNER("veml_lm1", mydata.ws2812_lux_min[1], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_lx1", mydata.ws2812_lux_max[1], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_bv1", mydata.ws2812_bright_val[1], 0, 255, 1, 0, GP_BLUE, "45px", 0); *_GPP += F("</div>");
     *_GPP += F("<div style='white-space:nowrap'>"); GP.SPINNER("veml_lm2", mydata.ws2812_lux_min[2], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_lx2", mydata.ws2812_lux_max[2], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_bv2", mydata.ws2812_bright_val[2], 0, 255, 1, 0, GP_BLUE, "45px", 0); *_GPP += F("</div>");
     *_GPP += F("<div style='white-space:nowrap'>"); GP.SPINNER("veml_lm3", mydata.ws2812_lux_min[3], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_lx3", mydata.ws2812_lux_max[3], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_bv3", mydata.ws2812_bright_val[3], 0, 255, 1, 0, GP_BLUE, "45px", 0); *_GPP += F("</div>");
+    *_GPP += F("<div style='white-space:nowrap'>"); GP.SPINNER("veml_lm4", mydata.ws2812_lux_min_extra[0], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_lx4", mydata.ws2812_lux_max_extra[0], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_bv4", mydata.ws2812_bright_val_extra[0], 0, 255, 1, 0, GP_BLUE, "45px", 0); *_GPP += F("</div>");
+    *_GPP += F("<div style='white-space:nowrap'>"); GP.SPINNER("veml_lm5", mydata.ws2812_lux_min_extra[1], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_lx5", mydata.ws2812_lux_max_extra[1], 0, 15000, 1, 0, GP_BLUE, "45px", 0); GP.SPINNER("veml_bv5", mydata.ws2812_bright_val_extra[1], 0, 255, 1, 0, GP_BLUE, "45px", 0); *_GPP += F("</div>");
   GP.BLOCK_END();
   GP.BLOCK_THIN_BEGIN();
   M_BOX(GP_CENTER, GP.LABEL(VEML_NIXIE[mydata.lng]););
@@ -455,6 +457,12 @@ void action(GyverPortal& ui) {
     if (ui.clickInt("veml_lm3", mydata.ws2812_lux_min[3]));
     if (ui.clickInt("veml_lx3", mydata.ws2812_lux_max[3]));
     if (ui.clickInt("veml_bv3", mydata.ws2812_bright_val[3]));
+    if (ui.clickInt("veml_lm4", mydata.ws2812_lux_min_extra[0]));
+    if (ui.clickInt("veml_lx4", mydata.ws2812_lux_max_extra[0]));
+    if (ui.clickInt("veml_bv4", mydata.ws2812_bright_val_extra[0]));
+    if (ui.clickInt("veml_lm5", mydata.ws2812_lux_min_extra[1]));
+    if (ui.clickInt("veml_lx5", mydata.ws2812_lux_max_extra[1]));
+    if (ui.clickInt("veml_bv5", mydata.ws2812_bright_val_extra[1]));
   if (ui.clickInt("ntp_sync_enable", mydata.ntp_sync_enable));
   if (ui.clickInt("ntp_sync_interval", mydata.ntp_sync_interval));
 
