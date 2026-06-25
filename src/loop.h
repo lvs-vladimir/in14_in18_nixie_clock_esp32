@@ -266,6 +266,8 @@ void prepareDisplayTarget(byte targetDisplay)
     rebuildSensorsAutoShowSelect();
   }
 
+  WiFiAutoReconnectFromAP();
+
   if (mydata.ntp_sync_enable && NtpSyncTimer.isReady() && WiFi.status() == WL_CONNECTED) {
     log_add('I', "NTP sync");
     NTPClientUpdate();

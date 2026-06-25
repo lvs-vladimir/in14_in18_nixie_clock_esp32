@@ -90,6 +90,49 @@ void WiFiConnect_APcreate()
   }
 }
 
+void WiFiAutoReconnectFromAP()
+{
+  static uint32_t lastTry = 0;
+  static uint32_t tryStarted = 0;
+  static bool trying = false;
+  if (!mydata.ap_mode || mydata.ssid[0] == '\0') return;
+  uint32_t now = millis();
+  if (WiFi.status() == WL_CONNECTED) {
+    String ip = WiFi.localIP().toString();
+    log_add('I', "WiFi connected from AP: %s ip=%s", mydata.ssid, ip.c_str());
+    WiFi.softAPdisconnect(true);
+    WiFi.mode(WIFI_STA);
+    mydata.ap_mode = false;
+    ap_show_scroll = false;
+    trying = false;
+    if (mydata.ntp_sync_enable) NTPClientUpdate();
+    return;
+  }
+  if (trying) {
+    if (now - tryStarted > 15000UL) {
+      char HOSTNAME[30];
+      sprintf_P(HOSTNAME, (PGM_P)F("%S-%llX"), YOUR_HOSTNAME, ESP.getEfuseMac());
+      WiFi.disconnect(false);
+      WiFi.mode(WIFI_AP);
+      WiFi.softAP(HOSTNAME);
+      trying = false;
+      log_add('W', "WiFi retry failed, AP active");
+    }
+    return;
+  }
+  if (now - lastTry < 60000UL) return;
+  lastTry = now;
+  tryStarted = now;
+  trying = true;
+  char HOSTNAME[30];
+  sprintf_P(HOSTNAME, (PGM_P)F("%S-%llX"), YOUR_HOSTNAME, ESP.getEfuseMac());
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.setHostname(HOSTNAME);
+  WiFi.setAutoReconnect(true);
+  WiFi.begin(mydata.ssid, mydata.pass);
+  log_add('I', "WiFi retry from AP: %s", mydata.ssid);
+}
+
 bool forgetWiFi() {
   mydata.ssid[0] = '\0';
   mydata.pass[0] = '\0';
